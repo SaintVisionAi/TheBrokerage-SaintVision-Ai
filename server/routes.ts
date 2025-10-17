@@ -1014,7 +1014,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // STEP 6.6: Send Login Credentials via SMS + EMAIL (NEW!)
       if (tempPassword && contactId) {
-        // SECURITY: Never log credentials, only send them
+        // SECURITY: Build messages but NEVER log them
         const smsMessage = `Welcome to Saint Vision Group! Your portal login:\n\nEmail: ${email}\nPassword: ${tempPassword}\n\nLogin at saintvisiongroup.com/login to track your application!`;
         
         const emailHTML = `
@@ -1032,18 +1032,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (phone) {
           try {
             await sendSMS(phone, smsMessage);
-            console.log(`✅ Step 6.6a: Login credentials sent via SMS`);
+            console.log(`✅ Step 6.6a: Credential SMS sent to client`);
           } catch (smsError) {
-            console.error('⚠️  Credential SMS failed');
+            console.error('⚠️  Credential SMS delivery failed');
           }
         }
         
         // ALWAYS send via Email as backup
         try {
           await sendEmailViaGHL(contactId, 'Your Saint Vision Group Portal Login', emailHTML);
-          console.log(`✅ Step 6.6b: Login credentials sent via EMAIL`);
+          console.log(`✅ Step 6.6b: Credential email sent to client`);
         } catch (emailError) {
-          console.error('⚠️  Credential email failed');
+          console.error('⚠️  Credential email delivery failed');
         }
       }
 
