@@ -26,6 +26,7 @@ import { createSession, deleteSession } from './lib/session';
 import { isAuthenticated, isAdmin } from './middleware/auth';
 import cookieParser from 'cookie-parser';
 import webhooksRouter from './routes/webhooks';
+import OpenAI from 'openai';
 
 // Utility: Parse loan amount string to integer (supports decimals like "$1.5M")
 function parseLoanAmount(amount: string | number): number {
@@ -545,8 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const openai = require('openai');
-      const client = new openai.OpenAI({ 
+      const client = new OpenAI({ 
         apiKey: process.env.OPENAI_API_KEY 
       });
 
@@ -590,8 +590,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const openai = require('openai');
-      const client = new openai.OpenAI({ 
+      const client = new OpenAI({ 
         apiKey: process.env.OPENAI_API_KEY 
       });
 
