@@ -202,7 +202,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.user) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
-    res.json(req.user);
+    
+    // Return in the format the frontend expects
+    res.json({
+      success: true,
+      user: {
+        id: req.user.userId,
+        email: req.user.email || null,
+        username: req.user.username || null,
+        role: req.user.role || null
+      }
+    });
   });
 
   app.get("/api/auth/check-role", isAuthenticated, async (req, res) => {
