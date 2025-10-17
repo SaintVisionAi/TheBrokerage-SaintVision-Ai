@@ -64,9 +64,11 @@ export default function Login() {
         const role = data.user.role;
         const targetUrl = (role === "admin" || role === "broker") ? "/dashboard" : "/client-portal";
         
+        console.log('[LOGIN] Redirecting to:', targetUrl, 'in 2 seconds...');
         setTimeout(() => {
-          window.location.href = targetUrl;
-        }, 1000);
+          console.log('[LOGIN] Executing redirect now...');
+          window.location.replace(targetUrl);
+        }, 2000);
       }
     } catch (error: any) {
       const errorMessage = error.message || "Failed to login";

@@ -69,7 +69,10 @@ function ProtectedDashboard() {
 function ProtectedClientPortal() {
   const { isLoading, isAuthenticated } = useAuth();
 
+  console.log('[PROTECTED_PORTAL] Auth check:', { isLoading, isAuthenticated });
+
   if (isLoading) {
+    console.log('[PROTECTED_PORTAL] Still loading auth...');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -81,9 +84,11 @@ function ProtectedClientPortal() {
   }
 
   if (!isAuthenticated) {
+    console.log('[PROTECTED_PORTAL] Not authenticated, redirecting to /login');
     return <Redirect to="/login" />;
   }
 
+  console.log('[PROTECTED_PORTAL] Authenticated, showing portal');
   return <ClientPortal />;
 }
 
