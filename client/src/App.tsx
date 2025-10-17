@@ -10,7 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import About from "@/pages/about";
-import Pricing from "@/pages/pricing";
+import Apply from "@/pages/apply";
 import Contact from "@/pages/contact";
 import WarRoom from "@/pages/warroom";
 import Enterprise from "@/pages/enterprise";
@@ -127,7 +127,7 @@ function Router() {
         {() => <ProtectedAdminRoute component={QuickContactsPage} />}
       </Route>
       <Route path="/about" component={About} />
-      <Route path="/apply" component={Pricing} />
+      <Route path="/apply" component={Apply} />
       <Route path="/application-complete" component={ApplicationCompletePage} />
       <Route path="/contact" component={Contact} />
       <Route path="/real-estate" component={RealEstate} />

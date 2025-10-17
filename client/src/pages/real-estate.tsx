@@ -73,9 +73,9 @@ export default function RealEstate() {
               <Button 
                 variant="outline" 
                 className="border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/10 px-8 py-6 text-lg"
-                data-testid="button-view-pricing"
+                data-testid="button-apply-lending"
               >
-                View Pricing
+                Apply for Lending
               </Button>
             </Link>
           </div>

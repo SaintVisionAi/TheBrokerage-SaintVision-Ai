@@ -44,6 +44,7 @@ export default function Lending() {
       const response = await fetch('/api/ghl/lead-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // CRITICAL: Allow browser to save session cookie from response
         body: JSON.stringify({
           ...formData,
           service: 'lending',

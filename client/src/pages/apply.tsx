@@ -21,7 +21,7 @@ import {
   Building2
 } from 'lucide-react';
 
-export default function Pricing() {
+export default function Apply() {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     // Personal Information
@@ -57,6 +57,7 @@ export default function Pricing() {
       const response = await fetch('/api/ghl/lead-capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // CRITICAL: Allow browser to save session cookie from response
         body: JSON.stringify({
           ...formData,
           service: 'lending',

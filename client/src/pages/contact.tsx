@@ -382,7 +382,7 @@ export default function Contact() {
             </Link>
             <Link href="/apply">
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-yellow-400 px-8 py-4 text-lg">
-                View Pricing
+                Apply Now
               </Button>
             </Link>
           </div>

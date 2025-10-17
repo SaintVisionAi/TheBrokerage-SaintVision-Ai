@@ -465,7 +465,7 @@ export default function Landing() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/apply">
               <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 px-8 py-4 text-lg font-semibold">
-                View Pricing
+                Apply Now
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
