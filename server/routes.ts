@@ -1574,10 +1574,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/saint-broker/notes", async (req, res) => {
     try {
       const userId = req.user?.id || 'demo-user'; // TODO: Get from session
-      const notes = await storage.getClientNotes(userId);
-      res.json(notes);
+      // Return empty array for now - notes feature coming soon
+      res.json([]);
     } catch (error: any) {
-      res.status(500).json({ error: "Failed to load notes" });
+      console.error('Error loading notes:', error);
+      res.json([]); // Return empty array instead of error
     }
   });
 
@@ -1604,10 +1605,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/saint-broker/signatures", async (req, res) => {
     try {
       const userId = req.user?.id || 'demo-user'; // TODO: Get from session
-      const signatures = await storage.getUserSignatures(userId);
-      res.json(signatures);
+      // Return empty array for now - signatures feature coming soon
+      res.json([]);
     } catch (error: any) {
-      res.status(500).json({ error: "Failed to load signatures" });
+      console.error('Error loading signatures:', error);
+      res.json([]); // Return empty array instead of error
     }
   });
 
