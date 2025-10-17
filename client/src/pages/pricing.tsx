@@ -71,53 +71,120 @@ export default function Pricing() {
       });
 
       const result = await response.json();
+      console.log('[AUTO-ONBOARDING] Response received:', { 
+        status: response.status, 
+        ok: response.ok, 
+        success: result.success,
+        hasSession: !!result.session,
+        hasWarning: !!result.warning,
+        result 
+      });
 
       if (result.success || response.ok) {
-        toast({
-          title: "Pre-Qualification Submitted!",
-          description: "Routing you to our lending partner...",
-        });
-        
-        // Extract credit score value from select format (e.g., "Good (670-739)" -> "700")
-        const creditValue = formData.creditScore ? 
-          (formData.creditScore.includes('Excellent') ? '750' :
-           formData.creditScore.includes('Good') ? '700' :
-           formData.creditScore.includes('Fair') ? '650' :
-           formData.creditScore.includes('Poor') ? '550' : '680') : '680';
-        
-        // Map loan amount ranges to numeric values (use upper bound)
-        const loanAmountMap: Record<string, number> = {
-          'Under $100K': 100000,
-          '$50K - $100K': 100000,
-          '$100K - $250K': 250000,
-          '$250K - $500K': 500000,
-          '$500K - $1M': 1000000,
-          '$1M - $3M': 3000000,
-          '$1M - $5M': 5000000,
-          '$3M - $5M': 5000000,
-          '$5M - $10M': 10000000,
-          '$5M+': 10000000, // High-value applications (Rok handles up to $50M)
-          '$10M+': 20000000, // Ultra high-value applications (Rok handles up to $50M)
-        };
-        
-        const loanAmount = loanAmountMap[formData.loanAmount] || 500000; // Default to 500K if not found
-        
-        // Redirect to completion page with ACTUAL form data + loan purpose for AI routing
-        setTimeout(() => {
-          const purposeEncoded = encodeURIComponent(formData.loanPurpose);
-          const timeframeEncoded = encodeURIComponent(formData.timeframe);
-          window.location.href = `/application-complete?amount=${loanAmount}&credit=${creditValue}&purpose=${purposeEncoded}&timeframe=${timeframeEncoded}`;
-        }, 1500);
+        // Check if session info was returned (auto-login)
+        if (result.session) {
+          console.log('[AUTO-ONBOARDING] Session detected, showing toast and redirecting to /client-portal');
+          // Account was created or exists - auto-login and redirect to portal
+          toast({
+            title: result.session.accountCreated ? "Account Created & Pre-Qualification Submitted!" : "Pre-Qualification Submitted!",
+            description: result.session.accountCreated 
+              ? "Your login credentials were sent via SMS & Email. Redirecting to your portal..." 
+              : "Redirecting to your client portal...",
+          });
+          
+          // Auto-login by redirecting to client portal (backend session already set)
+          // Use replace() to force full page reload and ensure cookie is picked up
+          // 3-second delay to ensure cookie is fully processed by browser before navigation
+          setTimeout(() => {
+            console.log('[AUTO-ONBOARDING] Redirecting to /client-portal now...');
+            window.location.replace('/client-portal');
+          }, 3000);
+        } else if (result.warning) {
+          console.log('[AUTO-ONBOARDING] Warning detected, redirecting to /application-complete');
+          // Account creation failed - show warning and redirect to completion page
+          toast({
+            title: "Pre-Qualification Submitted!",
+            description: result.warning || "Check your email for next steps.",
+          });
+          
+          // Extract credit score value for routing
+          const creditValue = formData.creditScore ? 
+            (formData.creditScore.includes('Excellent') ? '750' :
+             formData.creditScore.includes('Good') ? '700' :
+             formData.creditScore.includes('Fair') ? '650' :
+             formData.creditScore.includes('Poor') ? '550' : '680') : '680';
+          
+          // Map loan amount ranges to numeric values
+          const loanAmountMap: Record<string, number> = {
+            'Under $100K': 100000,
+            '$50K - $100K': 100000,
+            '$100K - $250K': 250000,
+            '$250K - $500K': 500000,
+            '$500K - $1M': 1000000,
+            '$1M - $3M': 3000000,
+            '$1M - $5M': 5000000,
+            '$3M - $5M': 5000000,
+            '$5M - $10M': 10000000,
+            '$5M+': 10000000,
+            '$10M+': 20000000,
+          };
+          
+          const loanAmount = loanAmountMap[formData.loanAmount] || 500000;
+          
+          setTimeout(() => {
+            const purposeEncoded = encodeURIComponent(formData.loanPurpose);
+            const timeframeEncoded = encodeURIComponent(formData.timeframe);
+            window.location.href = `/application-complete?amount=${loanAmount}&credit=${creditValue}&purpose=${purposeEncoded}&timeframe=${timeframeEncoded}`;
+          }, 1500);
+        } else {
+          console.log('[AUTO-ONBOARDING] Legacy flow, no session or warning, redirecting to /application-complete');
+          // Legacy flow - no auto-login info
+          toast({
+            title: "Pre-Qualification Submitted!",
+            description: "Routing you to our lending partner...",
+          });
+          
+          const creditValue = formData.creditScore ? 
+            (formData.creditScore.includes('Excellent') ? '750' :
+             formData.creditScore.includes('Good') ? '700' :
+             formData.creditScore.includes('Fair') ? '650' :
+             formData.creditScore.includes('Poor') ? '550' : '680') : '680';
+          
+          const loanAmountMap: Record<string, number> = {
+            'Under $100K': 100000,
+            '$50K - $100K': 100000,
+            '$100K - $250K': 250000,
+            '$250K - $500K': 500000,
+            '$500K - $1M': 1000000,
+            '$1M - $3M': 3000000,
+            '$1M - $5M': 5000000,
+            '$3M - $5M': 5000000,
+            '$5M - $10M': 10000000,
+            '$5M+': 10000000,
+            '$10M+': 20000000,
+          };
+          
+          const loanAmount = loanAmountMap[formData.loanAmount] || 500000;
+          
+          setTimeout(() => {
+            const purposeEncoded = encodeURIComponent(formData.loanPurpose);
+            const timeframeEncoded = encodeURIComponent(formData.timeframe);
+            window.location.href = `/application-complete?amount=${loanAmount}&credit=${creditValue}&purpose=${purposeEncoded}&timeframe=${timeframeEncoded}`;
+          }, 1500);
+        }
       } else {
+        console.log('[AUTO-ONBOARDING] Response not success, throwing error');
         throw new Error('Submission failed');
       }
     } catch (error) {
+      console.error('[AUTO-ONBOARDING] Error during submission:', error);
       toast({
         title: "Submission Error",
         description: "Please try again or call us directly at (800) 555-LOAN",
         variant: "destructive"
       });
     } finally {
+      console.log('[AUTO-ONBOARDING] Setting isSubmitting=false');
       setIsSubmitting(false);
     }
   };

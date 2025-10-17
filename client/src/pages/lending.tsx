@@ -65,10 +65,12 @@ export default function Lending() {
               : "Redirecting to your client portal...",
           });
           
-          // Auto-login by setting session (backend will handle cookie)
+          // Auto-login by redirecting to client portal (backend session already set)
+          // Use replace() to force full page reload and ensure cookie is picked up
+          // 3-second delay to ensure cookie is fully processed by browser before navigation
           setTimeout(() => {
-            window.location.href = '/client-portal';
-          }, 2000);
+            window.location.replace('/client-portal');
+          }, 3000);
         } else if (result.warning) {
           // Account creation failed - show warning
           toast({
