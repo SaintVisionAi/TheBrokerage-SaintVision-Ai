@@ -55,10 +55,35 @@ export default function Lending() {
       const result = await response.json();
 
       if (result.success || response.ok) {
-        toast({
-          title: "Application Received!",
-          description: "Our lending team will contact you within 24 hours. Check your email for next steps.",
-        });
+        // Check if session info was returned (auto-login)
+        if (result.session) {
+          // Account was created or exists - auto-login and redirect to portal
+          toast({
+            title: result.session.accountCreated ? "Account Created & Application Received!" : "Application Received!",
+            description: result.session.accountCreated 
+              ? "Your login credentials were sent via SMS & Email. Redirecting to your portal..." 
+              : "Redirecting to your client portal...",
+          });
+          
+          // Auto-login by setting session (backend will handle cookie)
+          setTimeout(() => {
+            window.location.href = '/client-portal';
+          }, 2000);
+        } else if (result.warning) {
+          // Account creation failed - show warning
+          toast({
+            title: "Application Received!",
+            description: result.warning,
+            variant: "default"
+          });
+        } else {
+          // Standard confirmation without auto-login
+          toast({
+            title: "Application Received!",
+            description: "Our lending team will contact you within 24 hours. Check your email for next steps.",
+          });
+        }
+        
         setFormData({
           firstName: '',
           lastName: '',

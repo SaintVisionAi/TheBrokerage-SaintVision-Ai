@@ -5,7 +5,7 @@ import { generateAssistantResponse, analyzeTone } from "./services/openai";
 import { crmService } from "./services/crm";
 import { brainService } from "./services/brain";
 import { godmodeExecutor } from "./godmode/executor";
-import { captureGHLLead, handleGHLWebhook, syncContactToGHL } from "./services/ghl";
+import { captureGHLLead, handleGHLWebhook, syncContactToGHL, sendEmailViaGHL } from "./services/ghl";
 import { enhanceSaintBrokerWithGHL } from "./services/saintbroker-ghl";
 import { handleIncomingSMS, sendSMS, sendTemplatedSMS } from "./services/twilio-service";
 import { qualifyLead } from "./services/ai-qualification";
@@ -954,6 +954,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // STEP 6.5: Auto-Create User Account (NEW!)
+      let userAccount = null;
+      let tempPassword = null;
+      let sessionToken = null;
+      
+      try {
+        // Check if user already exists
+        const existingUser = await storage.getUserByEmail(email);
+        
+        if (!existingUser) {
+          // Generate STRONG temporary password: 12 random characters
+          tempPassword = crypto.randomBytes(6).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 12);
+          const hashedPassword = await hashPassword(tempPassword);
+          
+          // Create user account
+          userAccount = await storage.createUser({
+            username: email.split('@')[0],
+            email,
+            password: hashedPassword,
+            role: 'client',
+            plan: 'free'
+          });
+          
+          // Create session token for auto-login
+          sessionToken = {
+            userId: userAccount.id,
+            email: userAccount.email!,
+            role: userAccount.role!,
+            username: userAccount.username!
+          };
+          
+          // Set session cookie for auto-login
+          createSession(res, sessionToken);
+          
+          console.log(`✅ Step 6.5: User account created and session set for ${email}`);
+        } else {
+          userAccount = existingUser;
+          
+          // Create session for existing user too (auto-login)
+          sessionToken = {
+            userId: existingUser.id,
+            email: existingUser.email!,
+            role: existingUser.role!,
+            username: existingUser.username!
+          };
+          
+          // Set session cookie for auto-login
+          createSession(res, sessionToken);
+          
+          console.log(`✅ Step 6.5: User account already exists for ${email}, session created for auto-login`);
+        }
+      } catch (accountError) {
+        console.error('⚠️  Account creation failed:', accountError);
+        // Set flag to indicate account creation failure
+        sessionToken = null;
+        userAccount = null;
+      }
+      
+      // STEP 6.6: Send Login Credentials via SMS + EMAIL (NEW!)
+      if (tempPassword && contactId) {
+        // SECURITY: Never log credentials, only send them
+        const smsMessage = `Welcome to Saint Vision Group! Your portal login:\n\nEmail: ${email}\nPassword: ${tempPassword}\n\nLogin at saintvisiongroup.com/login to track your application!`;
+        
+        const emailHTML = `
+          <h2>Welcome to Saint Vision Group!</h2>
+          <p>Your portal account has been created. Use these credentials to access your client portal:</p>
+          <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px;">
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Password:</strong> ${tempPassword}</p>
+          </div>
+          <p><a href="https://saintvisiongroup.com/login" style="background: #d4af37; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Login to Your Portal</a></p>
+          <p style="margin-top: 20px; color: #666; font-size: 14px;">For security, please change your password after your first login.</p>
+        `;
+        
+        // Send via SMS if phone provided
+        if (phone) {
+          try {
+            await sendSMS(phone, smsMessage);
+            console.log(`✅ Step 6.6a: Login credentials sent via SMS`);
+          } catch (smsError) {
+            console.error('⚠️  Credential SMS failed');
+          }
+        }
+        
+        // ALWAYS send via Email as backup
+        try {
+          await sendEmailViaGHL(contactId, 'Your Saint Vision Group Portal Login', emailHTML);
+          console.log(`✅ Step 6.6b: Login credentials sent via EMAIL`);
+        } catch (emailError) {
+          console.error('⚠️  Credential email failed');
+        }
+      }
+
       // STEP 7: GHL Workflow Trigger (0:07)
       const workflowMap = {
         investment: 'Investment Welcome Sequence',
@@ -999,7 +1092,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           estimatedValue: aiQualification.estimatedValue,
           nextSteps: aiQualification.nextSteps,
           processingTime: duration,
-        }
+        },
+        // Auto-login session info (NEW!)
+        session: sessionToken ? {
+          userId: sessionToken.userId,
+          email: sessionToken.email,
+          role: sessionToken.role,
+          username: sessionToken.username,
+          accountCreated: tempPassword ? true : false
+        } : null,
+        // Warning if account creation failed (NEW!)
+        warning: sessionToken ? null : "Account creation failed. You can still sign up manually at /signup"
       });
 
     } catch (error: any) {
