@@ -1,0 +1,10 @@
+.env
+.env.*
+*.key
+*KEY*.txt
+*SECRET*.txt
+*API*.txt
+node_modules/
+dist/
+.DS_Store
+attached_assets/
