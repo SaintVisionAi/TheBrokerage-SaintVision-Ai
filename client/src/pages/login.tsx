@@ -61,8 +61,8 @@ export default function Login() {
         });
 
         // Use hard redirect to ensure session cookie is fully processed
-        const role = data.user.role;
-        const targetUrl = (role === "admin" || role === "broker") ? "/dashboard" : "/client-portal";
+        // Send everyone to client portal for now (dashboard has issues)
+        const targetUrl = "/client-portal";
         
         console.log('[LOGIN] Redirecting to:', targetUrl, 'in 2 seconds...');
         setTimeout(() => {
