@@ -60,12 +60,13 @@ export default function Login() {
           description: `Welcome back, ${data.user.username || data.user.email}`,
         });
 
+        // Use hard redirect to ensure session cookie is fully processed
         const role = data.user.role;
-        if (role === "admin" || role === "broker") {
-          setLocation("/dashboard");
-        } else {
-          setLocation("/client-portal");
-        }
+        const targetUrl = (role === "admin" || role === "broker") ? "/dashboard" : "/client-portal";
+        
+        setTimeout(() => {
+          window.location.href = targetUrl;
+        }, 1000);
       }
     } catch (error: any) {
       const errorMessage = error.message || "Failed to login";
