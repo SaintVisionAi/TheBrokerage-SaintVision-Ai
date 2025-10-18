@@ -276,33 +276,43 @@ export default function SaintBrokerEnhanced() {
 
   if (!isOpen) {
     return (
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 shadow-2xl z-50"
-        data-testid="button-open-saintbroker"
-      >
-        <Sparkles className="h-7 w-7 text-black" />
-      </Button>
+      <div className="fixed bottom-6 right-6 z-50">
+        {/* Pulsing glow ring */}
+        <div className="absolute inset-0 rounded-full bg-yellow-400/30 blur-xl animate-pulse" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400/40 to-yellow-600/40 animate-ping" />
+        
+        <Button
+          onClick={() => setIsOpen(true)}
+          className="relative h-16 w-16 rounded-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-500 shadow-2xl hover:shadow-yellow-400/50 transition-all duration-300 hover:scale-110 border-2 border-yellow-300/50"
+          data-testid="button-open-saintbroker"
+        >
+          <Sparkles className="h-7 w-7 text-black animate-pulse" />
+        </Button>
+      </div>
     );
   }
 
   return (
-    <Card className="fixed bottom-6 right-6 w-[500px] h-[85vh] max-h-[800px] shadow-2xl z-50 flex flex-col bg-neutral-950 border-yellow-400/30">
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 border-b border-yellow-400/20">
+    <div className="fixed bottom-6 right-6 w-[500px] h-[85vh] max-h-[800px] z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
+      {/* Outer glow */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400/20 via-blue-500/20 to-yellow-600/20 rounded-2xl blur-xl" />
+      
+      <Card className="relative flex flex-col h-full bg-black/40 backdrop-blur-xl border border-yellow-400/40 shadow-2xl shadow-yellow-400/20">
+        <CardHeader className="flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-yellow-400/20 via-yellow-500/20 to-yellow-600/20 backdrop-blur-sm border-b border-yellow-400/30">
         <CardTitle className="text-xl font-bold flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-yellow-400" />
-          <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+          <Sparkles className="h-5 w-5 text-yellow-400 animate-pulse" />
+          <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent animate-gradient">
             SaintBroker
           </span>
-          <Badge variant="outline" className="text-xs border-yellow-400/50 text-yellow-400">
-            Enhanced
+          <Badge variant="outline" className="text-xs border-yellow-400/50 text-yellow-400 bg-yellow-400/10 animate-pulse">
+            AI™
           </Badge>
         </CardTitle>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsOpen(false)}
-          className="h-8 w-8 text-white/60 hover:text-white"
+          className="h-8 w-8 text-white/60 hover:text-white hover:bg-red-500/20 transition-all duration-200 hover:rotate-90"
           data-testid="button-close-saintbroker"
         >
           <X className="h-5 w-5" />
@@ -310,7 +320,7 @@ export default function SaintBrokerEnhanced() {
       </CardHeader>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-4 bg-neutral-900">
+        <TabsList className="grid w-full grid-cols-4 bg-black/30 backdrop-blur-md border-b border-white/10">
           <TabsTrigger value="chat" data-testid="tab-chat">
             <MessageCircle className="h-4 w-4 mr-1" />
             Chat
@@ -369,7 +379,7 @@ export default function SaintBrokerEnhanced() {
                       "rounded-lg p-3 max-w-[80%]",
                       msg.role === 'user'
                         ? 'bg-yellow-400 text-black'
-                        : 'bg-neutral-900 text-white'
+                        : 'bg-white/5 text-white backdrop-blur-sm'
                     )}
                   >
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -383,7 +393,7 @@ export default function SaintBrokerEnhanced() {
                       SB
                     </AvatarFallback>
                   </Avatar>
-                  <div className="bg-neutral-900 rounded-lg p-3">
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
                     <div className="flex gap-1">
                       <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" />
                       <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
@@ -397,12 +407,12 @@ export default function SaintBrokerEnhanced() {
 
           {/* Quick Actions */}
           {messages.length <= 1 && (
-            <div className="border-t border-neutral-800 p-3 bg-neutral-900/30">
+            <div className="border-t border-white/10 p-3 bg-white/5 backdrop-blur-sm">
               <p className="text-xs text-neutral-400 mb-2 font-medium">Quick Actions:</p>
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-neutral-900/80 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                   onClick={() => {
                     setInput("I'd like to apply for a business loan");
                   }}
@@ -413,7 +423,7 @@ export default function SaintBrokerEnhanced() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-neutral-900/80 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                   onClick={() => {
                     setInput("Tell me about your real estate services");
                   }}
@@ -424,7 +434,7 @@ export default function SaintBrokerEnhanced() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-neutral-900/80 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                   onClick={() => {
                     setInput("What investment opportunities do you offer?");
                   }}
@@ -435,7 +445,7 @@ export default function SaintBrokerEnhanced() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-neutral-900/80 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                   onClick={() => {
                     setInput("What's the status of my loan application?");
                   }}
@@ -454,7 +464,7 @@ export default function SaintBrokerEnhanced() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
               placeholder="Ask SaintBroker anything..."
-              className="flex-1 bg-neutral-900 border-neutral-700 text-white"
+              className="flex-1 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50"
               data-testid="input-chat"
             />
             <Button
@@ -498,7 +508,7 @@ export default function SaintBrokerEnhanced() {
                 </div>
               ) : (
                 documents.map((doc) => (
-                  <Card key={doc.id} className="bg-neutral-900 border-neutral-800" data-testid={`document-${doc.id}`}>
+                  <Card key={doc.id} className="bg-white/5 backdrop-blur-sm border-white/20" data-testid={`document-${doc.id}`}>
                     <CardContent className="p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -532,26 +542,26 @@ export default function SaintBrokerEnhanced() {
 
         {/* NOTES TAB */}
         <TabsContent value="notes" className="flex-1 flex flex-col mt-0 p-4 space-y-4">
-          <div className="space-y-2 bg-neutral-900 rounded-lg p-3">
+          <div className="space-y-2 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
             <Input
               value={noteTitle}
               onChange={(e) => setNoteTitle(e.target.value)}
               placeholder="Note title..."
-              className="bg-neutral-900 border-neutral-700 text-white"
+              className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50"
               data-testid="input-note-title"
             />
             <Textarea
               value={noteContent}
               onChange={(e) => setNoteContent(e.target.value)}
               placeholder="Write your note here..."
-              className="bg-neutral-900 border-neutral-700 text-white min-h-[80px]"
+              className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50 min-h-[80px]"
               data-testid="textarea-note-content"
             />
             <Input
               value={noteTags}
               onChange={(e) => setNoteTags(e.target.value)}
               placeholder="Tags (comma separated)"
-              className="bg-neutral-900 border-neutral-700 text-white"
+              className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50"
               data-testid="input-note-tags"
             />
             <Button
@@ -573,7 +583,7 @@ export default function SaintBrokerEnhanced() {
                 </div>
               ) : (
                 notes.map((note) => (
-                  <Card key={note.id} className="bg-neutral-900 border-neutral-800" data-testid={`note-${note.id}`}>
+                  <Card key={note.id} className="bg-white/5 backdrop-blur-sm border-white/20" data-testid={`note-${note.id}`}>
                     <CardContent className="p-3">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-semibold text-white">{note.title}</h4>
@@ -611,7 +621,7 @@ export default function SaintBrokerEnhanced() {
                 </div>
               ) : (
                 signatures.map((sig) => (
-                  <Card key={sig.id} className="bg-neutral-900 border-neutral-800" data-testid={`signature-${sig.id}`}>
+                  <Card key={sig.id} className="bg-white/5 backdrop-blur-sm border-white/20" data-testid={`signature-${sig.id}`}>
                     <CardContent className="p-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -647,5 +657,6 @@ export default function SaintBrokerEnhanced() {
         </TabsContent>
       </Tabs>
     </Card>
+    </div>
   );
 }
