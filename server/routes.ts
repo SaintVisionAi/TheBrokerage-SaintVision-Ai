@@ -1743,11 +1743,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return 'pending';
   }
 
-  // SaintBroker Enhanced API Endpoints
+  // SaintBroker Enhanced API Endpoints - MASTER ORCHESTRATOR
   app.post("/api/saint-broker/chat", async (req, res) => {
     try {
       const { message, context } = req.body;
-      const userId = req.user?.userId || 'demo-user'; // TODO: Get from session
+      const userId = req.user?.userId || 'demo-user';
+      const userRole = req.user?.role || 'client';
+      const userEmail = req.user?.email || 'unknown';
+
+      // BUILD CONTEXT-AWARE DATA FOR SAINTBROKER ORCHESTRATOR
+      let userContext = {
+        role: userRole,
+        email: userEmail,
+        userId: userId,
+        isAdmin: userRole === 'admin' || userRole === 'broker',
+        applicationData: null as any,
+        adminStats: null as any,
+        syncStatus: {
+          adminDashboard: 'synced',
+          clientPortal: 'synced',
+          saintBroker: 'active'
+        }
+      };
+
+      // If ADMIN - Load ALL applications and stats
+      if (userContext.isAdmin) {
+        try {
+          const { db } = await import('./db');
+          const { opportunities, contacts } = await import('@shared/schema');
+          const { eq, desc } = await import('drizzle-orm');
+          
+          // Get all applications
+          const apps = await db.select({
+            oppId: opportunities.id,
+            contactId: contacts.id,
+            firstName: contacts.firstName,
+            lastName: contacts.lastName,
+            email: contacts.email,
+            phone: contacts.phone,
+            monetaryValue: opportunities.monetaryValue,
+            division: opportunities.division,
+            status: opportunities.status,
+            priority: opportunities.priority,
+            stageName: opportunities.stageName,
+            createdAt: opportunities.createdAt
+          })
+          .from(opportunities)
+          .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
+          .orderBy(desc(opportunities.createdAt));
+
+          userContext.applicationData = apps;
+          userContext.adminStats = {
+            totalApplications: apps.length,
+            totalPipeline: apps.reduce((sum, app) => sum + (app.monetaryValue || 0), 0),
+            pendingCount: apps.filter(a => mapStageToStatus(a.stageName || '') === 'pending').length,
+            submittedCount: apps.filter(a => mapStageToStatus(a.stageName || '') === 'submitted').length
+          };
+        } catch (dbError) {
+          console.error('[SaintBroker Admin Context] DB error:', dbError);
+        }
+      } 
+      // If CLIENT - Load only their application
+      else {
+        try {
+          const { db } = await import('./db');
+          const { opportunities, contacts } = await import('@shared/schema');
+          const { eq } = await import('drizzle-orm');
+          
+          // Get client's application by email
+          const contact = await db.select().from(contacts).where(eq(contacts.email, userEmail)).limit(1);
+          if (contact[0]) {
+            const opp = await db.select().from(opportunities).where(eq(opportunities.contactId, contact[0].id)).limit(1);
+            if (opp[0]) {
+              userContext.applicationData = opp[0];
+            }
+          }
+        } catch (dbError) {
+          console.error('[SaintBroker Client Context] DB error:', dbError);
+        }
+      }
 
       // Load comprehensive knowledge base for SaintBroker
       const knowledgeBase = [];
@@ -1801,36 +1875,71 @@ ${FUNDING_PARTNERS.filter(p => p.active).map(p =>
         // Continue with available knowledge even if some files fail
       }
 
-      // Use the production AI orchestrator with retry logic and Claude fallback
-      const response = await saintBrokerAI.chat({
-        message: message,
-        context: {
-          division: 'lending', // Default to lending division for SaintBroker
-          stage: context?.stage || 'initial',
-        }
-      });
+      // BUILD ORCHESTRATOR MESSAGE WITH FULL CONTEXT
+      const orchestratorContext = `
+[SAINTBROKER AI ORCHESTRATOR CONTEXT]
+User Role: ${userContext.role}
+User Email: ${userContext.email}
+Is Admin: ${userContext.isAdmin}
 
-      // Add knowledge base context to the message if available
-      if (knowledgeBase.length > 0) {
-        const enhancedMessage = `
+${userContext.isAdmin ? `
+[ADMIN CONTEXT - FULL PIPELINE VIEW]
+Total Applications: ${userContext.adminStats?.totalApplications || 0}
+Total Pipeline Value: $${(userContext.adminStats?.totalPipeline || 0).toLocaleString()}
+Pending Applications: ${userContext.adminStats?.pendingCount || 0}
+Submitted Applications: ${userContext.adminStats?.submittedCount || 0}
+
+Recent Applications:
+${userContext.applicationData?.slice(0, 5).map((app: any) => 
+  `- ${app.firstName} ${app.lastName}: $${(app.monetaryValue || 0).toLocaleString()} (${app.stageName})`
+).join('\n') || 'No applications'}
+` : `
+[CLIENT CONTEXT - PERSONAL APPLICATION]
+${userContext.applicationData ? `
+Application Status: ${userContext.applicationData.stageName}
+Loan Amount: $${(userContext.applicationData.monetaryValue || 0).toLocaleString()}
+Division: ${userContext.applicationData.division}
+Priority: ${userContext.applicationData.priority}
+` : 'No active application'}
+`}
+
+[SYNC STATUS]
+Admin Dashboard: ${userContext.syncStatus.adminDashboard}
+Client Portal: ${userContext.syncStatus.clientPortal}
+SaintBroker AI: ${userContext.syncStatus.saintBroker}
+
+[USER MESSAGE]
 ${message}
 
-[Available Knowledge Base Context:]
+${knowledgeBase.length > 0 ? `
+[KNOWLEDGE BASE]
 ${knowledgeBase.slice(0, 2).join('\n\n')}
-        `;
-        
-        const enhancedResponse = await saintBrokerAI.chat({
-          message: enhancedMessage,
-          context: {
-            division: 'lending',
-            stage: context?.stage || 'initial',
-          }
-        });
-        
-        res.json({ response: enhancedResponse.response });
-      } else {
-        res.json({ response: response.response });
-      }
+` : ''}
+
+IMPORTANT: You are SaintBroker AI, the master orchestrator. Respond based on the user's role:
+- For ADMINS: Provide comprehensive pipeline insights, all applications, and management advice
+- For CLIENTS: Focus on their specific application, next steps, and personalized guidance
+- Always maintain sync awareness between admin dashboard, client portal, and your responses
+      `;
+
+      // Use the production AI orchestrator with full context
+      const enhancedResponse = await saintBrokerAI.chat({
+        message: orchestratorContext,
+        context: {
+          division: 'lending',
+          stage: context?.stage || 'initial',
+          userRole: userContext.role,
+          isAdmin: userContext.isAdmin
+        }
+      });
+      
+      res.json({ 
+        response: enhancedResponse.response,
+        context: {
+          role: userContext.role,
+          syncStatus: userContext.syncStatus
+        }
+      });
     } catch (error: any) {
       res.status(500).json({ error: "Failed to process chat message" });
     }
