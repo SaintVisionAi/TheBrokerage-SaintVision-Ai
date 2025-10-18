@@ -266,6 +266,7 @@ export default function Contact() {
                       disabled={isSubmitting}
                       size="lg"
                       className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 font-semibold"
+                      data-testid="button-send-message"
                     >
                       {isSubmitting ? (
                         <>
@@ -375,13 +376,13 @@ export default function Contact() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/dashboard">
-              <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 px-8 py-4 text-lg font-semibold">
+              <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 px-8 py-4 text-lg font-semibold" data-testid="button-try-demo">
                 Try Free Demo
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link href="/apply">
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-yellow-400 px-8 py-4 text-lg">
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-yellow-400 px-8 py-4 text-lg" data-testid="button-apply-cta">
                 Apply Now
               </Button>
             </Link>

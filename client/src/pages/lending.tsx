@@ -132,31 +132,66 @@ export default function Lending() {
   const loanProducts = [
     {
       icon: <DollarSign className="h-8 w-8 text-yellow-400" />,
-      title: "Working Capital Loans",
-      rates: "9-12% | $50K - $5M",
-      description: "Flexible financing for day-to-day business operations, payroll, and growth opportunities",
-      features: ["No collateral required", "Same-day approval possible", "Flexible repayment terms", "Use for any business purpose"]
+      title: "Term Loan",
+      rates: "7.99% APR | $25K - $2M",
+      description: "Traditional APR structure with no pre-payment penalties. Perfect for established businesses seeking long-term financing.",
+      features: ["Traditional APR structure", "No pre-payment penalties", "Monthly payments", "Fast funding in 1-3 days"]
+    },
+    {
+      icon: <Zap className="h-8 w-8 text-yellow-400" />,
+      title: "Working Capital",
+      rates: "Same Day Funding | $10K - $500K",
+      description: "Fast access to capital for day-to-day operations. Bad credit accepted, liens and judgements OK.",
+      features: ["Same day funding available", "Bad credit accepted", "Liens/judgements OK", "No minimum FICO required"]
+    },
+    {
+      icon: <TrendingUp className="h-8 w-8 text-yellow-400" />,
+      title: "AR Financing",
+      rates: "Low Cost | $10K - $5M",
+      description: "Leverage your accounts receivable with a revolving line of credit. Long-term financing for larger amounts.",
+      features: ["Low cost financing", "Revolving line of credit", "Leverage your receivables", "Longer terms available"]
     },
     {
       icon: <TrendingUp className="h-8 w-8 text-yellow-400" />,
       title: "Equipment Financing",
-      rates: "9-11% | $25K - $2M",
-      description: "Finance new or used equipment to grow your business without depleting cash reserves",
-      features: ["Equipment serves as collateral", "100% financing available", "Tax benefits", "Quick approval process"]
+      rates: "Competitive | $10K - $5M",
+      description: "Finance new or used equipment with low or no down payment. Take advantage of Section 179 tax benefits.",
+      features: ["Low or NO down payment", "Tax benefits (Section 179)", "Multi-year longer terms", "Keep cash flow intact"]
+    },
+    {
+      icon: <DollarSign className="h-8 w-8 text-yellow-400" />,
+      title: "Line of Credit",
+      rates: "Competitive | $10K - $1M",
+      description: "Draw as needed and only pay interest on funds you use. Flexible access to capital whenever you need it.",
+      features: ["Only pay interest on funds drawn", "Credit available as needed", "Draw as many times as you need", "Fast approvals"]
     },
     {
       icon: <Shield className="h-8 w-8 text-yellow-400" />,
-      title: "Commercial Real Estate",
-      rates: "10-13% | $100K - $10M",
-      description: "Purchase, refinance, or expand your commercial property portfolio",
-      features: ["Up to 85% LTV", "25-year terms available", "SBA and conventional options", "Investment properties welcome"]
+      title: "Fix & Flip",
+      rates: "8.99% | $50K - $2M",
+      description: "Real estate investors: Get 80-100% purchase funding plus 100% rehab funding. Quick closings in 3-7 days.",
+      features: ["80-100% purchase funding", "100% rehab funding", "Quick closings", "Experienced investor programs"]
+    },
+    {
+      icon: <Shield className="h-8 w-8 text-yellow-400" />,
+      title: "Real Estate Loan",
+      rates: "Traditional APR | $100K - $10M+",
+      description: "Commercial real estate financing with large amounts, low rates, and long-term stability up to 25 years.",
+      features: ["Large funding amounts", "Low rates", "5-25 year terms", "Commercial real estate financing"]
     },
     {
       icon: <Zap className="h-8 w-8 text-yellow-400" />,
-      title: "Bridge Loans",
-      rates: "11-14% | $100K - $5M",
-      description: "Short-term financing to bridge the gap until permanent financing is secured",
-      features: ["Fast close (5-7 days)", "Interest-only payments", "6-24 month terms", "Minimal documentation"]
+      title: "Business Credit Building",
+      rates: "No Personal Guarantee",
+      description: "Build business credit not linked to your SSN. Access high-limit Visa/Mastercard without personal credit checks.",
+      features: ["No personal guarantee", "Build credit for your EIN", "High-limit revolving accounts", "No personal credit check"]
+    },
+    {
+      icon: <Zap className="h-8 w-8 text-yellow-400" />,
+      title: "Cannabusiness Financing",
+      rates: "24hr Funding | $50K - $1M",
+      description: "Cannabis industry specialists. No real estate collateral needed with funds available in 24 hours.",
+      features: ["No real estate collateral needed", "Funds in 24 hours", "Cannabis industry expertise", "Limited documentation required"]
     }
   ];
 
@@ -189,9 +224,9 @@ export default function Lending() {
             24-Hour Decisions
           </h1>
           <p className="text-2xl text-white/80 mb-8 max-w-3xl mx-auto">
-            Enterprise-grade business lending from $50K to $5M with rates starting at 9%. 
-            Powered by AI underwriting for faster approvals and better terms. 
-            <span className="text-yellow-400"> No collateral required for qualified borrowers.</span>
+            Enterprise-grade business lending from $10K to $10M+ with rates starting at 7.99%. 
+            Powered by AI underwriting and <span className="text-yellow-400">13 Active Funding Partners with AI-Powered Routing</span> for faster approvals and better terms. 
+            No collateral required for qualified borrowers.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 

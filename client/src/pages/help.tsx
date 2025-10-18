@@ -154,7 +154,7 @@ export default function HelpCenter() {
                 placeholder="Search for help articles, guides, or tutorials..."
                 className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-green-500/50"
               />
-              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
+              <Button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700" data-testid="button-search-help">
                 Search
               </Button>
             </div>
@@ -253,7 +253,7 @@ export default function HelpCenter() {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700">
+                  <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700" data-testid={`button-contact-${channel.title.toLowerCase().replace(/\s+/g, '-')}`}>
                     Contact Now
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
@@ -286,7 +286,7 @@ export default function HelpCenter() {
                   <Badge className="bg-purple-500/20 text-purple-400 border-purple-400/30 mb-4">
                     {resource.count}
                   </Badge>
-                  <Button variant="outline" className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10">
+                  <Button variant="outline" className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10" data-testid={`button-browse-${resource.title.toLowerCase().replace(/\s+/g, '-')}`}>
                     Browse {resource.title}
                   </Button>
                 </CardContent>
@@ -310,12 +310,12 @@ export default function HelpCenter() {
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/contact">
-                  <Button size="lg" className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 px-8 py-4 text-lg font-semibold">
+                  <Button size="lg" className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 px-8 py-4 text-lg font-semibold" data-testid="button-contact-support-help">
                     Contact Support
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-green-400 px-8 py-4 text-lg">
+                <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-green-400 px-8 py-4 text-lg" data-testid="button-schedule-call">
                   Schedule Call
                 </Button>
               </div>

@@ -257,7 +257,7 @@ export default function Patent() {
                     The patent includes multiple claims covering various aspects of the HACP™ technology, 
                     including method claims, system claims, and computer-readable medium claims.
                   </p>
-                  <Button variant="outline" className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10">
+                  <Button variant="outline" className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10" data-testid="button-view-patent-document">
                     <FileText className="w-4 h-4 mr-2" />
                     View Full Patent Document
                     <ExternalLink className="w-4 h-4 ml-2" />
@@ -298,12 +298,12 @@ export default function Patent() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/contact">
-                  <Button size="lg" className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black hover:from-yellow-600 hover:to-yellow-700 px-8 py-4 text-lg font-semibold">
+                  <Button size="lg" className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-black hover:from-yellow-600 hover:to-yellow-700 px-8 py-4 text-lg font-semibold" data-testid="button-licensing-inquiry">
                     Licensing Inquiry
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-yellow-400 px-8 py-4 text-lg">
+                <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-yellow-400 px-8 py-4 text-lg" data-testid="button-download-patent-summary">
                   Download Patent Summary
                 </Button>
               </div>

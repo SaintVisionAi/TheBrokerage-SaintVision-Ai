@@ -135,11 +135,11 @@ export default function Community() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 px-8 py-4 text-lg font-semibold">
+            <Button size="lg" className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 px-8 py-4 text-lg font-semibold" data-testid="button-join-discord">
               Join Discord
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-orange-400 px-8 py-4 text-lg">
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-orange-400 px-8 py-4 text-lg" data-testid="button-view-github">
               View on GitHub
               <ExternalLink className="w-4 h-4 ml-2" />
             </Button>
@@ -181,7 +181,7 @@ export default function Community() {
                   
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-white/60">{channel.members}</div>
-                    <Button variant="outline" className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10">
+                    <Button variant="outline" className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10" data-testid={`button-join-${channel.platform.toLowerCase().replace(/\s+/g, '-')}`}>
                       Join Channel
                       <ExternalLink className="w-3 h-3 ml-2" />
                     </Button>
@@ -225,7 +225,7 @@ export default function Community() {
                         </div>
                       </div>
                     </div>
-                    <Button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700">
+                    <Button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700" data-testid={`button-register-event-${index}`}>
                       Register Free
                     </Button>
                   </div>
@@ -277,26 +277,26 @@ export default function Community() {
               </p>
               
               <div className="flex justify-center gap-6 mb-8">
-                <Button variant="outline" size="lg" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10">
+                <Button variant="outline" size="lg" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10" data-testid="button-twitter">
                   <Twitter className="w-5 h-5 mr-2" />
                   Twitter
                 </Button>
-                <Button variant="outline" size="lg" className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
+                <Button variant="outline" size="lg" className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10" data-testid="button-github">
                   <Github className="w-5 h-5 mr-2" />
                   GitHub
                 </Button>
-                <Button variant="outline" size="lg" className="border-blue-600/30 text-blue-300 hover:bg-blue-600/10">
+                <Button variant="outline" size="lg" className="border-blue-600/30 text-blue-300 hover:bg-blue-600/10" data-testid="button-linkedin">
                   <Linkedin className="w-5 h-5 mr-2" />
                   LinkedIn
                 </Button>
-                <Button variant="outline" size="lg" className="border-red-500/30 text-red-400 hover:bg-red-500/10">
+                <Button variant="outline" size="lg" className="border-red-500/30 text-red-400 hover:bg-red-500/10" data-testid="button-youtube">
                   <Youtube className="w-5 h-5 mr-2" />
                   YouTube
                 </Button>
               </div>
 
               <Link href="/contact">
-                <Button size="lg" className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 px-8 py-4 text-lg font-semibold">
+                <Button size="lg" className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 px-8 py-4 text-lg font-semibold" data-testid="button-join-community">
                   Join Our Community
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>

@@ -196,7 +196,7 @@ export default function Status() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-light text-white">Service Status</h2>
-            <Button variant="outline" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10">
+            <Button variant="outline" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10" data-testid="button-refresh-status">
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
@@ -335,10 +335,10 @@ export default function Status() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold">
+                <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold" data-testid="button-subscribe-updates">
                   Subscribe to Updates
                 </Button>
-                <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg">
+                <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg" data-testid="button-rss-feed">
                   RSS Feed
                 </Button>
               </div>

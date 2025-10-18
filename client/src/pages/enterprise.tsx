@@ -130,12 +130,12 @@ export default function Enterprise() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button size="lg" className="bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 px-8 py-4 text-lg font-semibold">
+              <Button size="lg" className="bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 px-8 py-4 text-lg font-semibold" data-testid="button-contact-enterprise-sales">
                 Contact Enterprise Sales
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-purple-400 px-8 py-4 text-lg">
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-purple-400 px-8 py-4 text-lg" data-testid="button-schedule-demo">
               <Phone className="w-4 h-4 mr-2" />
               Schedule Demo
             </Button>
@@ -257,12 +257,12 @@ export default function Enterprise() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/contact">
-                  <Button size="lg" className="bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 px-8 py-4 text-lg font-semibold">
+                  <Button size="lg" className="bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700 px-8 py-4 text-lg font-semibold" data-testid="button-get-roi-analysis">
                     Get ROI Analysis
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-purple-400 px-8 py-4 text-lg">
+                <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-purple-400 px-8 py-4 text-lg" data-testid="button-download-case-studies">
                   Download Case Studies
                 </Button>
               </div>

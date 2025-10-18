@@ -27,6 +27,9 @@ import { isAuthenticated, isAdmin } from './middleware/auth';
 import cookieParser from 'cookie-parser';
 import webhooksRouter from './routes/webhooks';
 import OpenAI from 'openai';
+import { FUNDING_PARTNERS } from '../shared/funding-partners-ai';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Utility: Parse loan amount string to integer (supports decimals like "$1.5M")
 function parseLoanAmount(amount: string | number): number {
@@ -1651,10 +1654,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { message, context } = req.body;
       const userId = req.user?.id || 'demo-user'; // TODO: Get from session
 
+      // Load comprehensive knowledge base for SaintBroker
+      const knowledgeBase = [];
+      
+      try {
+        // Load client hub knowledge base (384 lines of complete reference)
+        const hubKnowledgePath = path.join(process.cwd(), 'client-hub-knowledge-base.md');
+        if (fs.existsSync(hubKnowledgePath)) {
+          knowledgeBase.push(fs.readFileSync(hubKnowledgePath, 'utf-8'));
+        }
+        
+        // Load system architecture and workflows
+        const replitMdPath = path.join(process.cwd(), 'replit.md');
+        if (fs.existsSync(replitMdPath)) {
+          knowledgeBase.push(fs.readFileSync(replitMdPath, 'utf-8'));
+        }
+        
+        // Add funding partners knowledge with AI routing logic
+        const fundingPartnersKnowledge = `
+# FUNDING PARTNER NETWORK (13 Active Partners)
+
+Saint Vision Group operates a comprehensive funding partner network with AI-powered routing through SaintBroker™. The system automatically matches applications to the optimal lender based on loan type, amount, credit score, and urgency.
+
+**Network Overview:**
+- **13 Active Partners**: $5K to $50M+ funding range
+- **AI Auto-Selection**: SaintBroker analyzes and routes to best match
+- **Multiple Specialties**: MCA, Real Estate, Equipment, SBA, Startup (0% SLOC)
+- **Speed Range**: 1-3 days (urgent MCA) to 30-60 days (SBA)
+- **Commission**: 8-30% depending on partner and product
+
+**AI Routing Logic:**
+- Equipment loans → Commercial Capital Connect
+- Real Estate → Easy Street Capital or Trinity Bay Lending
+- Startup (700+ credit, <$100K) → Rich Mee (0% SLOC)
+- SBA (Expansion/Acquisition, 650+ credit) → SB Lending Source
+- General Business Lending ($50K-$5M) → SVG In-House first, then partners
+- Working Capital/MCA → SVG Partner Network (fastest)
+- Large Commercial → Rok Financial
+
+**Active Funding Partners:**
+${FUNDING_PARTNERS.filter(p => p.active).map(p => 
+  `- **${p.name}**: ${p.description} (Specialties: ${p.specialties.join(', ')})`
+).join('\n')}
+
+**IMPORTANT**: Saint Vision Group is the white-label brokerage. Clients see "Saint Vision Group - Powered by SaintBroker™ AI" throughout entire journey. Partners are SVG's competitive advantage and backend relationships - generally NOT exposed to clients except in strategic cases for credibility.
+`;
+        knowledgeBase.push(fundingPartnersKnowledge);
+        
+      } catch (fileError) {
+        console.error('[SaintBroker] Error loading knowledge base files:', fileError);
+        // Continue with available knowledge even if some files fail
+      }
+
       const response = await generateAssistantResponse(
         message,
         "SaintBroker Chat",
-        []
+        knowledgeBase
       );
 
       res.json({ response: response.content });

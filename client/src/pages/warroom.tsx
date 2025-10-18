@@ -16,7 +16,9 @@ import {
   Bot,
   Mic,
   Database,
-  AlertTriangle
+  AlertTriangle,
+  Building2,
+  TrendingUp
 } from 'lucide-react';
 import { Link } from 'wouter';
 import GlobalHeader from '@/components/layout/global-header';
@@ -84,15 +86,15 @@ export default function WarRoom() {
           </Badge>
           
           <h1 className="text-6xl font-light mb-8 text-white">
-            SaintSal™
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-yellow-400">
-              WarRoom
+            SaintBroker™
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-yellow-400">
+              Workspace
             </span>
           </h1>
           
           <p className="text-xl text-white/70 max-w-3xl mx-auto mb-12 leading-relaxed">
-            The ultimate command center for enterprise AI operations. Monitor, control, and optimize 
-            your entire AI infrastructure from a single, secure dashboard powered by HACP™ technology.
+            Your AI-powered brokerage command center. Access SaintBroker AI chat, lending tools, 
+            real estate services, and complete portfolio management from a single unified dashboard.
           </p>
 
           <div className="flex flex-wrap justify-center gap-6 text-sm mb-12">
@@ -112,13 +114,13 @@ export default function WarRoom() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button size="lg" className="bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 px-8 py-4 text-lg font-semibold">
+              <Button size="lg" className="bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 px-8 py-4 text-lg font-semibold" data-testid="button-request-access">
                 Request Access
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link href="/dashboard">
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-red-400 px-8 py-4 text-lg">
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-red-400 px-8 py-4 text-lg" data-testid="button-view-demo">
                 View Demo
               </Button>
             </Link>
@@ -130,9 +132,9 @@ export default function WarRoom() {
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-light mb-6 text-white">WarRoom Capabilities</h2>
+            <h2 className="text-4xl font-light mb-6 text-white">SaintBroker Workspace Capabilities</h2>
             <p className="text-xl text-white/60 max-w-2xl mx-auto">
-              Enterprise-grade AI command and control with patent-protected technology
+              Complete brokerage operations powered by SaintSal™ HACP™ technology
             </p>
           </div>
 
@@ -190,33 +192,33 @@ export default function WarRoom() {
           <Card className="bg-gradient-to-br from-red-900/20 to-yellow-900/20 border-red-500/30">
             <CardContent className="p-12 text-center">
               <Crown className="w-16 h-16 mx-auto mb-6 text-yellow-400" />
-              <h2 className="text-3xl font-light mb-4 text-white">Enterprise Exclusive Access</h2>
+              <h2 className="text-3xl font-light mb-4 text-white">Access Your SaintBroker Workspace</h2>
               <p className="text-xl text-white/70 mb-8 max-w-2xl mx-auto">
-                WarRoom access is restricted to Enterprise customers with verified business credentials 
-                and signed security agreements. Contact our enterprise team for qualification.
+                Sign up or log in to access your complete brokerage dashboard with SaintBroker AI chat, 
+                lending tools, real estate services, and portfolio management.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div className="bg-slate-800/30 rounded-lg p-4">
-                  <Shield className="w-8 h-8 mx-auto mb-2 text-red-400" />
-                  <div className="text-white font-medium">Security Clearance</div>
-                  <div className="text-white/60 text-sm">Background verification required</div>
+                  <Brain className="w-8 h-8 mx-auto mb-2 text-blue-400" />
+                  <div className="text-white font-medium">SaintBroker AI Chat</div>
+                  <div className="text-white/60 text-sm">24/7 AI assistant</div>
                 </div>
                 <div className="bg-slate-800/30 rounded-lg p-4">
-                  <Target className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
-                  <div className="text-white font-medium">Enterprise Plan</div>
-                  <div className="text-white/60 text-sm">Custom deployment options</div>
+                  <TrendingUp className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+                  <div className="text-white font-medium">Lending Tools</div>
+                  <div className="text-white/60 text-sm">$50K-$5M capital access</div>
                 </div>
                 <div className="bg-slate-800/30 rounded-lg p-4">
-                  <Lock className="w-8 h-8 mx-auto mb-2 text-green-400" />
-                  <div className="text-white font-medium">NDA Required</div>
-                  <div className="text-white/60 text-sm">Non-disclosure agreement</div>
+                  <Building2 className="w-8 h-8 mx-auto mb-2 text-green-400" />
+                  <div className="text-white font-medium">Real Estate Services</div>
+                  <div className="text-white/60 text-sm">Full brokerage platform</div>
                 </div>
               </div>
 
-              <Link href="/contact">
-                <Button size="lg" className="bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 px-8 py-4 text-lg font-semibold">
-                  Apply for Access
+              <Link href="/dashboard">
+                <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold" data-testid="button-access-workspace">
+                  Access Workspace
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>

@@ -160,12 +160,12 @@ const knowledge = await client.knowledge.ingest({
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold">
+              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold" data-testid="button-get-api-key-hero">
                 Get API Key
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg">
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg" data-testid="button-view-documentation-hero">
               <Book className="w-4 h-4 mr-2" />
               View Documentation
             </Button>
@@ -212,7 +212,7 @@ const knowledge = await client.knowledge.ingest({
           <Card className="bg-slate-900/50 border-slate-700/50">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-white">Example Implementation</CardTitle>
-              <Button size="sm" variant="outline" className="border-blue-500/30 text-blue-400">
+              <Button size="sm" variant="outline" className="border-blue-500/30 text-blue-400" data-testid="button-copy-code">
                 <Copy className="w-4 h-4 mr-2" />
                 Copy Code
               </Button>
@@ -332,12 +332,12 @@ const knowledge = await client.knowledge.ingest({
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold">
+              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold" data-testid="button-get-started-free">
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg">
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg" data-testid="button-read-documentation">
               Read Documentation
             </Button>
           </div>

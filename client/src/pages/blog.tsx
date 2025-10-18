@@ -160,7 +160,7 @@ export default function Blog() {
                   </div>
                 </div>
                 
-                <Button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700">
+                <Button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700" data-testid="button-read-featured">
                   Read Full Article
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
@@ -210,7 +210,7 @@ export default function Blog() {
                           </div>
                         </div>
                         
-                        <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10">
+                        <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10" data-testid={`button-read-post-${index}`}>
                           Read More
                         </Button>
                       </div>
@@ -261,7 +261,7 @@ export default function Blog() {
                   <p className="text-white/70 mb-6 text-sm">
                     Get the latest insights on AI technology, enterprise solutions, and SaintSal™ updates.
                   </p>
-                  <Button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700">
+                  <Button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700" data-testid="button-subscribe-newsletter">
                     Subscribe to Newsletter
                   </Button>
                 </CardContent>

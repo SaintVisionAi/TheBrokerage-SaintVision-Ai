@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Building2, Home, DollarSign, TrendingUp, CheckCircle, ArrowRight } from "lucide-react";
+import { Building2, Home, DollarSign, TrendingUp, CheckCircle, ArrowRight, MapPin, Hammer } from "lucide-react";
 import GlobalHeader from "@/components/layout/global-header";
 import GlobalFooter from "@/components/layout/global-footer";
 import { Link } from "wouter";
@@ -78,6 +78,184 @@ export default function RealEstate() {
                 Apply for Lending
               </Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Nationwide Coverage Section */}
+      <section className="py-16 px-6 bg-gradient-to-r from-yellow-900/20 to-yellow-900/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-3 bg-yellow-400/10 border-2 border-yellow-400/50 rounded-full px-8 py-4 mb-6">
+              <MapPin className="w-6 h-6 text-yellow-400" />
+              <span className="text-2xl text-yellow-400 font-bold">All 50 States Coverage</span>
+            </div>
+            <h2 className="text-4xl font-bold mb-4">Nationwide Real Estate Services</h2>
+            <p className="text-white/60 text-lg max-w-3xl mx-auto">
+              From coast to coast, Saint Vision Group provides comprehensive real estate solutions in every state. 
+              Whether you're buying in California, selling in Texas, or investing in Florida, we've got you covered.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 text-center">
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6">
+              <div className="text-3xl font-bold text-yellow-400 mb-2">50</div>
+              <p className="text-white/70">States Covered</p>
+            </div>
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6">
+              <div className="text-3xl font-bold text-yellow-400 mb-2">100%</div>
+              <p className="text-white/70">Nationwide Reach</p>
+            </div>
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6">
+              <div className="text-3xl font-bold text-yellow-400 mb-2">24/7</div>
+              <p className="text-white/70">Support Available</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Investment Strategies Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <Hammer className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
+            <h2 className="text-4xl font-bold mb-4">Real Estate Investment Strategies</h2>
+            <p className="text-white/60 text-lg max-w-2xl mx-auto">
+              Build wealth with proven real estate investment strategies tailored to your goals
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all" data-testid="strategy-brrrr">
+              <h3 className="text-xl font-bold mb-3 text-yellow-400">BRRRR Method</h3>
+              <p className="text-sm text-white/50 mb-3">Buy, Rehab, Rent, Refinance, Repeat</p>
+              <p className="text-white/70 mb-4">
+                Build a rental portfolio with recycled capital. Purchase undervalued properties, renovate, rent out, refinance, and repeat the process.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Leverage equity repeatedly</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Build passive income</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Tax advantages</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all" data-testid="strategy-str">
+              <h3 className="text-xl font-bold mb-3 text-yellow-400">STR (Short-Term Rentals)</h3>
+              <p className="text-sm text-white/50 mb-3">High-yield vacation properties</p>
+              <p className="text-white/70 mb-4">
+                Maximize income with short-term vacation rentals. Higher returns than traditional rentals in prime locations.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Premium nightly rates</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Flexible personal use</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Location advantages</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all" data-testid="strategy-airbnb">
+              <h3 className="text-xl font-bold mb-3 text-yellow-400">AirBnB Investment</h3>
+              <p className="text-sm text-white/50 mb-3">Platform-optimized properties</p>
+              <p className="text-white/70 mb-4">
+                Strategic properties designed for AirBnB success with professional management and optimization.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Property optimization</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Management services</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Market analysis</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all" data-testid="strategy-fix-flip">
+              <h3 className="text-xl font-bold mb-3 text-yellow-400">Fix & Flip</h3>
+              <p className="text-sm text-white/50 mb-3">Quick profit opportunities</p>
+              <p className="text-white/70 mb-4">
+                Purchase distressed properties, renovate strategically, and sell for profit in 6-12 months.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Fast returns</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">80-100% financing available</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Expert guidance</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all" data-testid="strategy-ground-up">
+              <h3 className="text-xl font-bold mb-3 text-yellow-400">Ground-Up Construction</h3>
+              <p className="text-sm text-white/50 mb-3">Build from scratch</p>
+              <p className="text-white/70 mb-4">
+                Develop new properties from the ground up with comprehensive construction financing and project management.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Maximum customization</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Construction financing</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Project oversight</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all" data-testid="strategy-build-to-rent">
+              <h3 className="text-xl font-bold mb-3 text-yellow-400">Build to Rent</h3>
+              <p className="text-sm text-white/50 mb-3">New construction rentals</p>
+              <p className="text-white/70 mb-4">
+                Develop new rental properties with modern amenities that command premium rents and attract quality tenants.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Premium rent potential</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Lower maintenance costs</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                  <span className="text-white/80">Long-term appreciation</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

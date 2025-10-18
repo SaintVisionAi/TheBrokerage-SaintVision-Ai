@@ -127,11 +127,11 @@ export default function Documentation() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold">
+            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold" data-testid="button-get-started">
               Get Started
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg">
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg" data-testid="button-search-docs">
               <Search className="w-4 h-4 mr-2" />
               Search Docs
             </Button>
@@ -178,7 +178,7 @@ export default function Documentation() {
                   <h3 className="text-lg font-semibold text-white mb-3">{step.title}</h3>
                   <p className="text-white/70 text-sm mb-4">{step.description}</p>
                   
-                  <Button variant="outline" size="sm" className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10">
+                  <Button variant="outline" size="sm" className="w-full border-blue-500/30 text-blue-400 hover:bg-blue-500/10" data-testid={`button-start-step-${index + 1}`}>
                     Start Step {index + 1}
                     <ArrowRight className="w-3 h-3 ml-2" />
                   </Button>
@@ -286,10 +286,10 @@ console.log(response.choices[0].message.content);`}</code>
               </pre>
               
               <div className="mt-6 flex gap-4">
-                <Button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700">
+                <Button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700" data-testid="button-try-playground">
                   Try in Playground
                 </Button>
-                <Button variant="outline" className="border-blue-500/30 text-blue-400">
+                <Button variant="outline" className="border-blue-500/30 text-blue-400" data-testid="button-view-example">
                   View Full Example
                 </Button>
               </div>
@@ -308,13 +308,13 @@ console.log(response.choices[0].message.content);`}</code>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/api">
-              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold">
+              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-4 text-lg font-semibold" data-testid="button-get-api-key">
                 Get API Key
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg">
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-blue-400 px-8 py-4 text-lg" data-testid="button-contact-support-docs">
                 Contact Support
               </Button>
             </Link>

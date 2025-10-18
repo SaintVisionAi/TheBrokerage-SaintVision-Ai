@@ -165,12 +165,12 @@ export default function Careers() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 px-8 py-4 text-lg font-semibold">
+            <Button size="lg" className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 px-8 py-4 text-lg font-semibold" data-testid="button-view-positions">
               View Open Positions
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Link href="/about">
-              <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-green-400 px-8 py-4 text-lg">
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-green-400 px-8 py-4 text-lg" data-testid="button-learn-about-us">
                 Learn About Us
               </Button>
             </Link>
@@ -223,7 +223,7 @@ export default function Careers() {
                       <h3 className="text-xl font-semibold text-white mb-2">{position.title}</h3>
                       <p className="text-white/70">{position.description}</p>
                     </div>
-                    <Button className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700">
+                    <Button className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700" data-testid={`button-apply-${position.title.toLowerCase().replace(/\s+/g, '-')}`}>
                       Apply Now
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
@@ -314,12 +314,12 @@ export default function Careers() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button size="lg" className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 px-8 py-4 text-lg font-semibold">
+              <Button size="lg" className="bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 px-8 py-4 text-lg font-semibold" data-testid="button-get-in-touch">
                 Get in Touch
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-green-400 px-8 py-4 text-lg">
+            <Button size="lg" variant="outline" className="border-white/30 text-white hover:text-green-400 px-8 py-4 text-lg" data-testid="button-submit-resume">
               Submit Resume
             </Button>
           </div>
