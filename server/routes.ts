@@ -16,6 +16,7 @@ import { sendDocumentRequest } from "./services/document-automation";
 import multer from 'multer';
 import express from 'express';
 import crypto from 'crypto';
+import { setupVoiceRoutes } from './routes/voice';
 import { 
   insertConversationSchema, 
   insertMessageSchema, 
@@ -84,6 +85,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.use(cookieParser());
   app.use(webhooksRouter);
+  
+  // Setup voice routes for speech-to-text and text-to-speech
+  setupVoiceRoutes(app);
 
   // Authentication Routes
   app.post("/api/auth/signup", async (req, res) => {

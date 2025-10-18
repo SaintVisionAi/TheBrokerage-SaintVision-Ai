@@ -194,8 +194,9 @@ export default function SaintBrokerEnhanced() {
         });
       };
 
-      recognition.onresult = (event) => {
-        const transcript = Array.from(event.results)
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const results = Array.from(event.results);
+        const transcript = results
           .map(result => result[0])
           .map(result => result.transcript)
           .join('');
@@ -203,7 +204,7 @@ export default function SaintBrokerEnhanced() {
         setInput(transcript);
       };
 
-      recognition.onerror = (event) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
         toast({
