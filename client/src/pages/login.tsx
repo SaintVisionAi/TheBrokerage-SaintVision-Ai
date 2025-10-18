@@ -96,7 +96,7 @@ export default function Login() {
               <img 
                 src={svgLogo} 
                 alt="Saint Vision Group AI Brokerage" 
-                className="w-32 h-32 object-contain"
+                className="w-32 h-32 object-contain rounded-3xl border-2 border-yellow-500/40 shadow-2xl shadow-yellow-500/30 bg-gradient-to-br from-neutral-900 to-black p-2"
                 data-testid="img-logo"
               />
             </div>
