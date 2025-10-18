@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { generateAssistantResponse, analyzeTone, openai, MODEL_NAME } from "./services/openai";
+import { saintBrokerAI } from "./lib/production";
 import { crmService } from "./services/crm";
 import { brainService } from "./services/brain";
 import { godmodeExecutor } from "./godmode/executor";
@@ -1802,13 +1803,36 @@ ${FUNDING_PARTNERS.filter(p => p.active).map(p =>
         // Continue with available knowledge even if some files fail
       }
 
-      const response = await generateAssistantResponse(
-        message,
-        "SaintBroker Chat",
-        knowledgeBase
-      );
+      // Use the production AI orchestrator with retry logic and Claude fallback
+      const response = await saintBrokerAI.chat({
+        message: message,
+        context: {
+          division: 'lending', // Default to lending division for SaintBroker
+          stage: context?.stage || 'initial',
+        }
+      });
 
-      res.json({ response: response.content });
+      // Add knowledge base context to the message if available
+      if (knowledgeBase.length > 0) {
+        const enhancedMessage = `
+${message}
+
+[Available Knowledge Base Context:]
+${knowledgeBase.slice(0, 2).join('\n\n')}
+        `;
+        
+        const enhancedResponse = await saintBrokerAI.chat({
+          message: enhancedMessage,
+          context: {
+            division: 'lending',
+            stage: context?.stage || 'initial',
+          }
+        });
+        
+        res.json({ response: enhancedResponse.response });
+      } else {
+        res.json({ response: response.response });
+      }
     } catch (error: any) {
       res.status(500).json({ error: "Failed to process chat message" });
     }

@@ -174,8 +174,9 @@ export class MonitoringService {
     const startTime = Date.now();
     
     try {
-      // Health check endpoint
-      const response = await fetch(`${process.env.API_URL}/api/health`);
+      // Use localhost for health check
+      const apiUrl = process.env.API_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/health`);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
