@@ -6,17 +6,19 @@ let standardClient: OpenAI | null = null;
 
 function createAzureClient(): OpenAI | null {
   if (process.env.AZURE_AI_FOUNDRY_KEY && process.env.AZURE_AI_FOUNDRY_ENDPOINT) {
-    console.log("🔵 Configuring Azure OpenAI client...");
+    console.log("🔵 Configuring Azure AI Foundry with GPT-5 FAST...");
     
-    // Ensure endpoint has proper format
-    const endpoint = process.env.AZURE_AI_FOUNDRY_ENDPOINT.endsWith('/openai/deployments')
-      ? process.env.AZURE_AI_FOUNDRY_ENDPOINT
-      : `${process.env.AZURE_AI_FOUNDRY_ENDPOINT.replace(/\/$/, '')}/openai/deployments`;
+    // Configure endpoint for GPT-5 FAST deployment
+    const baseEndpoint = process.env.AZURE_AI_FOUNDRY_ENDPOINT.replace(/\/$/, '');
+    const deploymentName = 'gpt-5-fast'; // Your GPT-5 FAST deployment
+    const endpoint = `${baseEndpoint}/openai/deployments/${deploymentName}`;
+    
+    console.log(`✅ Azure AI endpoint: ${endpoint}`);
     
     return new OpenAI({
       apiKey: process.env.AZURE_AI_FOUNDRY_KEY,
       baseURL: endpoint,
-      defaultQuery: { 'api-version': '2024-08-01-preview' },
+      defaultQuery: { 'api-version': '2025-04-01-preview' }, // Latest API version for GPT-5
       defaultHeaders: { 'api-key': process.env.AZURE_AI_FOUNDRY_KEY }
     });
   }
