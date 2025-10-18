@@ -1,9 +1,48 @@
 import OpenAI from "openai";
 
-// Use standard OpenAI API (Azure endpoints disabled temporarily due to auth issues)
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || ""
-});
+// OpenAI client configuration with explicit validation and fail-fast
+// Supports both Azure OpenAI and standard OpenAI API
+function createOpenAIClient(): OpenAI {
+  // Determine which API to use (Azure has priority if configured)
+  const useAzure = !!(
+    process.env.AZURE_AI_FOUNDRY_KEY && 
+    process.env.AZURE_AI_FOUNDRY_ENDPOINT
+  );
+
+  if (useAzure) {
+    console.log("🔵 Configuring Azure OpenAI client...");
+    
+    if (!process.env.AZURE_AI_FOUNDRY_KEY) {
+      throw new Error("AZURE_AI_FOUNDRY_KEY is required for Azure OpenAI but not set");
+    }
+    if (!process.env.AZURE_AI_FOUNDRY_ENDPOINT) {
+      throw new Error("AZURE_AI_FOUNDRY_ENDPOINT is required for Azure OpenAI but not set");
+    }
+    
+    return new OpenAI({
+      apiKey: process.env.AZURE_AI_FOUNDRY_KEY,
+      baseURL: process.env.AZURE_AI_FOUNDRY_ENDPOINT,
+      defaultQuery: { 'api-version': '2024-08-01-preview' },
+      defaultHeaders: { 'api-key': process.env.AZURE_AI_FOUNDRY_KEY }
+    });
+  }
+  
+  // Standard OpenAI API
+  console.log("🟢 Configuring standard OpenAI client...");
+  
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is required but not set. Configure either OPENAI_API_KEY or Azure credentials.");
+  }
+  
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  });
+}
+
+const openai = createOpenAIClient();
+
+// Export the configured client for use across the application
+export { openai };
 
 export interface ToneAnalysis {
   tone: string;

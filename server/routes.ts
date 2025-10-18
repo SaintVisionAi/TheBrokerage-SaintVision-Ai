@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { generateAssistantResponse, analyzeTone } from "./services/openai";
+import { generateAssistantResponse, analyzeTone, openai } from "./services/openai";
 import { crmService } from "./services/crm";
 import { brainService } from "./services/brain";
 import { godmodeExecutor } from "./godmode/executor";
@@ -26,7 +26,6 @@ import { createSession, deleteSession } from './lib/session';
 import { isAuthenticated, isAdmin } from './middleware/auth';
 import cookieParser from 'cookie-parser';
 import webhooksRouter from './routes/webhooks';
-import OpenAI from 'openai';
 import { FUNDING_PARTNERS } from '../shared/funding-partners-ai';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -553,16 +552,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { chatSettings, messages, functions } = req.body;
       
-      if (!process.env.OPENAI_API_KEY) {
-        return res.status(500).json({ 
-          message: "OpenAI API key not configured" 
-        });
-      }
-
-      const client = new OpenAI({ 
-        apiKey: process.env.OPENAI_API_KEY 
-      });
-
       const payload: any = {
         messages,
         temperature: chatSettings?.temperature || 0.7,
@@ -579,7 +568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         payload.functions = functions;
       }
 
-      const completion = await client.chat.completions.create(payload);
+      const completion = await openai.chat.completions.create(payload);
       
       res.json({
         choices: completion.choices
@@ -597,17 +586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { systemPrompt, userMessage } = req.body;
 
-      if (!process.env.OPENAI_API_KEY) {
-        return res.status(500).json({ 
-          reply: "OpenAI API key not configured. Please add your OPENAI_API_KEY to continue." 
-        });
-      }
-
-      const client = new OpenAI({ 
-        apiKey: process.env.OPENAI_API_KEY 
-      });
-
-      const completion = await client.chat.completions.create({
+      const completion = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt || "You are SaintBroker, a helpful AI assistant for Saint Vision Group." },
@@ -633,23 +612,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { user_id, userQuery } = req.body;
 
-      if (!process.env.OPENAI_API_KEY) {
-        return res.status(500).json({ 
-          reply: "OpenAI API key not configured" 
-        });
-      }
-
-      const openai = require('openai');
-      const client = new openai.OpenAI({ 
-        apiKey: process.env.OPENAI_API_KEY 
-      });
-
       // For now, we'll use basic memory context - later can be enhanced with storage
       const memoryContext = "Previous conversations and user preferences can be stored here";
 
       const prompt = `You are SaintSal™, an AI assistant with memory and intuition.\n\nMemory Context:\n${memoryContext}\n\nUser Query:\n${userQuery}\n\nRespond helpfully using context when relevant. Be helpful, intuitive, and aligned with enterprise values.`;
 
-      const completion = await client.chat.completions.create({
+      const completion = await openai.chat.completions.create({
         model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           { role: "system", content: "You are SaintSal™, an advanced AI assistant with memory capabilities and enterprise-grade intelligence." },
@@ -682,12 +650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const openai = require('openai');
-      const client = new openai.OpenAI({ 
-        apiKey: process.env.OPENAI_API_KEY 
-      });
-
-      const completion = await client.chat.completions.create({
+      const completion = await openai.chat.completions.create({
         model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
