@@ -153,7 +153,7 @@ export default function Landing() {
           </div>
           
           {/* Main Headline */}
-          <h1 className="text-7xl md:text-8xl font-bold tracking-tight mb-4 leading-none">
+          <h1 className="text-7xl md:text-8xl font-light tracking-tight mb-4 leading-none">
             <span className="text-white">
               "The Brokerage"
             </span>
