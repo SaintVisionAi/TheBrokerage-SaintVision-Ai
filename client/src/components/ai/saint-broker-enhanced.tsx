@@ -73,6 +73,8 @@ export default function SaintBrokerEnhanced() {
   }]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Documents State
@@ -175,6 +177,12 @@ export default function SaintBrokerEnhanced() {
       });
 
       const data = await response.json();
+      
+      // Update sync status and role from response
+      if (data.context) {
+        setSyncStatus(data.context.syncStatus);
+        setUserRole(data.context.role);
+      }
       
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -325,6 +333,18 @@ export default function SaintBrokerEnhanced() {
           <Badge variant="outline" className="text-xs border-yellow-400/50 text-yellow-400 bg-yellow-400/10 animate-pulse">
             AI™
           </Badge>
+          {/* ORCHESTRATOR SYNC STATUS */}
+          {syncStatus && (
+            <div className="flex items-center gap-2 ml-2">
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+              <span className="text-xs text-emerald-400 font-medium">SYNCED</span>
+            </div>
+          )}
+          {userRole && (
+            <Badge className="text-xs bg-blue-500/20 text-blue-400 border-blue-400/30">
+              {userRole.toUpperCase()}
+            </Badge>
+          )}
         </CardTitle>
         <Button
           variant="ghost"
