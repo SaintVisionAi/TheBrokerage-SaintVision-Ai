@@ -633,6 +633,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Lead qualification endpoint for lending pipeline
+  app.post("/api/leads/qualify", async (req, res) => {
+    try {
+      const { name, email, phone, loanAmount, creditScore, businessType, urgency } = req.body;
+      
+      // Qualify the lead based on criteria
+      const qualified = creditScore >= 600 && parseLoanAmount(loanAmount) >= 50000;
+      const priority = urgency === 'high' ? 'hot' : creditScore >= 700 ? 'warm' : 'cold';
+      
+      // Store lead in database (could be expanded later)
+      const leadData = {
+        name,
+        email,
+        phone,
+        loanAmount: parseLoanAmount(loanAmount),
+        creditScore: parseInt(creditScore),
+        businessType,
+        urgency,
+        qualified,
+        priority,
+        timestamp: new Date().toISOString()
+      };
+      
+      // If qualified, could trigger GHL workflow here
+      if (qualified) {
+        console.log(`✅ Qualified lead: ${name} - ${priority} priority`);
+      }
+      
+      res.json({
+        success: true,
+        qualified,
+        priority,
+        message: qualified 
+          ? `Great news! You pre-qualify for up to $${loanAmount}. A specialist will contact you shortly.`
+          : `Thank you for your interest. Let's discuss alternative options that may work better for you.`,
+        leadData
+      });
+    } catch (error: any) {
+      console.error("Lead qualification error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
+    }
+  });
+  
   // Debug endpoint to test OpenAI connection
   app.get("/api/test-openai", async (req, res) => {
     try {
