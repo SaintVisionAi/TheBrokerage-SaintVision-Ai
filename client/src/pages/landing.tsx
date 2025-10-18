@@ -136,29 +136,39 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="relative z-10 min-h-screen flex items-start justify-center pt-48">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          {/* URGENT LENDING CTA - PROMINENT */}
-          <div className="mb-6 animate-pulse">
-            <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-lg px-6 py-3 border-0">
-              💰 Get $50K-$5M Business Funding in 24-48 Hours
-            </Badge>
+          {/* TOP CTAs - Just the two buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Link href="/apply">
+              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-12 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30" data-testid="button-apply-top">
+                💰 Apply Now - Get Funded
+                <ArrowRight className="w-6 h-6 ml-2" />
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-10 py-6 text-xl font-semibold border-0 shadow-lg shadow-blue-500/30" data-testid="button-create-account-top">
+                🚀 Create Account
+                <ArrowRight className="w-6 h-6 ml-2" />
+              </Button>
+            </Link>
           </div>
           
-          {/* Main Headline - LENDING FOCUSED */}
+          {/* Main Headline */}
           <h1 className="text-7xl md:text-8xl font-bold tracking-tight mb-4 leading-none">
-            <span className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
-              Business Lending
-            </span>
-            <br />
-            <span className="text-5xl md:text-6xl bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">
-              Made Simple
+            <span className="text-white">
+              "The Brokerage"
             </span>
           </h1>
 
-          {/* AI-Powered - Royal Neon Blue */}
+          {/* Subtitle */}
+          <p className="text-2xl md:text-3xl text-white/80 mb-3">
+            By Saint Vision Technologies
+          </p>
+
+          {/* Responsible Intelligence - Royal Blue */}
           <p className="text-3xl md:text-4xl font-semibold mb-3 tracking-wide bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 bg-clip-text text-transparent" style={{
             textShadow: '0 0 40px rgba(59, 130, 246, 0.5)'
           }}>
-            AI-Powered Instant Approval
+            Responsible Intelligence
           </p>
 
           {/* by cookin.io - Clickable */}
@@ -202,10 +212,10 @@ export default function Landing() {
             </p>
           </div>
 
-          {/* Subtitle - LENDING FOCUSED */}
-          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed font-medium">
-            Get approved for <span className="text-yellow-400 font-bold">$50K to $5M</span> in business funding. 
-            <span className="text-emerald-400"> No hard credit check. 24-hour approval. 13 lending partners.</span>
+          {/* Description */}
+          <p className="text-xl md:text-2xl text-white/80 mb-8 max-w-4xl mx-auto leading-relaxed">
+            Transform opportunities into success with innovative strategies, technology, and<br />
+            unparalleled expertise. Faith-aligned. Patent-protected. GHL integrated.
           </p>
 
           {/* Trusted Tech Stack */}
