@@ -205,7 +205,7 @@ export default function WarRoom() {
                 <div className="bg-slate-800/30 rounded-lg p-4">
                   <Target className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
                   <div className="text-white font-medium">Enterprise Plan</div>
-                  <div className="text-white/60 text-sm">Custom pricing and deployment</div>
+                  <div className="text-white/60 text-sm">Custom deployment options</div>
                 </div>
                 <div className="bg-slate-800/30 rounded-lg p-4">
                   <Lock className="w-8 h-8 mx-auto mb-2 text-green-400" />

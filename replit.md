@@ -38,7 +38,7 @@ The server is built with Express.js and TypeScript, following a RESTful API desi
 PostgreSQL is used for data persistence with Drizzle ORM, supporting full schema management for users, conversations, knowledge base, logging, and activity tracking. It includes automatic migrations and environment-configured connection pooling.
 
 ### Authentication and Authorization
-The system uses session-based authentication with tiered user access (free, pro, enterprise) managed via Stripe subscriptions (though Stripe payment processing is currently removed). Feature gating controls access to advanced functionalities like Godmode and unlimited knowledge base storage.
+The system uses session-based authentication with tiered user access (free, pro, enterprise). NO PAYMENT PROCESSING - all accounts are free with full access. Feature gating can control access to advanced functionalities like Godmode and unlimited knowledge base storage if needed.
 
 ### AI Integration
 SaintSal™ HACP™ technology (U.S. Patent No. 10,290,222) and Azure Cognitive Services provide core AI functionalities, including conversation management with context preservation, tone analysis, real-time voice processing (speech-to-text, text-to-speech), knowledge base content ingestion with embeddings, and response generation. The system incorporates fallback mechanisms for AI service interruptions.

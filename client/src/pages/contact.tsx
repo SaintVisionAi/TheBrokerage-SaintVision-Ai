@@ -63,7 +63,7 @@ export default function Contact() {
     {
       icon: Users,
       title: "Sales Inquiry",
-      description: "Questions about pricing and features",
+      description: "Questions about our services and features",
       response: "< 2 hours"
     },
     {
