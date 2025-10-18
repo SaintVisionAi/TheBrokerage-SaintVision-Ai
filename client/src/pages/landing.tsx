@@ -134,10 +134,10 @@ export default function Landing() {
       <GlobalHeader />
 
       {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex items-start justify-center pt-48">
+      <section className="relative z-10 min-h-screen flex items-start justify-center pt-32">
         <div className="max-w-6xl mx-auto px-6 text-center">
           {/* TOP CTAs - Just the two buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Link href="/apply">
               <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-12 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30" data-testid="button-apply-top">
                 💰 Apply Now - Get Funded
