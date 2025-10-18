@@ -292,7 +292,7 @@ export default function Terms() {
                       If you have questions about these terms, please contact us:
                     </p>
                     <p className="mb-2">
-                      <strong>Email:</strong> support@cookin.io
+                      <strong>Email:</strong> saints@hacp.ai
                     </p>
                     <p>
                       <strong>Address:</strong> Saint Vision Group LLC<br />

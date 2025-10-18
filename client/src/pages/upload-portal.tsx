@@ -142,8 +142,8 @@ export default function UploadPortal() {
           <CardContent>
             <p className="text-sm text-muted-foreground">
               Please contact Saint Vision Group at{' '}
-              <a href="mailto:support@cookin.io" className="text-primary hover:underline">
-                support@cookin.io
+              <a href="mailto:saints@hacp.ai" className="text-primary hover:underline">
+                saints@hacp.ai
               </a>{' '}
               or{' '}
               <a href="tel:+19497550720" className="text-primary hover:underline">
@@ -288,8 +288,8 @@ export default function UploadPortal() {
             <div className="space-y-2">
               <p className="text-sm">
                 <strong>Email:</strong>{' '}
-                <a href="mailto:support@cookin.io" className="text-primary hover:underline" data-testid="link-email">
-                  support@cookin.io
+                <a href="mailto:saints@hacp.ai" className="text-primary hover:underline" data-testid="link-email">
+                  saints@hacp.ai
                 </a>
               </p>
               <p className="text-sm">

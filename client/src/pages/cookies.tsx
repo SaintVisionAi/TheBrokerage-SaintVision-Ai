@@ -287,7 +287,7 @@ export default function Cookies() {
                   </p>
                   <div className="bg-slate-700/30 rounded-lg p-4">
                     <p className="text-white/80">
-                      <strong>Email:</strong> support@cookin.io<br />
+                      <strong>Email:</strong> saints@hacp.ai<br />
                       <strong>Subject:</strong> Cookie Policy Inquiry
                     </p>
                   </div>
