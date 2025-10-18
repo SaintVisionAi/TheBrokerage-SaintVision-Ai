@@ -124,6 +124,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/dashboard" component={ProtectedDashboard} />
+      <Route path="/admin" component={ProtectedDashboard} />
       <Route path="/client-portal" component={ProtectedClientPortal} />
       <Route path="/admin/saintbook">
         {() => <ProtectedAdminRoute component={SaintBookDashboard} />}
