@@ -2028,6 +2028,83 @@ IMPORTANT: You are SaintBroker AI, the master orchestrator. Respond based on the
     }
   });
 
+  // ========== REAL-TIME SYNC API (ORCHESTRATOR) ==========
+  
+  // Master sync endpoint for real-time dashboard synchronization
+  app.get("/api/sync/status", async (req, res) => {
+    try {
+      const userRole = req.user?.role || 'client';
+      const userEmail = req.user?.email || 'unknown';
+      
+      const { db } = await import('./db');
+      const { opportunities, contacts } = await import('@shared/schema');
+      const { eq, desc } = await import('drizzle-orm');
+      
+      // Get latest data based on role
+      let syncData: any = {
+        timestamp: new Date().toISOString(),
+        role: userRole,
+        syncStatus: 'active'
+      };
+      
+      if (userRole === 'admin' || userRole === 'broker') {
+        // Admin sees all applications with real-time updates
+        const apps = await db.select({
+          oppId: opportunities.id,
+          firstName: contacts.firstName,
+          lastName: contacts.lastName,
+          monetaryValue: opportunities.monetaryValue,
+          stageName: opportunities.stageName,
+          updatedAt: opportunities.updatedAt
+        })
+        .from(opportunities)
+        .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
+        .orderBy(desc(opportunities.updatedAt))
+        .limit(10); // Last 10 updated
+        
+        syncData.adminView = {
+          totalApplications: apps.length,
+          recentUpdates: apps,
+          lastSync: new Date().toISOString()
+        };
+      } else {
+        // Client sees only their data with real-time updates
+        const contact = await db.select().from(contacts).where(eq(contacts.email, userEmail)).limit(1);
+        if (contact[0]) {
+          const opp = await db.select().from(opportunities).where(eq(opportunities.contactId, contact[0].id)).limit(1);
+          syncData.clientView = {
+            hasApplication: !!opp[0],
+            currentStage: opp[0]?.stageName || 'none',
+            lastUpdate: opp[0]?.updatedAt || null
+          };
+        }
+      }
+      
+      res.json(syncData);
+    } catch (error: any) {
+      console.error("Sync status error:", error);
+      res.status(500).json({ error: "Failed to get sync status" });
+    }
+  });
+  
+  // Webhook for real-time updates from GHL
+  app.post("/api/sync/webhook", async (req, res) => {
+    try {
+      const { eventType, data } = req.body;
+      
+      // Broadcast update to all connected dashboards
+      console.log(`[SYNC] Broadcasting ${eventType} update to all dashboards`);
+      
+      // TODO: Implement WebSocket broadcast for real-time updates
+      // For now, dashboards will poll /api/sync/status
+      
+      res.json({ success: true, broadcast: eventType });
+    } catch (error: any) {
+      console.error("Sync webhook error:", error);
+      res.status(500).json({ error: "Failed to process sync webhook" });
+    }
+  });
+
   // ========== DOCUMENT UPLOAD ROUTES ==========
   
   // Configure multer for memory storage
