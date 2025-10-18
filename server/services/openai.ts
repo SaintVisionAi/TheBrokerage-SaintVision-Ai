@@ -3,12 +3,7 @@ import OpenAI from "openai";
 // OpenAI client configuration with explicit validation and fail-fast
 // Supports both Azure OpenAI and standard OpenAI API
 function createOpenAIClient(): OpenAI {
-  // TEMPORARY: Azure credentials invalid, using standard OpenAI
   // Determine which API to use (Azure has priority if configured)
-  const useAzure = false; // Disabled until Azure credentials are updated
-  
-  // Keeping Azure code for when credentials are fixed
-  /* 
   const useAzure = !!(
     process.env.AZURE_AI_FOUNDRY_KEY && 
     process.env.AZURE_AI_FOUNDRY_ENDPOINT
@@ -31,9 +26,8 @@ function createOpenAIClient(): OpenAI {
       defaultHeaders: { 'api-key': process.env.AZURE_AI_FOUNDRY_KEY }
     });
   }
-  */
   
-  // Standard OpenAI API
+  // Standard OpenAI API fallback
   console.log("🟢 Configuring standard OpenAI client...");
   
   if (!process.env.OPENAI_API_KEY) {
@@ -46,6 +40,17 @@ function createOpenAIClient(): OpenAI {
 }
 
 const openai = createOpenAIClient();
+
+// Determine which model name to use based on configuration
+// Azure uses deployment names, standard OpenAI uses model names
+const useAzure = !!(
+  process.env.AZURE_AI_FOUNDRY_KEY && 
+  process.env.AZURE_AI_FOUNDRY_ENDPOINT
+);
+
+export const MODEL_NAME = useAzure 
+  ? (process.env.AZURE_DEPLOYMENT_GPT5_CORE || "gpt-5-core")
+  : "gpt-4o";
 
 // Export the configured client for use across the application
 export { openai };
@@ -67,7 +72,7 @@ export async function analyzeTone(text: string): Promise<ToneAnalysis> {
     const startTime = Date.now();
     
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: MODEL_NAME,
       messages: [
         {
           role: "system",
@@ -121,7 +126,7 @@ ${context}
 Respond helpfully and professionally. If the user seems frustrated or has a complex request, acknowledge their concern and provide the best assistance possible.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: MODEL_NAME,
       messages: [
         {
           role: "system",
