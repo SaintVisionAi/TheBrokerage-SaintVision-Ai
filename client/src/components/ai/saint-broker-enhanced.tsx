@@ -23,7 +23,11 @@ import {
   Clock,
   XCircle,
   Plus,
-  Search
+  Search,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -68,11 +72,19 @@ export default function SaintBrokerEnhanced() {
   // Chat State - Direct lending-focused greeting
   const [messages, setMessages] = useState<Message[]>([{
     role: 'assistant',
-    content: "**Need capital? Rates? Answers?** I gotta guy. 🏪",
+    content: "**Need capital? Rates? Answers?** I gotta guy. 🕴️",
     timestamp: new Date()
   }]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Voice State
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const speechSynthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const [syncStatus, setSyncStatus] = useState<any>(null);
   const [userRole, setUserRole] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -155,6 +167,120 @@ export default function SaintBrokerEnhanced() {
     }
   };
 
+  // Voice-to-Text using browser's Web Speech API
+  const startVoiceRecording = async () => {
+    try {
+      // Check for browser support
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        toast({
+          title: "Voice not supported",
+          description: "Your browser doesn't support voice recognition",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        toast({
+          title: "Listening...",
+          description: "Speak now",
+        });
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0])
+          .map(result => result.transcript)
+          .join('');
+        
+        setInput(transcript);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        toast({
+          title: "Voice error",
+          description: "Failed to recognize speech",
+          variant: "destructive"
+        });
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        if (input.trim()) {
+          handleSend();
+        }
+      };
+
+      recognition.start();
+      
+      // Store reference to stop later
+      (window as any).currentRecognition = recognition;
+      
+    } catch (error) {
+      console.error('Error starting voice recording:', error);
+      toast({
+        title: "Voice error",
+        description: "Failed to start voice recording",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const stopVoiceRecording = () => {
+    const recognition = (window as any).currentRecognition;
+    if (recognition) {
+      recognition.stop();
+      setIsListening(false);
+    }
+  };
+
+  const toggleVoiceRecording = () => {
+    if (isListening) {
+      stopVoiceRecording();
+    } else {
+      startVoiceRecording();
+    }
+  };
+
+  // Text-to-Speech using browser's Speech Synthesis
+  const speakMessage = (text: string) => {
+    if (!voiceEnabled || !window.speechSynthesis) return;
+    
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    // Use a natural English voice if available
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(voice => 
+      voice.lang === 'en-US' && voice.name.includes('Natural')
+    ) || voices.find(voice => voice.lang === 'en-US');
+    
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+    
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    
+    window.speechSynthesis.speak(utterance);
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -215,11 +341,24 @@ export default function SaintBrokerEnhanced() {
         setUserRole(data.context.role);
       }
       
-      setMessages(prev => [...prev, {
-        role: 'assistant',
+      const assistantMessage = {
+        role: 'assistant' as const,
         content: data.response,
         timestamp: new Date()
-      }]);
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      
+      // Speak the response if voice is enabled
+      if (voiceEnabled) {
+        // Clean the message for speech (remove markdown)
+        const cleanMessage = data.response
+          .replace(/\*\*/g, '')
+          .replace(/\*/g, '')
+          .replace(/\n/g, '. ')
+          .replace(/[#_`]/g, '');
+        speakMessage(cleanMessage);
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -528,24 +667,68 @@ export default function SaintBrokerEnhanced() {
             </div>
           </ScrollArea>
           
-          {/* Input section at the bottom */}
-          <div className="flex gap-2 p-4 border-t border-white/10 bg-black/20">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-              placeholder="Ask SaintBroker anything..."
-              className="flex-1 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50"
-              data-testid="input-chat"
-            />
-            <Button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
-              data-testid="button-send-message"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
+          {/* Input section at the bottom with voice controls */}
+          <div className="p-4 border-t border-white/10 bg-black/20">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => toggleVoiceRecording()}
+                className={cn(
+                  "border-white/20 hover:border-yellow-400",
+                  isListening && "bg-red-500/20 border-red-500 animate-pulse"
+                )}
+                data-testid="button-voice-record"
+              >
+                {isListening ? (
+                  <MicOff className="h-4 w-4 text-red-400" />
+                ) : (
+                  <Mic className="h-4 w-4 text-white" />
+                )}
+              </Button>
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                placeholder={isListening ? "Listening..." : "Ask SaintBroker anything..."}
+                disabled={isListening}
+                className="flex-1 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50"
+                data-testid="input-chat"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setVoiceEnabled(!voiceEnabled)}
+                className="border-white/20 hover:border-yellow-400"
+                data-testid="button-voice-toggle"
+              >
+                {voiceEnabled ? (
+                  <Volume2 className="h-4 w-4 text-white" />
+                ) : (
+                  <VolumeX className="h-4 w-4 text-white/50" />
+                )}
+              </Button>
+              <Button
+                onClick={handleSend}
+                disabled={isLoading || (!input.trim() && !isListening)}
+                className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                data-testid="button-send-message"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            {isListening && (
+              <div className="mt-2 flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className="w-1 h-3 bg-red-500 animate-pulse" />
+                  <div className="w-1 h-4 bg-red-500 animate-pulse" style={{ animationDelay: '0.1s' }} />
+                  <div className="w-1 h-2 bg-red-500 animate-pulse" style={{ animationDelay: '0.2s' }} />
+                  <div className="w-1 h-5 bg-red-500 animate-pulse" style={{ animationDelay: '0.3s' }} />
+                  <div className="w-1 h-3 bg-red-500 animate-pulse" style={{ animationDelay: '0.4s' }} />
+                </div>
+                <span className="text-xs text-red-400">Recording... Click mic to stop</span>
+              </div>
+            )}
           </div>
         </TabsContent>
 
