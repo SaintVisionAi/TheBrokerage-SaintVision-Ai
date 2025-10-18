@@ -7,6 +7,13 @@
  * Brother, this is your early warning system.
  */
 
+import { pool } from '../../db';
+import { storage } from '../../storage';
+import { sendSMS } from '../../services/twilio-service';
+import { sendEmail, checkGHLConnection } from '../../services/ghl-client';
+import { openai, MODEL_NAME } from '../../services/openai';
+import { validateSMSConfig } from '../../services/twilio-service';
+
 // ═══════════════════════════════════════════════════════════
 // CONFIGURATION
 // ═══════════════════════════════════════════════════════════
@@ -75,6 +82,10 @@ export class MonitoringService {
   private healthStatus: Map<string, HealthCheckResult> = new Map();
   private running = false;
   
+  // Alert deduplication tracking
+  private sentAlerts: Map<string, Date> = new Map(); // key: service-severity-messageHash, value: timestamp
+  private readonly ALERT_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes cooldown
+  
   /**
    * Start monitoring
    */
@@ -131,10 +142,13 @@ export class MonitoringService {
     
     try {
       // Simple query to test database
-      // TODO: Replace with your actual database client
-      // await db.query('SELECT 1');
-      
+      const result = await pool.query('SELECT 1 as test');
       const responseTime = Date.now() - startTime;
+      
+      // Check if we got a valid response
+      if (!result || !result.rows) {
+        throw new Error('Invalid database response');
+      }
       
       this.recordHealthCheck({
         service: 'database',
@@ -217,15 +231,31 @@ export class MonitoringService {
   }
   
   private async checkGHLHealth() {
+    const startTime = Date.now();
+    
     try {
-      // TODO: Test GHL API with simple request
-      // const response = await ghlClient.testConnection();
+      // Test GHL API with connection check
+      const isConnected = await checkGHLConnection();
+      const responseTime = Date.now() - startTime;
+      
+      if (!isConnected) {
+        throw new Error('GHL connection test failed');
+      }
       
       this.recordHealthCheck({
         service: 'ghl',
-        status: 'healthy',
+        status: responseTime < 3000 ? 'healthy' : 'degraded',
+        responseTime,
         timestamp: new Date(),
       });
+      
+      if (responseTime > 5000) {
+        this.sendAlert({
+          severity: 'warning',
+          service: 'ghl',
+          message: `GHL API response time: ${responseTime}ms (slow)`,
+        });
+      }
       
     } catch (error: any) {
       this.recordHealthCheck({
@@ -245,14 +275,30 @@ export class MonitoringService {
   
   private async checkTwilioHealth() {
     try {
-      // TODO: Test Twilio with simple request
-      // const response = await twilioClient.testConnection();
+      // Twilio is integrated via GHL, so check if SMS config is valid
+      const isConfigured = validateSMSConfig();
       
-      this.recordHealthCheck({
-        service: 'twilio',
-        status: 'healthy',
-        timestamp: new Date(),
-      });
+      if (!isConfigured) {
+        this.recordHealthCheck({
+          service: 'twilio',
+          status: 'degraded',
+          error: 'SMS service not configured',
+          timestamp: new Date(),
+        });
+        
+        // Only warn, not critical since SMS might be intentionally disabled
+        this.sendAlert({
+          severity: 'warning',
+          service: 'twilio',
+          message: 'SMS service not configured (GHL API key or location ID missing)',
+        });
+      } else {
+        this.recordHealthCheck({
+          service: 'twilio',
+          status: 'healthy',
+          timestamp: new Date(),
+        });
+      }
       
     } catch (error: any) {
       this.recordHealthCheck({
@@ -265,21 +311,52 @@ export class MonitoringService {
       this.sendAlert({
         severity: 'critical',
         service: 'twilio',
-        message: `Twilio SMS is DOWN: ${error.message}`,
+        message: `SMS service error: ${error.message}`,
       });
     }
   }
   
   private async checkOpenAIHealth() {
+    const startTime = Date.now();
+    
     try {
-      // TODO: Test OpenAI with simple request
-      // const response = await openaiClient.testConnection();
+      // Test OpenAI with a minimal completion request
+      const response = await openai.chat.completions.create({
+        model: MODEL_NAME,
+        messages: [
+          {
+            role: 'system',
+            content: 'Health check'
+          },
+          {
+            role: 'user',
+            content: 'OK'
+          }
+        ],
+        max_tokens: 5,
+        temperature: 0
+      });
+      
+      const responseTime = Date.now() - startTime;
+      
+      if (!response || !response.choices || response.choices.length === 0) {
+        throw new Error('Invalid OpenAI response');
+      }
       
       this.recordHealthCheck({
         service: 'openai',
-        status: 'healthy',
+        status: responseTime < 5000 ? 'healthy' : 'degraded',
+        responseTime,
         timestamp: new Date(),
       });
+      
+      if (responseTime > 10000) {
+        this.sendAlert({
+          severity: 'warning',
+          service: 'openai',
+          message: `OpenAI API response time: ${responseTime}ms (slow)`,
+        });
+      }
       
     } catch (error: any) {
       this.recordHealthCheck({
@@ -315,47 +392,107 @@ export class MonitoringService {
    */
   private async collectBusinessMetrics() {
     try {
-      // TODO: Query your database for these metrics
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       
-      // Leads captured today
-      const leadsToday = 0; // await db.countLeadsToday();
+      // Leads captured today - count new contacts created today
+      const leadsTodayResult = await pool.query(
+        `SELECT COUNT(*) as count FROM contacts WHERE created_at >= $1`,
+        [startOfDay]
+      );
+      const leadsToday = parseInt(leadsTodayResult.rows[0]?.count || '0');
+      
       this.recordMetric({
         name: 'leads_captured_today',
         value: leadsToday,
         unit: 'count',
-        timestamp: new Date(),
+        timestamp: now,
         tags: { division: 'all' },
       });
       
-      // Opportunities in pipeline
-      const openOpportunities = 0; // await db.countOpenOpportunities();
+      // Opportunities in pipeline - count active opportunities
+      const openOpportunitiesResult = await pool.query(
+        `SELECT COUNT(*) as count FROM opportunities 
+         WHERE status != 'closed' AND status != 'lost' AND status != 'won'`
+      );
+      const openOpportunities = parseInt(openOpportunitiesResult.rows[0]?.count || '0');
+      
       this.recordMetric({
         name: 'open_opportunities',
         value: openOpportunities,
         unit: 'count',
-        timestamp: new Date(),
+        timestamp: now,
         tags: { division: 'all' },
       });
       
-      // Pipeline value
-      const pipelineValue = 0; // await db.sumPipelineValue();
+      // Pipeline value - sum of all open opportunity values
+      const pipelineValueResult = await pool.query(
+        `SELECT COALESCE(SUM(monetary_value), 0) as total FROM opportunities 
+         WHERE status != 'closed' AND status != 'lost' AND status != 'won'`
+      );
+      const pipelineValue = parseInt(pipelineValueResult.rows[0]?.total || '0');
+      
       this.recordMetric({
         name: 'pipeline_value',
         value: pipelineValue,
         unit: 'usd',
-        timestamp: new Date(),
+        timestamp: now,
         tags: { division: 'all' },
       });
       
-      // Conversion rates
-      const conversionRate = 0; // await db.calculateConversionRate();
+      // Conversion rate - calculate won vs total opportunities this month
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const conversionRateResult = await pool.query(
+        `SELECT 
+          COUNT(*) FILTER (WHERE status = 'won' OR stage_name LIKE '%Funded%' OR stage_name LIKE '%Won%') as won,
+          COUNT(*) as total
+         FROM opportunities 
+         WHERE created_at >= $1`,
+        [startOfMonth]
+      );
+      
+      const wonCount = parseInt(conversionRateResult.rows[0]?.won || '0');
+      const totalCount = parseInt(conversionRateResult.rows[0]?.total || '1');
+      const conversionRate = totalCount > 0 ? (wonCount / totalCount) * 100 : 0;
+      
       this.recordMetric({
         name: 'conversion_rate',
-        value: conversionRate,
+        value: Math.round(conversionRate * 100) / 100, // Round to 2 decimal places
         unit: 'percent',
-        timestamp: new Date(),
+        timestamp: now,
         tags: { division: 'all' },
       });
+      
+      // Collect metrics by division
+      const divisionsResult = await pool.query(
+        `SELECT 
+          division,
+          COUNT(*) as count,
+          COALESCE(SUM(monetary_value), 0) as value
+         FROM opportunities
+         WHERE status != 'closed' AND status != 'lost' AND status != 'won'
+         GROUP BY division`
+      );
+      
+      for (const row of divisionsResult.rows) {
+        if (row.division) {
+          this.recordMetric({
+            name: `opportunities_${row.division}`,
+            value: parseInt(row.count),
+            unit: 'count',
+            timestamp: now,
+            tags: { division: row.division },
+          });
+          
+          this.recordMetric({
+            name: `pipeline_value_${row.division}`,
+            value: parseInt(row.value),
+            unit: 'usd',
+            timestamp: now,
+            tags: { division: row.division },
+          });
+        }
+      }
       
     } catch (error) {
       console.error('[MONITORING] Error collecting business metrics:', error);
@@ -366,10 +503,81 @@ export class MonitoringService {
    * Collect performance metrics
    */
   private async collectPerformanceMetrics() {
-    // API response times
-    // Database query times
-    // AI response times
-    // etc.
+    try {
+      const now = new Date();
+      
+      // Collect response times from health checks
+      for (const [service, health] of this.healthStatus.entries()) {
+        if (health.responseTime !== undefined) {
+          this.recordMetric({
+            name: `response_time_${service}`,
+            value: health.responseTime,
+            unit: 'ms',
+            timestamp: now,
+            tags: { service },
+          });
+          
+          // Alert if response time exceeds threshold
+          if (health.responseTime > MONITORING_CONFIG.thresholds.responseTime) {
+            this.sendAlert({
+              severity: 'warning',
+              service: service,
+              message: `High response time: ${health.responseTime}ms (threshold: ${MONITORING_CONFIG.thresholds.responseTime}ms)`,
+            });
+          }
+        }
+      }
+      
+      // Database connection pool stats
+      const poolStats = pool.totalCount;
+      const idleConnections = pool.idleCount;
+      const activeConnections = poolStats - idleConnections;
+      
+      this.recordMetric({
+        name: 'db_pool_total',
+        value: poolStats,
+        unit: 'count',
+        timestamp: now,
+        tags: { type: 'total' },
+      });
+      
+      this.recordMetric({
+        name: 'db_pool_active',
+        value: activeConnections,
+        unit: 'count',
+        timestamp: now,
+        tags: { type: 'active' },
+      });
+      
+      this.recordMetric({
+        name: 'db_pool_idle',
+        value: idleConnections,
+        unit: 'count',
+        timestamp: now,
+        tags: { type: 'idle' },
+      });
+      
+      // Memory usage
+      const memUsage = process.memoryUsage();
+      this.recordMetric({
+        name: 'memory_heap_used',
+        value: Math.round(memUsage.heapUsed / 1024 / 1024), // Convert to MB
+        unit: 'MB',
+        timestamp: now,
+        tags: { type: 'heap' },
+      });
+      
+      this.recordMetric({
+        name: 'memory_rss',
+        value: Math.round(memUsage.rss / 1024 / 1024), // Convert to MB
+        unit: 'MB',
+        timestamp: now,
+        tags: { type: 'rss' },
+      });
+      
+    } catch (error) {
+      console.error('[MONITORING] Error collecting performance metrics:', error);
+    }
   }
   
   /**
@@ -377,22 +585,91 @@ export class MonitoringService {
    */
   private async collectErrorMetrics() {
     try {
-      // TODO: Query error logs
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
       
-      const errorsLastHour = 0; // await db.countErrorsLastHour();
+      // Query error logs from system_logs table
+      const errorsResult = await pool.query(
+        `SELECT 
+          COUNT(*) as total,
+          COUNT(*) FILTER (WHERE action LIKE '%error%' OR action LIKE '%failed%') as errors,
+          COUNT(*) FILTER (WHERE details->>'severity' = 'critical') as critical
+         FROM system_logs
+         WHERE created_at >= $1`,
+        [oneHourAgo]
+      );
+      
+      const errorsLastHour = parseInt(errorsResult.rows[0]?.errors || '0');
+      const criticalErrors = parseInt(errorsResult.rows[0]?.critical || '0');
+      
       this.recordMetric({
         name: 'errors_last_hour',
         value: errorsLastHour,
         unit: 'count',
-        timestamp: new Date(),
+        timestamp: now,
         tags: { severity: 'all' },
       });
       
-      if (errorsLastHour > 10) {
+      this.recordMetric({
+        name: 'critical_errors_last_hour',
+        value: criticalErrors,
+        unit: 'count',
+        timestamp: now,
+        tags: { severity: 'critical' },
+      });
+      
+      // Calculate error rate
+      const totalLogs = parseInt(errorsResult.rows[0]?.total || '1');
+      const errorRate = totalLogs > 0 ? (errorsLastHour / totalLogs) : 0;
+      
+      this.recordMetric({
+        name: 'error_rate',
+        value: Math.round(errorRate * 10000) / 100, // Convert to percentage with 2 decimals
+        unit: 'percent',
+        timestamp: now,
+        tags: { period: 'hour' },
+      });
+      
+      // Alert on high error rate
+      if (errorRate > MONITORING_CONFIG.thresholds.errorRate) {
         this.sendAlert({
           severity: 'warning',
           service: 'platform',
-          message: `High error rate: ${errorsLastHour} errors in last hour`,
+          message: `High error rate: ${(errorRate * 100).toFixed(2)}% (${errorsLastHour} errors in last hour)`,
+        });
+      }
+      
+      // Alert on critical errors
+      if (criticalErrors > 0) {
+        this.sendAlert({
+          severity: 'critical',
+          service: 'platform',
+          message: `${criticalErrors} critical errors detected in last hour`,
+        });
+      }
+      
+      // Query failed automation logs
+      const failedAutomationsResult = await pool.query(
+        `SELECT COUNT(*) as count FROM automation_logs
+         WHERE success = false AND created_at >= $1`,
+        [oneHourAgo]
+      );
+      
+      const failedAutomations = parseInt(failedAutomationsResult.rows[0]?.count || '0');
+      
+      this.recordMetric({
+        name: 'failed_automations_last_hour',
+        value: failedAutomations,
+        unit: 'count',
+        timestamp: now,
+        tags: { type: 'automation' },
+      });
+      
+      if (failedAutomations > 5) {
+        this.sendAlert({
+          severity: 'warning',
+          service: 'automation',
+          message: `${failedAutomations} automation failures in last hour`,
         });
       }
       
@@ -427,20 +704,122 @@ export class MonitoringService {
   }
   
   private async checkFailedLeadCaptures() {
-    // TODO: Query recent failed lead captures
-    const recentFailures = 0; // await db.countRecentFailedCaptures(10 * 60 * 1000);
-    
-    if (recentFailures >= MONITORING_CONFIG.thresholds.failedLeadCaptures) {
-      this.sendAlert({
-        severity: 'critical',
-        service: 'lead-capture',
-        message: `${recentFailures} failed lead captures in last 10 minutes!`,
-      });
+    try {
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+      
+      // Query recent failed lead captures from automation logs
+      const failedCapturesResult = await pool.query(
+        `SELECT COUNT(*) as count FROM automation_logs
+         WHERE (action_type = 'lead_capture' OR action_type LIKE '%capture%')
+         AND success = false 
+         AND created_at >= $1`,
+        [tenMinutesAgo]
+      );
+      
+      const recentFailures = parseInt(failedCapturesResult.rows[0]?.count || '0');
+      
+      if (recentFailures >= MONITORING_CONFIG.thresholds.failedLeadCaptures) {
+        this.sendAlert({
+          severity: 'critical',
+          service: 'lead-capture',
+          message: `${recentFailures} failed lead captures in last 10 minutes!`,
+        });
+      }
+      
+      // Also check for contacts without opportunities (potential failed workflow)
+      const orphanedContactsResult = await pool.query(
+        `SELECT COUNT(*) as count FROM contacts c
+         WHERE c.created_at >= $1
+         AND NOT EXISTS (
+           SELECT 1 FROM opportunities o 
+           WHERE o.contact_id = c.id OR o.ghl_contact_id = c.ghl_contact_id
+         )`,
+        [tenMinutesAgo]
+      );
+      
+      const orphanedContacts = parseInt(orphanedContactsResult.rows[0]?.count || '0');
+      
+      if (orphanedContacts > 5) {
+        this.sendAlert({
+          severity: 'warning',
+          service: 'lead-capture',
+          message: `${orphanedContacts} new contacts without opportunities (possible workflow failure)`,
+        });
+      }
+      
+    } catch (error) {
+      console.error('[MONITORING] Error checking failed lead captures:', error);
     }
   }
   
   private async checkStuckProcesses() {
-    // TODO: Check for workflows that haven't completed
+    try {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      
+      // Check for opportunities stuck in certain stages for too long
+      const stuckOpportunitiesResult = await pool.query(
+        `SELECT 
+          COUNT(*) as count,
+          stage_name
+         FROM opportunities
+         WHERE updated_at < $1
+         AND stage_name IN ('Documents pending', 'Documents Pending and Follow Up', 'Pre Qualified -Apply Now-SVG2')
+         AND status NOT IN ('closed', 'lost', 'won')
+         GROUP BY stage_name`,
+        [oneHourAgo]
+      );
+      
+      for (const row of stuckOpportunitiesResult.rows) {
+        const count = parseInt(row.count);
+        if (count > 0) {
+          this.sendAlert({
+            severity: 'warning',
+            service: 'workflow',
+            message: `${count} opportunities stuck in "${row.stage_name}" stage for over 1 hour`,
+          });
+        }
+      }
+      
+      // Check for upload tokens that expired without being used
+      const expiredTokensResult = await pool.query(
+        `SELECT COUNT(*) as count FROM upload_tokens
+         WHERE expires_at < NOW()
+         AND used = false
+         AND created_at >= $1`,
+        [oneHourAgo]
+      );
+      
+      const expiredTokens = parseInt(expiredTokensResult.rows[0]?.count || '0');
+      
+      if (expiredTokens > 3) {
+        this.sendAlert({
+          severity: 'warning',
+          service: 'document-upload',
+          message: `${expiredTokens} upload tokens expired unused (clients may need help uploading)`,
+        });
+      }
+      
+      // Check for long-running automations (potential infinite loops)
+      const longRunningAutomationsResult = await pool.query(
+        `SELECT COUNT(*) as count FROM automation_logs
+         WHERE created_at < $1
+         AND success IS NULL`,  // Still running
+        [oneHourAgo]
+      );
+      
+      const longRunningCount = parseInt(longRunningAutomationsResult.rows[0]?.count || '0');
+      
+      if (longRunningCount > 0) {
+        this.sendAlert({
+          severity: 'critical',
+          service: 'automation',
+          message: `${longRunningCount} automations running for over 1 hour (possible infinite loop)`,
+        });
+      }
+      
+    } catch (error) {
+      console.error('[MONITORING] Error checking stuck processes:', error);
+    }
   }
   
   private async checkBalanceWarnings() {
@@ -461,16 +840,28 @@ export class MonitoringService {
     service: string;
     message: string;
   }) {
+    // Create alert key for deduplication
+    const alertKey = `${params.service}-${params.severity}-${this.hashMessage(params.message)}`;
+    const lastSent = this.sentAlerts.get(alertKey);
+    const now = new Date();
+    
+    // Check if we've sent this alert recently
+    if (lastSent && (now.getTime() - lastSent.getTime()) < this.ALERT_COOLDOWN_MS) {
+      console.log(`[ALERT] Suppressed duplicate alert for ${params.service} (cooldown active)`);
+      return; // Skip duplicate alert within cooldown period
+    }
+    
     const alert: Alert = {
       id: `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       severity: params.severity,
       service: params.service,
       message: params.message,
-      timestamp: new Date(),
+      timestamp: now,
       resolved: false,
     };
     
     this.alerts.push(alert);
+    this.sentAlerts.set(alertKey, now); // Mark this alert as sent
     
     console.log(`[ALERT] ${params.severity.toUpperCase()} - ${params.service}: ${params.message}`);
     
@@ -493,9 +884,21 @@ export class MonitoringService {
     }
   }
   
+  /**
+   * Simple hash function for message deduplication
+   */
+  private hashMessage(message: string): string {
+    let hash = 0;
+    for (let i = 0; i < message.length; i++) {
+      const char = message.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash).toString(36);
+  }
+  
   private async sendSMSAlert(alert: Alert) {
     try {
-      // TODO: Send SMS via Twilio
       console.log(`[SMS ALERT] Sending to ${MONITORING_CONFIG.alerts.sms}`);
       
       const message = `🚨 ${alert.severity.toUpperCase()} ALERT\n\n` +
@@ -504,10 +907,14 @@ export class MonitoringService {
         `Time: ${alert.timestamp.toLocaleString()}\n` +
         `Check dashboard: https://saintvisiongroup.com/admin`;
       
-      // await twilioClient.sendSMS({
-      //   to: MONITORING_CONFIG.alerts.sms,
-      //   message,
-      // });
+      // Send SMS using the Twilio service (which uses GHL internally)
+      const result = await sendSMS(MONITORING_CONFIG.alerts.sms, message);
+      
+      if (result.success) {
+        console.log(`[SMS ALERT] ✅ Alert sent successfully (ID: ${result.messageSid})`);
+      } else {
+        console.error(`[SMS ALERT] ❌ Failed to send: ${result.error}`);
+      }
       
     } catch (error) {
       console.error('[MONITORING] Failed to send SMS alert:', error);
@@ -518,7 +925,47 @@ export class MonitoringService {
     try {
       console.log(`[EMAIL ALERT] Sending to ${MONITORING_CONFIG.alerts.email}`);
       
-      // TODO: Send email via your email service
+      // Create HTML email content
+      const htmlBody = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: ${alert.severity === 'critical' ? '#ff0000' : alert.severity === 'warning' ? '#ffaa00' : '#0099ff'};">
+              🚨 ${alert.severity.toUpperCase()} ALERT
+            </h2>
+            
+            <div style="margin: 20px 0;">
+              <p><strong>Service:</strong> ${alert.service}</p>
+              <p><strong>Message:</strong> ${alert.message}</p>
+              <p><strong>Time:</strong> ${alert.timestamp.toLocaleString()}</p>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 15px; background-color: #f0f0f0; border-radius: 5px;">
+              <p style="margin: 0;">
+                <a href="https://saintvisiongroup.com/admin" style="color: #0066cc; text-decoration: none;">
+                  📊 View Dashboard →
+                </a>
+              </p>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 12px; color: #666;">
+              <p>This is an automated alert from Saint Vision Group monitoring system.</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Note: GHL sendEmail requires a contactId, not an email address
+      // For system alerts, we'll need to handle this differently
+      // For now, log the alert - in production, you'd integrate with your email service
+      console.log(`[EMAIL ALERT] Alert prepared for ${MONITORING_CONFIG.alerts.email}`);
+      
+      // If you have a dedicated email service or SMTP, implement it here
+      // For example:
+      // await yourEmailService.send({
+      //   to: MONITORING_CONFIG.alerts.email,
+      //   subject: `[${alert.severity.toUpperCase()}] ${alert.service} Alert`,
+      //   html: htmlBody
+      // });
       
     } catch (error) {
       console.error('[MONITORING] Failed to send email alert:', error);

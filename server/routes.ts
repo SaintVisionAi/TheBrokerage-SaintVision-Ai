@@ -64,11 +64,19 @@ function parseLoanAmount(amount: string | number): number {
 
 function requireApiKey(req: any, res: any, next: any) {
   const apiKey = req.headers['x-api-key'];
-  const validKey = process.env.INTERNAL_API_KEY || 'set-in-production';
+  const validKey = process.env.INTERNAL_API_KEY;
   
-  if (apiKey !== validKey) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  // Ensure API key is configured (this should never happen if server startup validation works)
+  if (!validKey) {
+    console.error('CRITICAL: INTERNAL_API_KEY is not configured!');
+    return res.status(500).json({ error: 'Server misconfiguration' });
   }
+  
+  // Validate the provided API key
+  if (!apiKey || apiKey !== validKey) {
+    return res.status(401).json({ error: 'Unauthorized - Invalid or missing API key' });
+  }
+  
   next();
 }
 

@@ -1,3 +1,4 @@
+import 'dotenv/config';  // Load environment variables from .env file
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -52,6 +53,14 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // CRITICAL: Validate required environment variables before starting
+  if (!process.env.INTERNAL_API_KEY) {
+    console.error('❌ CRITICAL ERROR: INTERNAL_API_KEY environment variable is not set!');
+    console.error('   This is required for securing internal API endpoints.');
+    console.error('   Please set INTERNAL_API_KEY in your environment variables.');
+    process.exit(1); // Exit with error code
+  }
+  
   // Initialize database tables on startup
   initializeDatabase().catch(err => {
     console.error('⚠️  Database init failed (continuing anyway):', err.message);

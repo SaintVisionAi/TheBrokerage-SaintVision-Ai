@@ -8,6 +8,29 @@
  */
 
 import { SaintBrokerAI } from './ai-orchestrator';
+import { db } from '../../db';
+import { 
+  contacts, 
+  opportunities, 
+  automationLogs, 
+  smsMessages,
+  uploadTokens,
+  documents,
+  type Contact as DBContact,
+  type Opportunity as DBOpportunity,
+  type InsertAutomationLog
+} from '@shared/schema';
+import { eq, and, lte, gte, isNull, sql, or, notInArray, inArray } from 'drizzle-orm';
+import * as ghlClient from '../../services/ghl-client';
+import { 
+  triggerWorkflow as triggerGHLWorkflow,
+  WORKFLOW_REGISTRY,
+  LENDING_PIPELINE_STAGES,
+  resolveStageNameFromWebhook
+} from '../../services/ghl';
+import { sendSMS, SMS_TEMPLATES } from '../../services/twilio-service';
+import { documentStorage } from '../../services/document-storage';
+import { EMAIL_CONFIG } from '../../config/email';
 
 // Initialize AI instance
 const saintBrokerAI = new SaintBrokerAI();
@@ -15,32 +38,6 @@ const saintBrokerAI = new SaintBrokerAI();
 // ═══════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════
-
-interface Contact {
-  id: string;
-  email: string;
-  phone: string;
-  firstName: string;
-  lastName: string;
-  division: 'investment' | 'real-estate' | 'lending';
-  tags: string[];
-  customFields: Record<string, any>;
-  lastContactedAt?: Date;
-  createdAt: Date;
-}
-
-interface Opportunity {
-  id: string;
-  contactId: string;
-  pipelineId: string;
-  stageId: string;
-  stageName: string;
-  value: number;
-  status: 'open' | 'won' | 'lost' | 'abandoned';
-  lastActivityAt: Date;
-  createdAt: Date;
-  metadata: Record<string, any>;
-}
 
 interface Workflow {
   id: string;
@@ -68,7 +65,15 @@ type WorkflowAction =
   | { type: 'update_stage'; stageId: string }
   | { type: 'tag_contact'; tags: string[] }
   | { type: 'ai_followup'; context: string }
-  | { type: 'webhook'; url: string; payload: Record<string, any> };
+  | { type: 'webhook'; url: string; payload: Record<string, any> }
+  | { type: 'trigger_ghl_workflow'; workflowId?: string };
+
+// Workflow execution state persistence
+interface WorkflowExecutionState {
+  workflowId: string;
+  opportunityId: string;
+  lastExecutedAt: Date;
+}
 
 // ═══════════════════════════════════════════════════════════
 // AUTOMATION ENGINE
@@ -78,9 +83,41 @@ export class AutomationOrchestrator {
   private workflows: Workflow[] = [];
   private running = false;
   private checkInterval = 60000; // Check every minute
+  private executionState = new Map<string, WorkflowExecutionState>();
   
   constructor() {
     this.initializeWorkflows();
+    this.loadExecutionState();
+  }
+  
+  /**
+   * Load execution state from database
+   */
+  private async loadExecutionState() {
+    try {
+      // Load recent automation logs to prevent re-execution
+      const recentLogs = await db
+        .select()
+        .from(automationLogs)
+        .where(
+          gte(automationLogs.createdAt, new Date(Date.now() - 24 * 60 * 60 * 1000))
+        );
+      
+      for (const log of recentLogs) {
+        if (log.actionType && log.opportunityId) {
+          const key = `${log.actionType}_${log.opportunityId}`;
+          this.executionState.set(key, {
+            workflowId: log.actionType,
+            opportunityId: log.opportunityId,
+            lastExecutedAt: log.createdAt!
+          });
+        }
+      }
+      
+      console.log(`[AUTOMATION] Loaded ${this.executionState.size} execution states`);
+    } catch (error) {
+      console.error('[AUTOMATION] Failed to load execution state:', error);
+    }
   }
   
   /**
@@ -134,6 +171,12 @@ export class AutomationOrchestrator {
         
       } catch (error) {
         console.error('[AUTOMATION] Error in monitoring loop:', error);
+        await this.logAutomation({
+          actionType: 'monitoring_error',
+          actionDetails: { error: String(error) },
+          success: false,
+          errorMessage: String(error)
+        });
       }
       
       // Wait before next check
@@ -171,6 +214,10 @@ export class AutomationOrchestrator {
             tags: ['hot-lead', 'needs-follow-up'] 
           },
           { 
+            type: 'trigger_ghl_workflow',
+            workflowId: WORKFLOW_REGISTRY[LENDING_PIPELINE_STAGES.NEW_LEAD]
+          },
+          { 
             type: 'create_task', 
             assignee: 'ryan', 
             title: 'Review new lending lead - {{firstName}} {{lastName}}' 
@@ -185,13 +232,12 @@ export class AutomationOrchestrator {
         trigger: { type: 'time_based', hours: 24 },
         conditions: [
           { field: 'division', operator: 'equals', value: 'lending' },
-          { field: 'stage', operator: 'equals', value: 'contacted' },
-          { field: 'creditAuthorized', operator: 'equals', value: false },
+          { field: 'stageName', operator: 'equals', value: LENDING_PIPELINE_STAGES.CONTACTED },
         ],
         actions: [
           { 
             type: 'send_sms', 
-            template: 'Hi {{firstName}}, just following up on your loan inquiry. We need your authorization for a soft credit check to provide accurate loan options. Click here to authorize: {{creditAuthLink}}' 
+            template: 'Hi {{firstName}}, just following up on your loan inquiry. We need your authorization for a soft credit check to provide accurate loan options. Click here to authorize: https://saintvisiongroup.com/credit-auth' 
           },
           { 
             type: 'ai_followup', 
@@ -204,7 +250,7 @@ export class AutomationOrchestrator {
       {
         id: 'lending-documents-pending',
         name: 'Document Collection Follow-Up',
-        trigger: { type: 'stage_change', to: 'documents_pending' },
+        trigger: { type: 'stage_change', to: LENDING_PIPELINE_STAGES.DOCUMENTS_PENDING },
         conditions: [],
         actions: [
           { 
@@ -215,6 +261,10 @@ export class AutomationOrchestrator {
             type: 'send_sms', 
             template: 'Hi {{firstName}}, we need a few documents to move forward with your loan. Check your email for the complete list. Upload here: {{uploadLink}}' 
           },
+          {
+            type: 'trigger_ghl_workflow',
+            workflowId: WORKFLOW_REGISTRY[LENDING_PIPELINE_STAGES.DOCUMENTS_PENDING]
+          }
         ],
         enabled: true,
       },
@@ -224,7 +274,7 @@ export class AutomationOrchestrator {
         name: 'Stuck in Under Review - Escalate',
         trigger: { type: 'time_based', hours: 72 },
         conditions: [
-          { field: 'stage', operator: 'equals', value: 'under_review' },
+          { field: 'stageName', operator: 'equals', value: LENDING_PIPELINE_STAGES.SENT_TO_LENDER },
         ],
         actions: [
           { 
@@ -247,7 +297,7 @@ export class AutomationOrchestrator {
       {
         id: 'lending-funding-celebration',
         name: 'Loan Funded - Celebration & Next Steps',
-        trigger: { type: 'stage_change', to: 'funded' },
+        trigger: { type: 'stage_change', to: LENDING_PIPELINE_STAGES.FUNDED },
         conditions: [],
         actions: [
           { 
@@ -261,6 +311,10 @@ export class AutomationOrchestrator {
           { 
             type: 'tag_contact', 
             tags: ['funded', 'success-story', 'testimonial-candidate'] 
+          },
+          {
+            type: 'trigger_ghl_workflow',
+            workflowId: WORKFLOW_REGISTRY[LENDING_PIPELINE_STAGES.FUNDED]
           },
           { 
             type: 'create_task', 
@@ -289,7 +343,7 @@ export class AutomationOrchestrator {
           },
           { 
             type: 'send_sms', 
-            template: 'Hi {{firstName}}! Thanks for your interest in investment opportunities with Saint Vision Group. Let\'s schedule a call to discuss your goals: {{calendlyLink}}' 
+            template: 'Hi {{firstName}}! Thanks for your interest in investment opportunities with Saint Vision Group. Let\'s schedule a call to discuss your goals: https://calendly.com/saintvision' 
           },
           { 
             type: 'tag_contact', 
@@ -298,49 +352,6 @@ export class AutomationOrchestrator {
           { 
             type: 'ai_followup', 
             context: 'qualify investment interest and accreditation status' 
-          },
-        ],
-        enabled: true,
-      },
-      
-      {
-        id: 'investment-accreditation-check',
-        name: 'Accreditation Status Follow-Up',
-        trigger: { type: 'time_based', hours: 48 },
-        conditions: [
-          { field: 'division', operator: 'equals', value: 'investment' },
-          { field: 'accreditationStatus', operator: 'equals', value: 'unknown' },
-        ],
-        actions: [
-          { 
-            type: 'send_email', 
-            template: 'accreditation_verification' 
-          },
-          { 
-            type: 'send_sms', 
-            template: 'Hi {{firstName}}, to move forward with investment opportunities, we need to verify your accreditation status. This takes 5 minutes: {{verificationLink}}' 
-          },
-        ],
-        enabled: true,
-      },
-      
-      {
-        id: 'investment-deal-match-notification',
-        name: 'New Deal Match - Notify Investor',
-        trigger: { type: 'webhook_received', source: 'deal_matcher' },
-        conditions: [],
-        actions: [
-          { 
-            type: 'send_email', 
-            template: 'new_deal_match' 
-          },
-          { 
-            type: 'send_sms', 
-            template: 'Hi {{firstName}}, we found an investment opportunity that matches your criteria: {{dealSummary}}. Interested? Reply YES for details.' 
-          },
-          { 
-            type: 'tag_contact', 
-            tags: ['active-deal-consideration'] 
           },
         ],
         enabled: true,
@@ -355,12 +366,12 @@ export class AutomationOrchestrator {
         name: 'New Real Estate Lead - Instant Response',
         trigger: { type: 'new_lead' },
         conditions: [
-          { field: 'division', operator: 'equals', value: 'real-estate' },
+          { field: 'division', operator: 'equals', value: 'real_estate' },
         ],
         actions: [
           { 
             type: 'send_sms', 
-            template: 'Hi {{firstName}}! Thanks for contacting Saint Vision Group about {{propertyInterest}}. Let\'s schedule a showing or consultation: {{calendlyLink}}' 
+            template: 'Hi {{firstName}}! Thanks for contacting Saint Vision Group about real estate. Let\'s schedule a showing or consultation: https://calendly.com/saintvision' 
           },
           { 
             type: 'send_email', 
@@ -369,22 +380,6 @@ export class AutomationOrchestrator {
           { 
             type: 'tag_contact', 
             tags: ['buyer', 'needs-showing'] 
-          },
-        ],
-        enabled: true,
-      },
-      
-      {
-        id: 'real-estate-showing-reminder',
-        name: 'Property Showing Reminder',
-        trigger: { type: 'time_based', hours: 24 },
-        conditions: [
-          { field: 'hasUpcomingShowing', operator: 'equals', value: true },
-        ],
-        actions: [
-          { 
-            type: 'send_sms', 
-            template: 'Hi {{firstName}}, reminder about your property showing tomorrow at {{showingTime}}. Address: {{propertyAddress}}. See you there!' 
           },
         ],
         enabled: true,
@@ -399,7 +394,6 @@ export class AutomationOrchestrator {
         name: 'Abandoned Lead Recovery',
         trigger: { type: 'time_based', hours: 168 }, // 7 days
         conditions: [
-          { field: 'lastContactedAt', operator: 'greater_than', value: 7 * 24 * 60 * 60 * 1000 },
           { field: 'status', operator: 'equals', value: 'open' },
         ],
         actions: [
@@ -418,20 +412,6 @@ export class AutomationOrchestrator {
         ],
         enabled: true,
       },
-      
-      {
-        id: 'universal-ai-health-check',
-        name: 'AI Follow-Up Health Check',
-        trigger: { type: 'time_based', hours: 24 },
-        conditions: [],
-        actions: [
-          { 
-            type: 'ai_followup', 
-            context: 'review all open opportunities and provide status update' 
-          },
-        ],
-        enabled: true,
-      },
     ];
     
     console.log(`[AUTOMATION] Initialized ${this.workflows.length} workflows`);
@@ -443,24 +423,29 @@ export class AutomationOrchestrator {
   private async checkTimeBasedTriggers() {
     const now = new Date();
     
-    // Get all opportunities that haven't been touched recently
-    const opportunities = await this.fetchOpportunitiesNeedingAttention();
-    
-    for (const opp of opportunities) {
-      const hoursStale = (now.getTime() - opp.lastActivityAt.getTime()) / (1000 * 60 * 60);
+    try {
+      // Get all opportunities that haven't been touched recently
+      const staleOpportunities = await this.fetchOpportunitiesNeedingAttention();
       
-      // Find matching workflows
-      const matchingWorkflows = this.workflows.filter(w => 
-        w.enabled && 
-        w.trigger.type === 'time_based' && 
-        hoursStale >= (w.trigger as any).hours &&
-        this.checkConditions(w.conditions, opp)
-      );
-      
-      for (const workflow of matchingWorkflows) {
-        console.log(`[AUTOMATION] Executing workflow: ${workflow.name}`);
-        await this.executeWorkflow(workflow, opp);
+      for (const opp of staleOpportunities) {
+        const hoursStale = (now.getTime() - (opp.updatedAt || opp.createdAt!).getTime()) / (1000 * 60 * 60);
+        
+        // Find matching workflows
+        const matchingWorkflows = this.workflows.filter(w => 
+          w.enabled && 
+          w.trigger.type === 'time_based' && 
+          hoursStale >= (w.trigger as any).hours &&
+          this.checkConditions(w.conditions, opp) &&
+          !this.hasRecentExecution(w.id, opp.id)
+        );
+        
+        for (const workflow of matchingWorkflows) {
+          console.log(`[AUTOMATION] Executing workflow: ${workflow.name} for opportunity ${opp.id}`);
+          await this.executeWorkflow(workflow, opp);
+        }
       }
+    } catch (error) {
+      console.error('[AUTOMATION] Error checking time-based triggers:', error);
     }
   }
   
@@ -470,24 +455,55 @@ export class AutomationOrchestrator {
   private async checkAbandonedLeads() {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     
-    // Query database for abandoned leads
-    // (Placeholder - implement with your actual DB)
-    const abandonedLeads = await this.fetchAbandonedLeads(sevenDaysAgo);
-    
-    for (const lead of abandonedLeads) {
-      console.log(`[AUTOMATION] Found abandoned lead: ${lead.firstName} ${lead.lastName}`);
+    try {
+      // Query database for abandoned leads
+      const abandonedOpportunities = await db
+        .select()
+        .from(opportunities)
+        .where(
+          and(
+            eq(opportunities.status, 'open'),
+            lte(opportunities.updatedAt, sevenDaysAgo)
+          )
+        );
       
-      // AI-powered re-engagement
-      await saintBrokerAI.chat({
-        message: `This lead has been inactive for 7+ days. Craft a personalized re-engagement message.`,
-        context: {
-          contactId: lead.id,
-          division: lead.division,
-        },
-      });
-      
-      // Tag as cold
-      await this.tagContact(lead.id, ['cold-lead', 'needs-reactivation']);
+      for (const opp of abandonedOpportunities) {
+        if (this.hasRecentExecution('abandoned-recovery', opp.id)) continue;
+        
+        console.log(`[AUTOMATION] Found abandoned opportunity: ${opp.firstName} ${opp.lastName}`);
+        
+        // Get contact details
+        const [contact] = opp.contactId 
+          ? await db.select().from(contacts).where(eq(contacts.id, opp.contactId))
+          : [];
+        
+        if (contact) {
+          // AI-powered re-engagement
+          await saintBrokerAI.chat({
+            message: `This lead has been inactive for 7+ days. Craft a personalized re-engagement message.`,
+            context: {
+              contactId: contact.id,
+              division: opp.division || 'lending',
+            },
+          });
+          
+          // Tag as cold
+          if (contact.ghlContactId) {
+            await this.tagContact(contact.ghlContactId, ['cold-lead', 'needs-reactivation']);
+          }
+          
+          // Log the action
+          await this.logAutomation({
+            contactId: contact.id,
+            opportunityId: opp.id,
+            actionType: 'abandoned-recovery',
+            actionDetails: { daysAbandoned: 7 },
+            success: true
+          });
+        }
+      }
+    } catch (error) {
+      console.error('[AUTOMATION] Error checking abandoned leads:', error);
     }
   }
   
@@ -497,27 +513,66 @@ export class AutomationOrchestrator {
   private async checkStuckOpportunities() {
     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
     
-    const stuckOpportunities = await this.fetchStuckOpportunities(threeDaysAgo);
-    
-    for (const opp of stuckOpportunities) {
-      console.log(`[AUTOMATION] Found stuck opportunity: ${opp.id} (${opp.stageName})`);
+    try {
+      const stuckOpportunities = await db
+        .select()
+        .from(opportunities)
+        .where(
+          and(
+            eq(opportunities.status, 'open'),
+            lte(opportunities.updatedAt, threeDaysAgo),
+            notInArray(opportunities.stageName, [
+              LENDING_PIPELINE_STAGES.FUNDED,
+              LENDING_PIPELINE_STAGES.AMOUNT_WON,
+              LENDING_PIPELINE_STAGES.DISQUALIFIED
+            ])
+          )
+        );
       
-      // Create urgent task for Ryan
-      await this.createTask({
-        assignee: 'ryan',
-        title: `URGENT: Opportunity stuck in ${opp.stageName} for 3+ days`,
-        opportunityId: opp.id,
-        priority: 'high',
-      });
-      
-      // AI analysis of why it's stuck
-      await saintBrokerAI.chat({
-        message: `Analyze why this opportunity is stuck and suggest actions to move it forward.`,
-        context: {
+      for (const opp of stuckOpportunities) {
+        if (this.hasRecentExecution('stuck-escalation', opp.id)) continue;
+        
+        console.log(`[AUTOMATION] Found stuck opportunity: ${opp.id} (${opp.stageName})`);
+        
+        // Create urgent task (log it for now)
+        console.log(`[TASK] URGENT: Opportunity stuck in ${opp.stageName} for 3+ days - ${opp.firstName} ${opp.lastName}`);
+        
+        // Get contact for SMS
+        const [contact] = opp.contactId 
+          ? await db.select().from(contacts).where(eq(contacts.id, opp.contactId))
+          : [];
+        
+        if (contact?.phone) {
+          // Send follow-up SMS
+          await sendSMS(
+            contact.phone,
+            `Hi ${contact.firstName}, checking in on your application. We want to ensure we're moving as quickly as possible. Any questions? Call us: (949) 755-0720`
+          );
+        }
+        
+        // AI analysis of why it's stuck
+        await saintBrokerAI.chat({
+          message: `Analyze why this opportunity is stuck and suggest actions to move it forward.`,
+          context: {
+            opportunityId: opp.id,
+            stage: opp.stageName || 'unknown',
+          },
+        });
+        
+        // Log the escalation
+        await this.logAutomation({
+          contactId: contact?.id,
           opportunityId: opp.id,
-          stage: opp.stageName,
-        },
-      });
+          actionType: 'stuck-escalation',
+          actionDetails: { 
+            stageName: opp.stageName,
+            daysStuck: 3
+          },
+          success: true
+        });
+      }
+    } catch (error) {
+      console.error('[AUTOMATION] Error checking stuck opportunities:', error);
     }
   }
   
@@ -525,54 +580,179 @@ export class AutomationOrchestrator {
    * Check for document expirations
    */
   private async checkDocumentExpirations() {
-    // Check for documents expiring in 30 days
-    const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    // Check for upload tokens expiring soon
+    const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     
-    const expiringDocuments = await this.fetchExpiringDocuments(thirtyDaysFromNow);
-    
-    for (const doc of expiringDocuments) {
-      console.log(`[AUTOMATION] Document expiring soon: ${doc.type} for contact ${doc.contactId}`);
+    try {
+      const expiringTokens = await db
+        .select()
+        .from(uploadTokens)
+        .where(
+          and(
+            lte(uploadTokens.expiresAt, sevenDaysFromNow),
+            gte(uploadTokens.expiresAt, new Date()),
+            eq(uploadTokens.used, false),
+            isNull(uploadTokens.completedAt)
+          )
+        );
       
-      // Send reminder SMS
-      await this.sendSMS({
-        to: doc.contactPhone,
-        message: `Hi ${doc.contactFirstName}, your ${doc.type} expires in 30 days. Please upload a new one to avoid delays: ${doc.uploadLink}`,
-      });
+      for (const token of expiringTokens) {
+        if (!token.contactId) continue;
+        
+        const [contact] = await db
+          .select()
+          .from(contacts)
+          .where(eq(contacts.id, token.contactId));
+        
+        if (contact?.phone) {
+          const uploadLink = `https://saintvisiongroup.com/upload/${token.token}`;
+          
+          console.log(`[AUTOMATION] Document token expiring soon for contact ${contact.id}`);
+          
+          // Send reminder SMS
+          await sendSMS(
+            contact.phone,
+            `Hi ${contact.firstName}, your document upload link expires in 7 days. Please upload your documents soon to avoid delays: ${uploadLink}`
+          );
+          
+          // Log the reminder
+          await this.logAutomation({
+            contactId: contact.id,
+            opportunityId: token.opportunityId,
+            actionType: 'document-expiry-reminder',
+            actionDetails: { 
+              tokenId: token.id,
+              expiresAt: token.expiresAt
+            },
+            success: true
+          });
+        }
+      }
+    } catch (error) {
+      console.error('[AUTOMATION] Error checking document expirations:', error);
     }
   }
   
   /**
-   * Check for follow-up reminders
+   * Check for follow-up reminders based on stage
    */
   private async checkFollowUpReminders() {
-    const now = new Date();
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     
-    const dueReminders = await this.fetchDueReminders(now);
-    
-    for (const reminder of dueReminders) {
-      console.log(`[AUTOMATION] Follow-up reminder due: ${reminder.title}`);
+    try {
+      // Check opportunities in specific stages that need follow-up
+      const needsFollowUp = await db
+        .select()
+        .from(opportunities)
+        .where(
+          and(
+            eq(opportunities.status, 'open'),
+            inArray(opportunities.stageName, [
+              LENDING_PIPELINE_STAGES.DOCUMENTS_PENDING,
+              LENDING_PIPELINE_STAGES.DOCUMENTS_PENDING_FOLLOWUP,
+              LENDING_PIPELINE_STAGES.PRE_QUALIFIED
+            ]),
+            lte(opportunities.updatedAt, oneDayAgo)
+          )
+        );
       
-      // Execute reminder action
-      await this.executeReminderAction(reminder);
-      
-      // Mark as completed
-      await this.markReminderComplete(reminder.id);
+      for (const opp of needsFollowUp) {
+        if (this.hasRecentExecution('stage-follow-up', opp.id)) continue;
+        
+        const [contact] = opp.contactId 
+          ? await db.select().from(contacts).where(eq(contacts.id, opp.contactId))
+          : [];
+        
+        if (contact?.phone) {
+          let message = '';
+          
+          switch (opp.stageName) {
+            case LENDING_PIPELINE_STAGES.DOCUMENTS_PENDING:
+              message = `Hi ${contact.firstName}, reminder: We're still waiting for your documents to process your loan. Need help? Reply YES`;
+              break;
+            case LENDING_PIPELINE_STAGES.PRE_QUALIFIED:
+              message = `Hi ${contact.firstName}, you're pre-qualified! Complete your application to move forward. Questions? Reply HELP`;
+              break;
+            default:
+              message = `Hi ${contact.firstName}, checking in on your application. Reply STATUS for an update`;
+          }
+          
+          if (message) {
+            await sendSMS(contact.phone, message);
+            
+            // Log the follow-up
+            await this.logAutomation({
+              contactId: contact.id,
+              opportunityId: opp.id,
+              actionType: 'stage-follow-up',
+              actionDetails: { 
+                stageName: opp.stageName,
+                message
+              },
+              success: true
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('[AUTOMATION] Error checking follow-up reminders:', error);
     }
   }
   
   /**
-   * Execute a workflow
+   * Execute a workflow with all actions
    */
-  private async executeWorkflow(workflow: Workflow, context: any) {
+  private async executeWorkflow(workflow: Workflow, opportunity: DBOpportunity) {
     console.log(`[AUTOMATION] ⚡ Executing: ${workflow.name}`);
+    
+    // Get contact details
+    const [contact] = opportunity.contactId 
+      ? await db.select().from(contacts).where(eq(contacts.id, opportunity.contactId))
+      : [];
+    
+    const context = {
+      ...opportunity,
+      ...contact,
+      phone: contact?.phone,
+      email: contact?.email,
+      contactId: contact?.id,
+      firstName: contact?.firstName || opportunity.firstName,
+      lastName: contact?.lastName || opportunity.lastName,
+      uploadLink: opportunity.id ? `https://saintvisiongroup.com/upload/${opportunity.id}` : ''
+    };
+    
+    let success = true;
+    const errors: string[] = [];
     
     for (const action of workflow.actions) {
       try {
         await this.executeAction(action, context);
       } catch (error) {
         console.error(`[AUTOMATION] Action failed:`, error);
+        errors.push(`${action.type}: ${String(error)}`);
+        success = false;
       }
     }
+    
+    // Record execution
+    await this.logAutomation({
+      contactId: contact?.id,
+      opportunityId: opportunity.id,
+      actionType: workflow.id,
+      actionDetails: { 
+        workflowName: workflow.name,
+        actionsCount: workflow.actions.length
+      },
+      success,
+      errorMessage: errors.length > 0 ? errors.join('; ') : undefined
+    });
+    
+    // Update execution state
+    this.executionState.set(`${workflow.id}_${opportunity.id}`, {
+      workflowId: workflow.id,
+      opportunityId: opportunity.id,
+      lastExecutedAt: new Date()
+    });
   }
   
   /**
@@ -581,34 +761,55 @@ export class AutomationOrchestrator {
   private async executeAction(action: WorkflowAction, context: any) {
     switch (action.type) {
       case 'send_sms':
-        await this.sendSMS({
-          to: context.phone,
-          message: this.interpolateTemplate(action.template, context),
-        });
+        if (context.phone) {
+          const message = this.interpolateTemplate(action.template, context);
+          await sendSMS(context.phone, message);
+          
+          // Log SMS in database
+          await db.insert(smsMessages).values({
+            contactId: context.contactId,
+            direction: 'outbound',
+            fromNumber: '+19497550720',
+            toNumber: context.phone,
+            message: message,
+            status: 'sent'
+          });
+        }
         break;
         
       case 'send_email':
-        await this.sendEmail({
-          to: context.email,
-          template: action.template,
-          context,
-        });
+        if (context.email && context.ghlContactId) {
+          // Use GHL to send email
+          const subject = EMAIL_CONFIG.TEMPLATES[action.template as keyof typeof EMAIL_CONFIG.TEMPLATES]?.subject || 'Saint Vision Group Update';
+          const htmlBody = this.generateEmailBody(action.template, context);
+          await ghlClient.sendEmail(context.ghlContactId, subject, htmlBody);
+        }
         break;
         
       case 'create_task':
-        await this.createTask({
-          assignee: action.assignee,
-          title: this.interpolateTemplate(action.title, context),
-          opportunityId: context.id,
-        });
+        // Log task creation (implement actual task system as needed)
+        console.log(`[TASK] ${action.assignee}: ${this.interpolateTemplate(action.title, context)}`);
         break;
         
       case 'update_stage':
-        await this.updateOpportunityStage(context.id, action.stageId);
+        if (context.ghlOpportunityId) {
+          await ghlClient.moveOpportunityStage(context.ghlOpportunityId, action.stageId);
+          
+          // Update local database
+          await db
+            .update(opportunities)
+            .set({ 
+              stageId: action.stageId,
+              updatedAt: new Date()
+            })
+            .where(eq(opportunities.id, context.id));
+        }
         break;
         
       case 'tag_contact':
-        await this.tagContact(context.contactId, action.tags);
+        if (context.ghlContactId) {
+          await this.tagContact(context.ghlContactId, action.tags);
+        }
         break;
         
       case 'ai_followup':
@@ -621,11 +822,21 @@ export class AutomationOrchestrator {
         });
         break;
         
+      case 'trigger_ghl_workflow':
+        if (context.ghlContactId) {
+          const workflowId = action.workflowId || WORKFLOW_REGISTRY[context.stageName];
+          if (workflowId) {
+            await ghlClient.triggerWorkflow(context.ghlContactId, workflowId);
+            console.log(`[AUTOMATION] Triggered GHL workflow ${workflowId} for contact ${context.ghlContactId}`);
+          }
+        }
+        break;
+        
       case 'webhook':
         await fetch(action.url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(action.payload),
+          body: JSON.stringify({ ...action.payload, context }),
         });
         break;
     }
@@ -662,86 +873,205 @@ export class AutomationOrchestrator {
     });
   }
   
+  /**
+   * Generate email body from template
+   */
+  private generateEmailBody(template: string, context: any): string {
+    // Basic email templates
+    const templates: Record<string, string> = {
+      new_lending_lead_welcome: `
+        <h2>Welcome to Saint Vision Group, ${context.firstName}!</h2>
+        <p>Thank you for your interest in our lending services.</p>
+        <p>We've received your application and will review it within 1 hour.</p>
+        <p>Next steps:</p>
+        <ol>
+          <li>Complete any missing information</li>
+          <li>Upload required documents</li>
+          <li>Schedule a call with our team</li>
+        </ol>
+        <p>Questions? Reply to this email or call (949) 755-0720</p>
+      `,
+      document_checklist: `
+        <h2>Documents Needed, ${context.firstName}</h2>
+        <p>To process your loan application, please upload the following:</p>
+        <ul>
+          <li>Government-issued ID</li>
+          <li>Bank statements (last 3 months)</li>
+          <li>Proof of income</li>
+          <li>Tax returns (if self-employed)</li>
+        </ul>
+        <p><a href="${context.uploadLink}">Click here to upload documents</a></p>
+      `,
+      loan_funded_congratulations: `
+        <h2>🎉 Congratulations, ${context.firstName}!</h2>
+        <p>Your loan has been successfully funded!</p>
+        <p>The funds will be in your account within 1-2 business days.</p>
+        <p>Thank you for choosing Saint Vision Group!</p>
+      `,
+      investment_welcome: `
+        <h2>Welcome to Saint Vision Group Investments</h2>
+        <p>Dear ${context.firstName},</p>
+        <p>Thank you for your interest in investment opportunities with Saint Vision Group.</p>
+        <p>Our team will contact you within 24 hours to discuss your investment goals.</p>
+      `,
+      real_estate_welcome: `
+        <h2>Welcome to Saint Vision Group Real Estate</h2>
+        <p>Hello ${context.firstName},</p>
+        <p>Thank you for contacting us about real estate opportunities.</p>
+        <p>Our agents will reach out within 24 hours to schedule a consultation.</p>
+      `,
+      win_back_campaign: `
+        <h2>We Miss You, ${context.firstName}!</h2>
+        <p>We noticed you started an application but haven't completed it.</p>
+        <p>Is there anything we can help with? Our team is here to assist.</p>
+        <p>Reply to this email or call us at (949) 755-0720</p>
+      `
+    };
+    
+    return templates[template] || `<p>${template}</p>`;
+  }
+  
+  /**
+   * Check if workflow was recently executed
+   */
+  private hasRecentExecution(workflowId: string, opportunityId: string): boolean {
+    const key = `${workflowId}_${opportunityId}`;
+    const state = this.executionState.get(key);
+    
+    if (!state) return false;
+    
+    // Don't re-execute within 24 hours
+    const hoursSinceExecution = (Date.now() - state.lastExecutedAt.getTime()) / (1000 * 60 * 60);
+    return hoursSinceExecution < 24;
+  }
+  
+  /**
+   * Log automation execution
+   */
+  private async logAutomation(log: InsertAutomationLog) {
+    try {
+      await db.insert(automationLogs).values(log);
+    } catch (error) {
+      console.error('[AUTOMATION] Failed to log automation:', error);
+    }
+  }
+  
+  /**
+   * Tag a contact in GHL
+   */
+  private async tagContact(ghlContactId: string, tags: string[]) {
+    try {
+      await ghlClient.updateContact(ghlContactId, { tags });
+      console.log(`[AUTOMATION] Tagged contact ${ghlContactId} with:`, tags);
+    } catch (error) {
+      console.error('[AUTOMATION] Failed to tag contact:', error);
+    }
+  }
+  
   // ═══════════════════════════════════════════════════════════
-  // DATABASE QUERIES (IMPLEMENT WITH YOUR ACTUAL DB)
+  // DATABASE QUERIES
   // ═══════════════════════════════════════════════════════════
   
-  private async fetchOpportunitiesNeedingAttention(): Promise<Opportunity[]> {
-    // TODO: Implement with your database
-    return [];
+  private async fetchOpportunitiesNeedingAttention(): Promise<DBOpportunity[]> {
+    try {
+      // Get opportunities not updated in last hour
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      
+      return await db
+        .select()
+        .from(opportunities)
+        .where(
+          and(
+            eq(opportunities.status, 'open'),
+            lte(opportunities.updatedAt, oneHourAgo)
+          )
+        )
+        .limit(100);
+    } catch (error) {
+      console.error('[AUTOMATION] Error fetching opportunities:', error);
+      return [];
+    }
   }
   
-  private async fetchAbandonedLeads(since: Date): Promise<Contact[]> {
-    // TODO: Implement with your database
-    return [];
+  /**
+   * Process new lead trigger
+   */
+  async processNewLead(contact: DBContact, opportunity: DBOpportunity) {
+    console.log(`[AUTOMATION] Processing new lead: ${contact.firstName} ${contact.lastName}`);
+    
+    // Find workflows with new_lead trigger
+    const newLeadWorkflows = this.workflows.filter(w => 
+      w.enabled && 
+      w.trigger.type === 'new_lead' &&
+      this.checkConditions(w.conditions, { ...opportunity, ...contact })
+    );
+    
+    for (const workflow of newLeadWorkflows) {
+      await this.executeWorkflow(workflow, opportunity);
+    }
   }
   
-  private async fetchStuckOpportunities(since: Date): Promise<Opportunity[]> {
-    // TODO: Implement with your database
-    return [];
+  /**
+   * Process stage change trigger
+   */
+  async processStageChange(opportunity: DBOpportunity, fromStage: string, toStage: string) {
+    console.log(`[AUTOMATION] Processing stage change: ${fromStage} → ${toStage}`);
+    
+    // Find workflows with stage_change trigger
+    const stageChangeWorkflows = this.workflows.filter(w => {
+      if (!w.enabled || w.trigger.type !== 'stage_change') return false;
+      
+      const trigger = w.trigger as { type: 'stage_change'; from?: string; to?: string };
+      
+      // Check if trigger matches the stage change
+      const matchesFrom = !trigger.from || trigger.from === fromStage;
+      const matchesTo = !trigger.to || trigger.to === toStage;
+      
+      return matchesFrom && matchesTo && this.checkConditions(w.conditions, opportunity);
+    });
+    
+    for (const workflow of stageChangeWorkflows) {
+      await this.executeWorkflow(workflow, opportunity);
+    }
   }
   
-  private async fetchExpiringDocuments(before: Date): Promise<any[]> {
-    // TODO: Implement with your database
-    return [];
-  }
-  
-  private async fetchDueReminders(at: Date): Promise<any[]> {
-    // TODO: Implement with your database
-    return [];
-  }
-  
-  // ═══════════════════════════════════════════════════════════
-  // EXTERNAL INTEGRATIONS (IMPLEMENT WITH YOUR ACTUAL APIS)
-  // ═══════════════════════════════════════════════════════════
-  
-  private async sendSMS(params: { to: string; message: string }) {
-    console.log(`[SMS] Sending to ${params.to}: ${params.message}`);
-    // TODO: Implement with Twilio
-  }
-  
-  private async sendEmail(params: { to: string; template: string; context: any }) {
-    console.log(`[EMAIL] Sending ${params.template} to ${params.to}`);
-    // TODO: Implement with your email service
-  }
-  
-  private async createTask(params: { assignee: string; title: string; opportunityId?: string; priority?: string }) {
-    console.log(`[TASK] Creating for ${params.assignee}: ${params.title}`);
-    // TODO: Implement with GHL or your task system
-  }
-  
-  private async updateOpportunityStage(opportunityId: string, stageId: string) {
-    console.log(`[PIPELINE] Moving opportunity ${opportunityId} to stage ${stageId}`);
-    // TODO: Implement with GHL API
-  }
-  
-  private async tagContact(contactId: string, tags: string[]) {
-    console.log(`[TAGS] Adding tags to ${contactId}:`, tags);
-    // TODO: Implement with GHL API
-  }
-  
-  private async executeReminderAction(reminder: any) {
-    console.log(`[REMINDER] Executing: ${reminder.title}`);
-    // TODO: Implement reminder action
-  }
-  
-  private async markReminderComplete(reminderId: string) {
-    console.log(`[REMINDER] Marking ${reminderId} complete`);
-    // TODO: Implement with your database
+  /**
+   * Process document upload trigger
+   */
+  async processDocumentUpload(uploadToken: any, document: any) {
+    console.log(`[AUTOMATION] Processing document upload for token ${uploadToken.id}`);
+    
+    if (uploadToken.completedAt && uploadToken.opportunityId) {
+      // Get opportunity
+      const [opportunity] = await db
+        .select()
+        .from(opportunities)
+        .where(eq(opportunities.id, uploadToken.opportunityId));
+      
+      if (opportunity && opportunity.stageName === LENDING_PIPELINE_STAGES.DOCUMENTS_PENDING) {
+        // Move to next stage
+        const nextStage = LENDING_PIPELINE_STAGES.FULL_APPLICATION_COMPLETE;
+        
+        if (opportunity.ghlOpportunityId) {
+          // Find the stage ID for the next stage (would need mapping)
+          console.log(`[AUTOMATION] Moving opportunity to ${nextStage}`);
+          
+          // Update local database
+          await db
+            .update(opportunities)
+            .set({ 
+              stageName: nextStage,
+              updatedAt: new Date()
+            })
+            .where(eq(opportunities.id, opportunity.id));
+          
+          // Trigger stage change workflows
+          await this.processStageChange(opportunity, LENDING_PIPELINE_STAGES.DOCUMENTS_PENDING, nextStage);
+        }
+      }
+    }
   }
 }
 
-// ═══════════════════════════════════════════════════════════
-// EXPORT SINGLETON
-// ═══════════════════════════════════════════════════════════
-
+// Export singleton instance
 export const automationOrchestrator = new AutomationOrchestrator();
-
-// ═══════════════════════════════════════════════════════════
-// START ON SERVER BOOT
-// ═══════════════════════════════════════════════════════════
-
-// In your server.ts or app entry point:
-// automationOrchestrator.start();
-
-console.log('[AUTOMATION] ✅ 24/7 Automation Orchestrator ready');
