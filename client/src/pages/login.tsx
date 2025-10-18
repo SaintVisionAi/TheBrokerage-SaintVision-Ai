@@ -61,15 +61,14 @@ export default function Login() {
           description: `Welcome back, ${data.user.username || data.user.email}`,
         });
 
-        // Use hard redirect to ensure session cookie is fully processed
+        // Immediate redirect for admin/broker users
         const role = data.user.role;
         const targetUrl = (role === "admin" || role === "broker") ? "/dashboard" : "/client-portal";
         
-        console.log('[LOGIN] Redirecting to:', targetUrl, 'in 2 seconds...');
-        setTimeout(() => {
-          console.log('[LOGIN] Executing redirect now...');
-          window.location.replace(targetUrl);
-        }, 2000);
+        // Direct navigation without delay
+        setLocation(targetUrl);
+      } else {
+        throw new Error(data.message || "Login failed");
       }
     } catch (error: any) {
       const errorMessage = error.message || "Failed to login";
