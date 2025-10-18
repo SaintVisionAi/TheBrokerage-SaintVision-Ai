@@ -1,9 +1,7 @@
 import OpenAI from "openai";
 
-// OpenAI client configuration with explicit validation and fail-fast
-// Supports both Azure OpenAI and standard OpenAI API
+// OpenAI client configuration - Azure AI Foundry
 function createOpenAIClient(): OpenAI {
-  // Determine which API to use (Azure has priority if configured)
   const useAzure = !!(
     process.env.AZURE_AI_FOUNDRY_KEY && 
     process.env.AZURE_AI_FOUNDRY_ENDPOINT
@@ -11,13 +9,6 @@ function createOpenAIClient(): OpenAI {
 
   if (useAzure) {
     console.log("🔵 Configuring Azure OpenAI client...");
-    
-    if (!process.env.AZURE_AI_FOUNDRY_KEY) {
-      throw new Error("AZURE_AI_FOUNDRY_KEY is required for Azure OpenAI but not set");
-    }
-    if (!process.env.AZURE_AI_FOUNDRY_ENDPOINT) {
-      throw new Error("AZURE_AI_FOUNDRY_ENDPOINT is required for Azure OpenAI but not set");
-    }
     
     return new OpenAI({
       apiKey: process.env.AZURE_AI_FOUNDRY_KEY,
@@ -27,12 +18,7 @@ function createOpenAIClient(): OpenAI {
     });
   }
   
-  // Standard OpenAI API fallback
   console.log("🟢 Configuring standard OpenAI client...");
-  
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is required but not set. Configure either OPENAI_API_KEY or Azure credentials.");
-  }
   
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
@@ -41,8 +27,6 @@ function createOpenAIClient(): OpenAI {
 
 const openai = createOpenAIClient();
 
-// Determine which model name to use based on configuration
-// Azure uses deployment names, standard OpenAI uses model names
 const useAzure = !!(
   process.env.AZURE_AI_FOUNDRY_KEY && 
   process.env.AZURE_AI_FOUNDRY_ENDPOINT
@@ -52,7 +36,6 @@ export const MODEL_NAME = useAzure
   ? (process.env.AZURE_DEPLOYMENT_GPT5_CORE || "gpt-5-core")
   : "gpt-4o";
 
-// Export the configured client for use across the application
 export { openai };
 
 export interface ToneAnalysis {
@@ -69,8 +52,6 @@ export interface AssistantResponse {
 
 export async function analyzeTone(text: string): Promise<ToneAnalysis> {
   try {
-    const startTime = Date.now();
-    
     const response = await openai.chat.completions.create({
       model: MODEL_NAME,
       messages: [
@@ -111,10 +92,8 @@ export async function generateAssistantResponse(
   const startTime = Date.now();
   
   try {
-    // First analyze tone
     const toneAnalysis = await analyzeTone(userMessage);
     
-    // Build context for the assistant
     const systemMessage = `You are SaintSal, an AI assistant with access to a comprehensive knowledge base. You help users with their questions using the provided context and knowledge.
 
 Available Knowledge:
@@ -162,7 +141,7 @@ Respond helpfully and professionally. If the user seems frustrated or has a comp
 export async function processKnowledgeContent(content: string, filename: string): Promise<string[]> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: MODEL_NAME,
       messages: [
         {
           role: "system",
