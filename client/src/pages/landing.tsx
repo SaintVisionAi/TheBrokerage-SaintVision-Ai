@@ -133,12 +133,13 @@ export default function Landing() {
       {/* Navigation */}
       <GlobalHeader />
 
-      {/* PRIMARY CTAs - ABOVE THE FOLD */}
-      <section className="relative z-10 pt-24 pb-8 border-b border-white/10 bg-gradient-to-b from-black/50 to-transparent">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      {/* Hero Section */}
+      <section className="relative z-10 min-h-screen flex items-start justify-center pt-48">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          {/* TOP CTAs - Simple addition */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Link href="/apply">
-              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-12 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30 animate-pulse" data-testid="button-apply-top">
+              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-12 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30" data-testid="button-apply-top">
                 💰 Apply Now - Get Funded
                 <ArrowRight className="w-6 h-6 ml-2" />
               </Button>
@@ -150,13 +151,7 @@ export default function Landing() {
               </Button>
             </Link>
           </div>
-          <p className="text-center text-white/60 text-sm mt-4">No commitment • Instant approval • 100% automated</p>
-        </div>
-      </section>
 
-      {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex items-start justify-center pt-20">
-        <div className="max-w-6xl mx-auto px-6 text-center">
           {/* URGENT LENDING CTA - PROMINENT */}
           <div className="mb-6 animate-pulse">
             <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-lg px-6 py-3 border-0">

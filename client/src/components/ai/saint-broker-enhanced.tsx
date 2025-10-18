@@ -65,10 +65,10 @@ export default function SaintBrokerEnhanced() {
   const [isOpen, setIsOpen] = useState(true); // Auto-open on page load
   const [activeTab, setActiveTab] = useState('chat');
   
-  // Chat State - Warm and inviting greeting
+  // Chat State - Direct lending-focused greeting
   const [messages, setMessages] = useState<Message[]>([{
     role: 'assistant',
-    content: "Welcome! I'm SaintBroker AI, your personal funding specialist available 24/7. 🌟\n\nI've helped thousands of businesses secure the capital they need to grow and thrive. Whether you need **$50K or $5M**, I'm here to make it happen - often within 24 hours.\n\n**How can I help you today?**\n• Get pre-approved for business funding\n• Learn about our lending options\n• Explore real estate opportunities\n• Discuss investment strategies\n\nLet's start with what matters most to you. What brings you here today?",
+    content: "**Need capital? Rates? Answers?** I gotta guy. 🏪",
     timestamp: new Date()
   }]);
   const [input, setInput] = useState('');
