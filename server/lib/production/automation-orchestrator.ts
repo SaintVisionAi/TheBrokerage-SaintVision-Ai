@@ -7,7 +7,10 @@
  * Brother, this is the system that makes you money while you sleep.
  */
 
-import { saintBrokerAI } from './ai-orchestrator-production';
+import { SaintBrokerAI } from './ai-orchestrator';
+
+// Initialize AI instance
+const saintBrokerAI = new SaintBrokerAI();
 
 // ═══════════════════════════════════════════════════════════
 // TYPES

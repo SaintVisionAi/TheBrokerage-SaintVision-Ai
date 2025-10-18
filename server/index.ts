@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeDatabase } from "./db-init";
 import rateLimit from 'express-rate-limit';
+import { initializeProductionSystems } from "./lib/production/index";
 
 const app = express();
 
@@ -55,6 +56,14 @@ app.use((req, res, next) => {
   initializeDatabase().catch(err => {
     console.error('⚠️  Database init failed (continuing anyway):', err.message);
   });
+  
+  // Initialize production systems (AI, automation, monitoring)
+  try {
+    initializeProductionSystems();
+    console.log('🚀 Production systems initialized!');
+  } catch (err: any) {
+    console.error('⚠️  Production systems initialization failed:', err.message);
+  }
   
   const server = await registerRoutes(app);
 
