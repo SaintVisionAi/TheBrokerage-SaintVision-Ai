@@ -326,13 +326,13 @@ export default function SaintBrokerEnhanced() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-[500px] h-[85vh] max-h-[800px] z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
+    <div className="fixed bottom-2 md:bottom-6 right-2 md:right-6 w-[calc(100vw-1rem)] md:w-[500px] h-[70vh] md:h-[85vh] max-h-[500px] md:max-h-[800px] z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
       {/* Outer glow */}
       <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400/20 via-blue-500/20 to-yellow-600/20 rounded-2xl blur-xl" />
       
       <Card className="relative flex flex-col h-full bg-black/40 backdrop-blur-xl border border-yellow-400/40 shadow-2xl shadow-yellow-400/20">
-        <CardHeader className="flex-row items-center justify-between space-y-0 pb-3 bg-gradient-to-r from-yellow-400/20 via-yellow-500/20 to-yellow-600/20 backdrop-blur-sm border-b border-yellow-400/30">
-        <CardTitle className="text-xl font-bold flex items-center gap-2">
+        <CardHeader className="flex-row items-center justify-between space-y-0 pb-2 md:pb-3 bg-gradient-to-r from-yellow-400/20 via-yellow-500/20 to-yellow-600/20 backdrop-blur-sm border-b border-yellow-400/30">
+        <CardTitle className="text-lg md:text-xl font-bold flex items-center gap-1 md:gap-2">
           <Sparkles className="h-5 w-5 text-yellow-400 animate-pulse" />
           <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent animate-gradient">
             SaintBroker
@@ -452,9 +452,9 @@ export default function SaintBrokerEnhanced() {
 
           {/* Quick Actions */}
           {messages.length <= 1 && (
-            <div className="border-t border-white/10 p-3 bg-white/5 backdrop-blur-sm">
-              <p className="text-xs text-neutral-400 mb-2 font-medium">Quick Actions:</p>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="border-t border-white/10 p-2 md:p-3 bg-white/5 backdrop-blur-sm">
+              <p className="text-xs text-neutral-400 mb-2 font-medium hidden md:block">Quick Actions:</p>
+              <div className="grid grid-cols-2 gap-1 md:gap-2">
                 <Button
                   variant="outline"
                   className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
