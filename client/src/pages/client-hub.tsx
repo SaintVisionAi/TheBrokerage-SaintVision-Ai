@@ -24,7 +24,10 @@ import {
   Send,
   Eye,
   Trash2,
-  Plus
+  Plus,
+  Calculator,
+  Search,
+  Building2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -206,22 +209,36 @@ export default function ClientHub() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-black/40 backdrop-blur-md border border-yellow-400/20">
+          <TabsList className="grid w-full grid-cols-6 bg-black/40 backdrop-blur-md border border-yellow-400/20">
             <TabsTrigger value="overview" data-testid="tab-overview">
-              <Briefcase className="h-4 w-4 mr-2" />
-              Overview
+              <Briefcase className="h-4 w-4 mr-1 md:mr-2" />
+              <span className="hidden md:inline">Overview</span>
+              <span className="md:hidden">View</span>
             </TabsTrigger>
             <TabsTrigger value="applications" data-testid="tab-applications">
-              <FileText className="h-4 w-4 mr-2" />
-              Applications
+              <FileText className="h-4 w-4 mr-1 md:mr-2" />
+              <span className="hidden md:inline">Applications</span>
+              <span className="md:hidden">Apps</span>
             </TabsTrigger>
             <TabsTrigger value="documents" data-testid="tab-documents">
-              <Upload className="h-4 w-4 mr-2" />
-              Documents
+              <Upload className="h-4 w-4 mr-1 md:mr-2" />
+              <span className="hidden md:inline">Documents</span>
+              <span className="md:hidden">Docs</span>
             </TabsTrigger>
             <TabsTrigger value="products" data-testid="tab-products">
-              <Download className="h-4 w-4 mr-2" />
-              Products
+              <Download className="h-4 w-4 mr-1 md:mr-2" />
+              <span className="hidden md:inline">Products</span>
+              <span className="md:hidden">PDF</span>
+            </TabsTrigger>
+            <TabsTrigger value="calculator" data-testid="tab-calculator">
+              <Calculator className="h-4 w-4 mr-1 md:mr-2" />
+              <span className="hidden md:inline">ROI Calc</span>
+              <span className="md:hidden">Calc</span>
+            </TabsTrigger>
+            <TabsTrigger value="search" data-testid="tab-search">
+              <Search className="h-4 w-4 mr-1 md:mr-2" />
+              <span className="hidden md:inline">Property</span>
+              <span className="md:hidden">Find</span>
             </TabsTrigger>
           </TabsList>
 
@@ -513,6 +530,282 @@ export default function ClientHub() {
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* CALCULATOR TAB - Real Estate ROI Calculator */}
+          <TabsContent value="calculator" className="space-y-6">
+            <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="h-6 w-6 text-yellow-400" />
+                  Real Estate Investment ROI Calculator
+                </CardTitle>
+                <CardDescription>The most comprehensive investment calculator in the industry</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Property Details */}
+                <div>
+                  <h3 className="text-lg font-semibold text-yellow-400 mb-4">Property Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-neutral-400">Purchase Price</label>
+                      <input
+                        type="number"
+                        placeholder="$450,000"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-purchase-price"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-neutral-400">Down Payment (%)</label>
+                      <input
+                        type="number"
+                        placeholder="20"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-down-payment"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-neutral-400">Interest Rate (%)</label>
+                      <input
+                        type="number"
+                        placeholder="7.5"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-interest-rate"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-neutral-400">Loan Term (Years)</label>
+                      <input
+                        type="number"
+                        placeholder="30"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-loan-term"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Income & Expenses */}
+                <div>
+                  <h3 className="text-lg font-semibold text-emerald-400 mb-4">Income & Expenses</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-neutral-400">Monthly Rental Income</label>
+                      <input
+                        type="number"
+                        placeholder="$3,500"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-rental-income"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-neutral-400">Property Tax (Annual)</label>
+                      <input
+                        type="number"
+                        placeholder="$5,400"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-property-tax"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-neutral-400">Insurance (Annual)</label>
+                      <input
+                        type="number"
+                        placeholder="$1,200"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-insurance"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-neutral-400">HOA Fees (Monthly)</label>
+                      <input
+                        type="number"
+                        placeholder="$150"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-hoa"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-neutral-400">Maintenance (% of Value)</label>
+                      <input
+                        type="number"
+                        placeholder="1"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-maintenance"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-neutral-400">Vacancy Rate (%)</label>
+                      <input
+                        type="number"
+                        placeholder="5"
+                        className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                        data-testid="input-vacancy"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Calculate Button */}
+                <Button
+                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black font-semibold"
+                  data-testid="button-calculate-roi"
+                >
+                  <Calculator className="h-5 w-5 mr-2" />
+                  Calculate ROI
+                </Button>
+
+                {/* Results */}
+                <div className="bg-gradient-to-r from-emerald-400/10 to-emerald-600/10 rounded-lg p-6 border border-emerald-400/20">
+                  <h3 className="text-lg font-semibold text-emerald-400 mb-4">Investment Analysis</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <p className="text-neutral-400 text-sm">Cash on Cash Return</p>
+                      <p className="text-3xl font-bold text-emerald-400">12.4%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-neutral-400 text-sm">Cap Rate</p>
+                      <p className="text-3xl font-bold text-yellow-400">8.2%</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-neutral-400 text-sm">Monthly Cash Flow</p>
+                      <p className="text-3xl font-bold text-white">$1,245</p>
+                    </div>
+                  </div>
+                  <Separator className="bg-white/10 my-4" />
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-neutral-400">Total ROI (5 Years):</span>
+                      <span className="text-white ml-2 font-semibold">45.2%</span>
+                    </div>
+                    <div>
+                      <span className="text-neutral-400">Break-even Point:</span>
+                      <span className="text-white ml-2 font-semibold">4.2 Years</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* SEARCH TAB - Property Search */}
+          <TabsContent value="search" className="space-y-6">
+            <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="h-6 w-6 text-yellow-400" />
+                  Property Search & Analysis
+                </CardTitle>
+                <CardDescription>Find investment properties and analyze deals instantly</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Search Filters */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-sm text-neutral-400">Location</label>
+                    <input
+                      type="text"
+                      placeholder="City, State or ZIP"
+                      className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50"
+                      data-testid="input-location"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-neutral-400">Price Range</label>
+                    <select className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white">
+                      <option>$0 - $500k</option>
+                      <option>$500k - $1M</option>
+                      <option>$1M - $5M</option>
+                      <option>$5M+</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm text-neutral-400">Property Type</label>
+                    <select className="w-full mt-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white">
+                      <option>All Types</option>
+                      <option>Single Family</option>
+                      <option>Multi-Family</option>
+                      <option>Commercial</option>
+                      <option>Industrial</option>
+                    </select>
+                  </div>
+                </div>
+
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white"
+                  data-testid="button-search-properties"
+                >
+                  <Search className="h-5 w-5 mr-2" />
+                  Search Properties
+                </Button>
+
+                {/* Sample Results */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-yellow-400">Featured Properties</h3>
+                  
+                  <Card className="bg-white/5 border-white/10">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-semibold text-white">4-Unit Apartment Complex</h4>
+                          <p className="text-neutral-400 text-sm">Houston, TX 77001</p>
+                          <div className="flex gap-4 mt-2">
+                            <span className="text-yellow-400 font-bold">$850,000</span>
+                            <Badge className="bg-emerald-500/20 text-emerald-400">9.2% Cap Rate</Badge>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-yellow-400/30 hover:border-yellow-400"
+                          data-testid="button-analyze-property-1"
+                        >
+                          Analyze
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white/5 border-white/10">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-semibold text-white">Retail Strip Center</h4>
+                          <p className="text-neutral-400 text-sm">Dallas, TX 75201</p>
+                          <div className="flex gap-4 mt-2">
+                            <span className="text-yellow-400 font-bold">$2,500,000</span>
+                            <Badge className="bg-emerald-500/20 text-emerald-400">7.8% Cap Rate</Badge>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-yellow-400/30 hover:border-yellow-400"
+                          data-testid="button-analyze-property-2"
+                        >
+                          Analyze
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Quick Links */}
+                <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-4">
+                  <p className="text-yellow-400 font-semibold mb-2">Need Financing?</p>
+                  <p className="text-white text-sm">
+                    Get pre-approved for real estate financing with competitive rates starting at 7.5%
+                  </p>
+                  <Button
+                    className="mt-3 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                    data-testid="button-get-financing"
+                  >
+                    Get Pre-Approved
+                  </Button>
                 </div>
               </CardContent>
             </Card>
