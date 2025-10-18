@@ -1,0 +1,39 @@
+{
+  "name": "Saint Vision Group - AI Brokerage Platform",
+  "short_name": "SaintBroker",
+  "description": "AI-powered commercial lending, real estate, and investment solutions",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "business", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "type": "image/png",
+      "sizes": "540x720",
+      "form_factor": "narrow"
+    }
+  ]
+}

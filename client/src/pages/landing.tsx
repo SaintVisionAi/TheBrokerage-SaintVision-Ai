@@ -122,8 +122,11 @@ export default function Landing() {
         style={{
           backgroundImage: `url('https://cdn.builder.io/api/v1/image/assets%2F2c553a9d8cf24e6eae81a4a63962c5a4%2F446d6f0fa2c34f478f99f49fc6ba7f85?format=webp&width=800')`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center 35%',
-          filter: 'brightness(0.7)'
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+          filter: 'brightness(0.7)',
+          transform: 'scale(1)',
+          WebkitTransform: 'scale(1)'
         }}
       />
 
