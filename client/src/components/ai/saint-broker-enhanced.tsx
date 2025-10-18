@@ -124,22 +124,28 @@ export default function SaintBrokerEnhanced() {
 
   const loadUserData = async () => {
     try {
-      // Load documents
-      const docsRes = await fetch('/api/saint-broker/documents');
+      // Load documents (with credentials for auth)
+      const docsRes = await fetch('/api/saint-broker/documents', {
+        credentials: 'include'
+      });
       if (docsRes.ok) {
         const docsData = await docsRes.json();
         setDocuments(docsData);
       }
 
-      // Load notes
-      const notesRes = await fetch('/api/saint-broker/notes');
+      // Load notes (with credentials for auth)
+      const notesRes = await fetch('/api/saint-broker/notes', {
+        credentials: 'include'
+      });
       if (notesRes.ok) {
         const notesData = await notesRes.json();
         setNotes(notesData);
       }
 
-      // Load signatures
-      const sigRes = await fetch('/api/saint-broker/signatures');
+      // Load signatures (with credentials for auth)
+      const sigRes = await fetch('/api/saint-broker/signatures', {
+        credentials: 'include'
+      });
       if (sigRes.ok) {
         const sigData = await sigRes.json();
         setSignatures(sigData);
@@ -166,6 +172,7 @@ export default function SaintBrokerEnhanced() {
       const response = await fetch('/api/saint-broker/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // IMPORTANT: Include cookies for authentication
         body: JSON.stringify({ 
           message: input,
           context: {

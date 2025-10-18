@@ -1744,7 +1744,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // SaintBroker Enhanced API Endpoints - MASTER ORCHESTRATOR
-  app.post("/api/saint-broker/chat", async (req, res) => {
+  // FIXED: Added authentication middleware to get user context
+  app.post("/api/saint-broker/chat", isAuthenticated, async (req, res) => {
     try {
       const { message, context } = req.body;
       const userId = req.user?.userId || 'demo-user';
