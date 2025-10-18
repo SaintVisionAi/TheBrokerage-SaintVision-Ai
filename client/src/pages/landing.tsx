@@ -136,22 +136,6 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="relative z-10 min-h-screen flex items-start justify-center pt-48">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          {/* TOP CTAs - Simple addition */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <Link href="/apply">
-              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-12 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30" data-testid="button-apply-top">
-                💰 Apply Now - Get Funded
-                <ArrowRight className="w-6 h-6 ml-2" />
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-10 py-6 text-xl font-semibold border-0 shadow-lg shadow-blue-500/30" data-testid="button-create-account-top">
-                🚀 Create Account
-                <ArrowRight className="w-6 h-6 ml-2" />
-              </Button>
-            </Link>
-          </div>
-
           {/* URGENT LENDING CTA - PROMINENT */}
           <div className="mb-6 animate-pulse">
             <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-lg px-6 py-3 border-0">
