@@ -102,9 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser({
         username,
         email,
-        password: hashedPassword,
-        role: 'client',
-        plan: 'free'
+        password: hashedPassword
       });
 
       createSession(res, {
@@ -465,7 +463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const syncResult = await crmService.createOrUpdateContact({
         email: user.email,
-        username: user.username,
+        username: user.username || '',
         plan: user.plan || "free"
       });
       
@@ -687,7 +685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hasAzureEndpoint = !!process.env.AZURE_AI_FOUNDRY_ENDPOINT;
       const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
       
-      const status = {
+      const status: any = {
         azure: { hasKey: hasAzureKey, hasEndpoint: hasAzureEndpoint },
         openai: { hasKey: hasOpenAIKey },
         modelName: MODEL_NAME
@@ -900,23 +898,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lending: 'lending',
       };
       
-      const contact = await captureGHLLead({
+      const contactResponse = await captureGHLLead({
         firstName: firstName || 'New',
         lastName: lastName || 'Lead',
         email,
         phone,
-        service: divisionToServiceMap[aiQualification.division] || 'general',
+        service: (divisionToServiceMap[aiQualification.division] || 'general') as 'real-estate' | 'lending' | 'investments' | 'general' | 'real-estate-brokerage' | 'real-estate-finance',
         type: leadData.type || aiQualification.division,
-        notes: leadData.notes || `AI: ${aiQualification.reasoning}`,
-        source: leadData.source || 'website',
-        customFields: {
-          division: aiQualification.division,
-          priority: aiQualification.priority,
-          estimated_value: aiQualification.estimatedValue,
-          ai_confidence: aiQualification.confidenceScore,
-        }
+        notes: leadData.notes || `AI: ${aiQualification.reasoning} | Division: ${aiQualification.division} | Priority: ${aiQualification.priority} | Est. Value: ${aiQualification.estimatedValue} | Confidence: ${aiQualification.confidenceScore}`,
+        source: leadData.source || 'website'
       });
-      const contactId = contact.contact?.id || '';
+      const contactId = (contactResponse as any).contact?.id || (contactResponse as any).data?.contact?.id || '';
       console.log(`✅ Step 2: Contact created - ${contactId}`);
 
       // STEP 2.5: Save contact to PostgreSQL database
@@ -1082,9 +1074,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userAccount = await storage.createUser({
             username: email.split('@')[0],
             email,
-            password: hashedPassword,
-            role: 'client',
-            plan: 'free'
+            password: hashedPassword
           });
           
           // Create session token for auto-login
@@ -1500,7 +1490,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { opportunities, contacts } = await import('@shared/schema');
       const { desc, eq } = await import('drizzle-orm');
       
-      const contactId = req.params.contactId ? parseInt(req.params.contactId) : null;
+      const contactId = req.params.contactId || null;
       
       // If no contactId, get the first opportunity with contact details
       let opportunity;
@@ -1580,16 +1570,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'funded $': 8
       };
 
-      const pipelineStages = [
-        { name: 'New Lead', status: 'pending' as const },
-        { name: 'Contacted', status: 'pending' as const },
-        { name: 'Pre Qualified', status: 'pending' as const },
-        { name: 'Documents pending', status: 'pending' as const },
-        { name: 'Full Application Complete', status: 'pending' as const },
-        { name: 'Sent to Lender', status: 'pending' as const },
-        { name: 'Documents Pending and Follow Up', status: 'pending' as const },
-        { name: 'Signature/Qualified', status: 'pending' as const },
-        { name: 'Funded $', status: 'pending' as const }
+      const pipelineStages: Array<{ name: string; status: 'pending' | 'completed' | 'current' }> = [
+        { name: 'New Lead', status: 'pending' },
+        { name: 'Contacted', status: 'pending' },
+        { name: 'Pre Qualified', status: 'pending' },
+        { name: 'Documents pending', status: 'pending' },
+        { name: 'Full Application Complete', status: 'pending' },
+        { name: 'Sent to Lender', status: 'pending' },
+        { name: 'Documents Pending and Follow Up', status: 'pending' },
+        { name: 'Signature/Qualified', status: 'pending' },
+        { name: 'Funded $', status: 'pending' }
       ];
 
       // Get current stage index using EXACT match
@@ -1615,7 +1605,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         application: {
           loanAmount: `$${(opp.monetaryValue || 0).toLocaleString()}`,
           loanType: opp.division?.replace(/_/g, ' ').toUpperCase() || 'Lending',
-          applicationDate: new Date(opp.contactCreatedAt).toLocaleDateString(),
+          applicationDate: opp.contactCreatedAt ? new Date(opp.contactCreatedAt).toLocaleDateString() : 'N/A',
           currentStage: opp.stageName || 'New Lead',
           priority: opp.priority || 'medium',
           status: opp.status || 'Active',
@@ -1624,7 +1614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pipelineStages: pipelineStages.map((stage, idx) => ({
           name: stage.name,
           status: stage.status,
-          date: stage.status === 'completed' ? new Date(opp.oppCreatedAt).toLocaleDateString() : undefined
+          date: stage.status === 'completed' && opp.oppCreatedAt ? new Date(opp.oppCreatedAt).toLocaleDateString() : undefined
         })),
         documents: {
           needed: [
@@ -1676,7 +1666,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         loanType: app.division?.replace(/_/g, ' ').toUpperCase() || 'Lending',
         status: mapStageToStatus(app.stageName || 'new_lead'),
         currentStage: app.stageName || 'New Lead',
-        applicationDate: new Date(app.createdAt).toLocaleDateString(),
+        applicationDate: app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'N/A',
         priority: app.priority || 'medium'
       }));
 
@@ -1749,7 +1739,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/saint-broker/chat", async (req, res) => {
     try {
       const { message, context } = req.body;
-      const userId = req.user?.id || 'demo-user'; // TODO: Get from session
+      const userId = req.user?.userId || 'demo-user'; // TODO: Get from session
 
       // Load comprehensive knowledge base for SaintBroker
       const knowledgeBase = [];
@@ -1840,7 +1830,7 @@ ${knowledgeBase.slice(0, 2).join('\n\n')}
 
   app.get("/api/saint-broker/documents", async (req, res) => {
     try {
-      const userId = req.user?.id || 'demo-user'; // TODO: Get from session
+      const userId = req.user?.userId || 'demo-user'; // TODO: Get from session
       const documents = await storage.getUserDocuments(userId);
       res.json(documents);
     } catch (error: any) {
@@ -1850,7 +1840,7 @@ ${knowledgeBase.slice(0, 2).join('\n\n')}
 
   app.post("/api/saint-broker/upload", async (req, res) => {
     try {
-      const userId = req.user?.id || 'demo-user'; // TODO: Get from session
+      const userId = req.user?.userId || 'demo-user'; // TODO: Get from session
       
       // TODO: Implement file upload with multer
       res.status(501).json({ error: "File upload not yet implemented" });
@@ -1861,7 +1851,7 @@ ${knowledgeBase.slice(0, 2).join('\n\n')}
 
   app.get("/api/saint-broker/notes", async (req, res) => {
     try {
-      const userId = req.user?.id || 'demo-user'; // TODO: Get from session
+      const userId = req.user?.userId || 'demo-user'; // TODO: Get from session
       // Return empty array for now - notes feature coming soon
       res.json([]);
     } catch (error: any) {
@@ -1872,7 +1862,7 @@ ${knowledgeBase.slice(0, 2).join('\n\n')}
 
   app.post("/api/saint-broker/notes", async (req, res) => {
     try {
-      const userId = req.user?.id || 'demo-user'; // TODO: Get from session
+      const userId = req.user?.userId || 'demo-user'; // TODO: Get from session
       const { title, content, tags } = req.body;
 
       const note = await storage.createClientNote({
@@ -1892,7 +1882,7 @@ ${knowledgeBase.slice(0, 2).join('\n\n')}
 
   app.get("/api/saint-broker/signatures", async (req, res) => {
     try {
-      const userId = req.user?.id || 'demo-user'; // TODO: Get from session
+      const userId = req.user?.userId || 'demo-user'; // TODO: Get from session
       // Return empty array for now - signatures feature coming soon
       res.json([]);
     } catch (error: any) {
@@ -1903,7 +1893,7 @@ ${knowledgeBase.slice(0, 2).join('\n\n')}
 
   app.post("/api/saint-broker/signatures/request", async (req, res) => {
     try {
-      const userId = req.user?.id || 'demo-user'; // TODO: Get from session
+      const userId = req.user?.userId || 'demo-user'; // TODO: Get from session
       const { documentId, documentTitle } = req.body;
 
       const signature = await storage.createSignature({
