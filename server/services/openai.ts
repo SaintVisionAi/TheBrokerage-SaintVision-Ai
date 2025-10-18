@@ -1,13 +1,8 @@
 import OpenAI from "openai";
 
-// Use Azure OpenAI as primary (fully configured), fallback to OpenAI
+// Use standard OpenAI API (Azure endpoints disabled temporarily due to auth issues)
 const openai = new OpenAI({ 
-  apiKey: process.env.AZURE_AI_FOUNDRY_KEY || process.env.OPENAI_API_KEY || "",
-  baseURL: process.env.AZURE_AI_FOUNDRY_ENDPOINT || process.env.AZURE_OPENAI_ENDPOINT || undefined,
-  defaultQuery: process.env.AZURE_AI_FOUNDRY_ENDPOINT ? { 'api-version': '2024-08-01-preview' } : undefined,
-  defaultHeaders: process.env.AZURE_AI_FOUNDRY_ENDPOINT ? {
-    'api-key': process.env.AZURE_AI_FOUNDRY_KEY || ""
-  } : undefined
+  apiKey: process.env.OPENAI_API_KEY || ""
 });
 
 export interface ToneAnalysis {
