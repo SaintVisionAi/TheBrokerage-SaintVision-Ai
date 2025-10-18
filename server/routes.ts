@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { generateAssistantResponse, analyzeTone, openai } from "./services/openai";
+import { generateAssistantResponse, analyzeTone, openai, MODEL_NAME } from "./services/openai";
 import { crmService } from "./services/crm";
 import { brainService } from "./services/brain";
 import { godmodeExecutor } from "./godmode/executor";
@@ -550,12 +550,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // OpenAI Chat Endpoint - compatible with frontend ChatClient
   app.post("/api/chat/openai", async (req, res) => {
     try {
-      const { chatSettings, messages, functions } = req.body;
+      const { chatSettings, messages, functions, message } = req.body;
+      
+      // Handle both message formats
+      const chatMessages = messages || [
+        { role: "system", content: "You are SaintBroker AI, an expert assistant for business lending, real estate, and investment services. Be professional, helpful, and knowledgeable about Saint Vision Group's services." },
+        { role: "user", content: message || "Hello" }
+      ];
       
       const payload: any = {
-        messages,
+        messages: chatMessages,
         temperature: chatSettings?.temperature || 0.7,
-        model: chatSettings?.model || "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: chatSettings?.model || MODEL_NAME,
       };
 
       // Vision support
@@ -568,19 +574,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
         payload.functions = functions;
       }
 
-      const completion = await openai.chat.completions.create(payload);
+      let completion = null;
+      let lastError = null;
+      
+      // Try Azure first if configured
+      try {
+        completion = await openai.chat.completions.create(payload);
+      } catch (azureError: any) {
+        console.log("Azure OpenAI failed, attempting fallback...");
+        lastError = azureError;
+        
+        // Try standard OpenAI as fallback if available
+        if (process.env.OPENAI_API_KEY) {
+          try {
+            const OpenAI = (await import('openai')).default;
+            const standardOpenAI = new OpenAI({
+              apiKey: process.env.OPENAI_API_KEY
+            });
+            
+            payload.model = "gpt-4o"; // Use standard model for fallback
+            completion = await standardOpenAI.chat.completions.create(payload);
+            console.log("✅ Fallback to standard OpenAI successful");
+          } catch (fallbackError: any) {
+            console.error("Both Azure and standard OpenAI failed", fallbackError);
+            lastError = fallbackError;
+          }
+        }
+      }
+      
+      if (!completion) {
+        // If all AI services fail, provide a helpful fallback response
+        res.json({
+          choices: [{
+            message: {
+              content: "I'm experiencing technical difficulties, but I'm here to help with Saint Vision Group services:\n\n📊 **Business Lending**: $50K-$5M loans with flexible terms\n🏡 **Real Estate**: Full-service property solutions\n💰 **Investments**: 9-12% fixed returns\n\nPlease call us directly at (949) 755-0720 or email saints@hacp.ai for immediate assistance.",
+              role: "assistant"
+            }
+          }]
+        });
+        return;
+      }
       
       res.json({
         choices: completion.choices
       });
     } catch (error: any) {
       console.error("OpenAI chat error:", error);
-      res.status(500).json({
-        message: error?.message || "OpenAI chat failed"
+      
+      // Provide a fallback response instead of an error
+      res.json({
+        choices: [{
+          message: {
+            content: "I'm here to help with Saint Vision Group services. While I'm experiencing a technical issue, you can:\n\n• Call: (949) 755-0720\n• Email: saints@hacp.ai\n• Apply online for business lending ($50K-$5M)\n• Explore our real estate services\n• Learn about our 9-12% investment returns\n\nHow can I assist you today?",
+            role: "assistant"
+          }
+        }]
       });
     }
   });
 
+  // Debug endpoint to test OpenAI connection
+  app.get("/api/test-openai", async (req, res) => {
+    try {
+      const hasAzureKey = !!process.env.AZURE_AI_FOUNDRY_KEY;
+      const hasAzureEndpoint = !!process.env.AZURE_AI_FOUNDRY_ENDPOINT;
+      const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
+      
+      const status = {
+        azure: { hasKey: hasAzureKey, hasEndpoint: hasAzureEndpoint },
+        openai: { hasKey: hasOpenAIKey },
+        modelName: MODEL_NAME
+      };
+      
+      // Try a simple test with standard OpenAI
+      if (hasOpenAIKey) {
+        try {
+          const OpenAI = (await import('openai')).default;
+          const testClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+          const testResponse = await testClient.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: "Say 'test successful'" }],
+            max_tokens: 10
+          });
+          status.openaiTest = testResponse.choices[0].message.content;
+        } catch (err: any) {
+          status.openaiError = err.message;
+        }
+      }
+      
+      res.json(status);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
   // SaintBroker chat endpoint - handles SaintBroker AI assistant requests
   app.post("/api/gpt/memory-chat", async (req, res) => {
     try {

@@ -1,40 +1,51 @@
 import OpenAI from "openai";
 
-// OpenAI client configuration - Azure AI Foundry
-function createOpenAIClient(): OpenAI {
-  const useAzure = !!(
-    process.env.AZURE_AI_FOUNDRY_KEY && 
-    process.env.AZURE_AI_FOUNDRY_ENDPOINT
-  );
+// OpenAI client configuration with Azure AI Foundry and fallback
+let azureClient: OpenAI | null = null;
+let standardClient: OpenAI | null = null;
 
-  if (useAzure) {
+function createAzureClient(): OpenAI | null {
+  if (process.env.AZURE_AI_FOUNDRY_KEY && process.env.AZURE_AI_FOUNDRY_ENDPOINT) {
     console.log("🔵 Configuring Azure OpenAI client...");
+    
+    // Ensure endpoint has proper format
+    const endpoint = process.env.AZURE_AI_FOUNDRY_ENDPOINT.endsWith('/openai/deployments')
+      ? process.env.AZURE_AI_FOUNDRY_ENDPOINT
+      : `${process.env.AZURE_AI_FOUNDRY_ENDPOINT.replace(/\/$/, '')}/openai/deployments`;
     
     return new OpenAI({
       apiKey: process.env.AZURE_AI_FOUNDRY_KEY,
-      baseURL: process.env.AZURE_AI_FOUNDRY_ENDPOINT,
+      baseURL: endpoint,
       defaultQuery: { 'api-version': '2024-08-01-preview' },
       defaultHeaders: { 'api-key': process.env.AZURE_AI_FOUNDRY_KEY }
     });
   }
-  
-  console.log("🟢 Configuring standard OpenAI client...");
-  
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  });
+  return null;
 }
 
-const openai = createOpenAIClient();
+function createStandardClient(): OpenAI | null {
+  if (process.env.OPENAI_API_KEY) {
+    console.log("🟢 Configuring standard OpenAI client...");
+    return new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+  }
+  return null;
+}
 
-const useAzure = !!(
-  process.env.AZURE_AI_FOUNDRY_KEY && 
-  process.env.AZURE_AI_FOUNDRY_ENDPOINT
-);
+// Initialize clients
+azureClient = createAzureClient();
+standardClient = createStandardClient();
 
-export const MODEL_NAME = useAzure 
-  ? (process.env.AZURE_DEPLOYMENT_GPT5_CORE || "gpt-5-core")
-  : "gpt-4o";
+// Primary client selection
+const openai = azureClient || standardClient || new OpenAI({
+  apiKey: "dummy-key" // Dummy key for development
+});
+
+// Model selection based on which client is being used
+export const MODEL_NAME = azureClient 
+  ? "gpt-5-core"  // Azure deployment name
+  : "gpt-4o";      // Standard OpenAI model
 
 export { openai };
 
