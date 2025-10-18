@@ -164,6 +164,28 @@ export default function SaintBrokerEnhanced() {
       timestamp: new Date()
     };
 
+    // Client Hub awareness - immediate responses for common queries
+    const lowerInput = input.toLowerCase();
+    if (lowerInput.includes('upload') || lowerInput.includes('document')) {
+      setMessages(prev => [...prev, userMessage, {
+        role: 'assistant',
+        content: `I can help you with document uploads! You have two options:\n\n📁 **Quick Upload**: Use the Documents tab right here in my chat window for immediate uploads.\n\n🏢 **Full Client Hub**: Visit the Client Hub for comprehensive document management, loan tracking, and access to all loan products.\n\nThe Client Hub is your complete loan management center. Would you like me to guide you there?`,
+        timestamp: new Date()
+      }]);
+      setInput('');
+      return;
+    }
+    
+    if (lowerInput.includes('client hub') || lowerInput.includes('portal')) {
+      setMessages(prev => [...prev, userMessage, {
+        role: 'assistant',
+        content: `The **Client Hub** is your all-in-one loan management center! 🏢\n\n📊 **Overview**: Track all active applications and funding history\n📄 **Applications**: View detailed status and progress of each loan\n📁 **Documents**: Upload and manage all your loan documents\n📥 **Products**: Download loan product information and forms\n\n➡️ Visit: /client-hub\n\nOr I can help you right here. What would you like to do?`,
+        timestamp: new Date()
+      }]);
+      setInput('');
+      return;
+    }
+
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
@@ -178,7 +200,9 @@ export default function SaintBrokerEnhanced() {
           context: {
             documentCount: documents.length,
             noteCount: notes.length,
-            pendingSignatures: signatures.filter(s => s.status === 'pending').length
+            pendingSignatures: signatures.filter(s => s.status === 'pending').length,
+            hasClientHub: true,
+            clientHubUrl: '/client-hub'
           }
         })
       });
@@ -400,8 +424,62 @@ export default function SaintBrokerEnhanced() {
         </TabsList>
 
         {/* CHAT TAB */}
-        <TabsContent value="chat" className="flex-1 flex flex-col mt-0 p-4 space-y-4 overflow-hidden">
-          <ScrollArea className="flex-1 pr-4 h-full overflow-y-auto" ref={scrollRef}>
+        <TabsContent value="chat" className="flex-1 flex flex-col mt-0 overflow-hidden">
+          {/* Quick Actions at top */}
+          {messages.length <= 1 && (
+            <div className="border-b border-white/10 p-2 md:p-3 bg-white/5 backdrop-blur-sm">
+              <p className="text-xs text-neutral-400 mb-2 font-medium">Quick Actions:</p>
+              <div className="grid grid-cols-2 gap-1 md:gap-2">
+                <Button
+                  variant="outline"
+                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  onClick={() => {
+                    setInput("I need a business loan for my company");
+                  }}
+                  data-testid="quick-action-loan"
+                >
+                  <span className="text-lg">💰</span>
+                  <span className="text-xs text-white font-medium leading-tight">Business Loan</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  onClick={() => {
+                    setInput("Tell me about real estate financing options");
+                  }}
+                  data-testid="quick-action-real-estate"
+                >
+                  <span className="text-lg">🏠</span>
+                  <span className="text-xs text-white font-medium leading-tight">Real Estate</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  onClick={() => {
+                    setInput("What investment opportunities do you offer?");
+                  }}
+                  data-testid="quick-action-investments"
+                >
+                  <span className="text-lg">📈</span>
+                  <span className="text-xs text-white font-medium leading-tight">Investments</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  onClick={() => {
+                    setInput("What's the status of my loan application?");
+                  }}
+                  data-testid="quick-action-check-status"
+                >
+                  <span className="text-lg">⏱️</span>
+                  <span className="text-xs text-white font-medium leading-tight">Loan Status</span>
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {/* Messages scroll area */}
+          <ScrollArea className="flex-1 p-4 overflow-y-auto" ref={scrollRef}>
             <div className="space-y-4">
               {messages.map((msg, idx) => (
                 <div
@@ -449,61 +527,9 @@ export default function SaintBrokerEnhanced() {
               )}
             </div>
           </ScrollArea>
-
-          {/* Quick Actions */}
-          {messages.length <= 1 && (
-            <div className="border-t border-white/10 p-2 md:p-3 bg-white/5 backdrop-blur-sm">
-              <p className="text-xs text-neutral-400 mb-2 font-medium hidden md:block">Quick Actions:</p>
-              <div className="grid grid-cols-2 gap-1 md:gap-2">
-                <Button
-                  variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
-                  onClick={() => {
-                    setInput("I'd like to apply for a business loan");
-                  }}
-                  data-testid="quick-action-apply-loan"
-                >
-                  <span className="text-lg">💰</span>
-                  <span className="text-xs text-white font-medium leading-tight">Business Loan</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
-                  onClick={() => {
-                    setInput("Tell me about your real estate services");
-                  }}
-                  data-testid="quick-action-real-estate"
-                >
-                  <span className="text-lg">🏠</span>
-                  <span className="text-xs text-white font-medium leading-tight">Real Estate</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
-                  onClick={() => {
-                    setInput("What investment opportunities do you offer?");
-                  }}
-                  data-testid="quick-action-investments"
-                >
-                  <span className="text-lg">📈</span>
-                  <span className="text-xs text-white font-medium leading-tight">Investments</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
-                  onClick={() => {
-                    setInput("What's the status of my loan application?");
-                  }}
-                  data-testid="quick-action-check-status"
-                >
-                  <span className="text-lg">⏱️</span>
-                  <span className="text-xs text-white font-medium leading-tight">Loan Status</span>
-                </Button>
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-2">
+          
+          {/* Input section at the bottom */}
+          <div className="flex gap-2 p-4 border-t border-white/10 bg-black/20">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}

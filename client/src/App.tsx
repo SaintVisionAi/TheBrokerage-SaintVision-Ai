@@ -31,6 +31,7 @@ import Lending from "@/pages/lending";
 import Investments from "@/pages/investments";
 import CommercialProducts from "@/pages/commercial-products";
 import ClientPortal from "@/pages/client-portal";
+import ClientHub from "@/pages/client-hub";
 import REBrokerageIntakePage from "@/pages/re-brokerage-intake";
 import REFinanceIntakePage from "@/pages/re-finance-intake";
 import AgreementPreviewPage from "@/pages/agreement-preview";
@@ -126,6 +127,7 @@ function Router() {
       <Route path="/dashboard" component={ProtectedDashboard} />
       <Route path="/admin" component={ProtectedDashboard} />
       <Route path="/client-portal" component={ProtectedClientPortal} />
+      <Route path="/client-hub" component={ClientHub} />
       <Route path="/admin/saintbook">
         {() => <ProtectedAdminRoute component={SaintBookDashboard} />}
       </Route>

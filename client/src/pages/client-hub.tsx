@@ -1,0 +1,535 @@
+import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Upload, 
+  FileText, 
+  Download, 
+  Clock, 
+  CheckCircle, 
+  AlertCircle,
+  Calendar,
+  DollarSign,
+  Briefcase,
+  Home,
+  TrendingUp,
+  Shield,
+  FileSignature,
+  Send,
+  Eye,
+  Trash2,
+  Plus
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+interface LoanApplication {
+  id: string;
+  type: string;
+  amount: string;
+  status: 'draft' | 'submitted' | 'in-review' | 'approved' | 'funded' | 'denied';
+  progress: number;
+  dateSubmitted?: string;
+  nextAction?: string;
+  documents: Document[];
+}
+
+interface Document {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  uploadDate: string;
+  status: 'pending' | 'verified' | 'rejected';
+  category: string;
+}
+
+const LOAN_PRODUCTS = [
+  {
+    title: 'AR Financing',
+    file: 'AR_Financing.pdf',
+    icon: '📊',
+    description: 'Accounts Receivable financing solutions'
+  },
+  {
+    title: 'Business Credit Building',
+    file: 'Business_Credit_Building.pdf',
+    icon: '🏗️',
+    description: 'Build your business credit profile'
+  },
+  {
+    title: 'Cannabis Business',
+    file: 'Cannabusiness.pdf',
+    icon: '🌿',
+    description: 'Specialized cannabis industry financing'
+  },
+  {
+    title: 'Equipment Financing',
+    file: 'Equipment_Financing.pdf',
+    icon: '🏗️',
+    description: 'Finance your equipment needs'
+  },
+  {
+    title: 'Fix & Flip',
+    file: 'Fix_N_Flip.pdf',
+    icon: '🏠',
+    description: 'Real estate investment financing'
+  },
+  {
+    title: 'Line of Credit',
+    file: 'Line_of_Credit.pdf',
+    icon: '💳',
+    description: 'Flexible credit lines for working capital'
+  },
+  {
+    title: 'Real Estate',
+    file: 'Real_Estate.pdf',
+    icon: '🏢',
+    description: 'Commercial real estate financing'
+  },
+  {
+    title: 'SBA Loans',
+    file: 'SBA.pdf',
+    icon: '🏛️',
+    description: 'Government-backed SBA loan programs'
+  },
+  {
+    title: 'Term Loans',
+    file: 'Term_Loan.pdf',
+    icon: '📈',
+    description: 'Traditional term loan financing'
+  },
+  {
+    title: 'Working Capital',
+    file: 'Working_Capital.pdf',
+    icon: '💰',
+    description: 'Quick working capital solutions'
+  }
+];
+
+export default function ClientHub() {
+  const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [applications, setApplications] = useState<LoanApplication[]>([
+    {
+      id: '1',
+      type: 'Commercial/Business Lending',
+      amount: '$250,000',
+      status: 'in-review',
+      progress: 65,
+      dateSubmitted: '2024-03-15',
+      nextAction: 'Upload bank statements',
+      documents: []
+    }
+  ]);
+  const [selectedApp, setSelectedApp] = useState<LoanApplication | null>(applications[0]);
+
+  const handleFileUpload = (files: FileList | null) => {
+    if (!files) return;
+    
+    toast({
+      title: "Documents Uploaded",
+      description: `${files.length} document(s) uploaded successfully`
+    });
+  };
+
+  const handleDownloadProduct = (file: string) => {
+    toast({
+      title: "Download Started",
+      description: `Downloading ${file}`
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'draft': return 'bg-gray-500';
+      case 'submitted': return 'bg-blue-500';
+      case 'in-review': return 'bg-yellow-500';
+      case 'approved': return 'bg-emerald-500';
+      case 'funded': return 'bg-green-600';
+      case 'denied': return 'bg-red-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'draft': return <FileText className="h-4 w-4" />;
+      case 'submitted': return <Send className="h-4 w-4" />;
+      case 'in-review': return <Eye className="h-4 w-4" />;
+      case 'approved': return <CheckCircle className="h-4 w-4" />;
+      case 'funded': return <DollarSign className="h-4 w-4" />;
+      case 'denied': return <AlertCircle className="h-4 w-4" />;
+      default: return <Clock className="h-4 w-4" />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-black to-neutral-900 text-white">
+      {/* Header */}
+      <div className="bg-black/40 backdrop-blur-xl border-b border-yellow-400/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                Client Hub
+              </h1>
+              <p className="text-neutral-400 mt-1">Your complete loan management center</p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10"
+                onClick={() => navigate('/landing')}
+                data-testid="button-back-home"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Button>
+              <Button
+                className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                data-testid="button-new-application"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                New Application
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 bg-black/40 backdrop-blur-md border border-yellow-400/20">
+            <TabsTrigger value="overview" data-testid="tab-overview">
+              <Briefcase className="h-4 w-4 mr-2" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="applications" data-testid="tab-applications">
+              <FileText className="h-4 w-4 mr-2" />
+              Applications
+            </TabsTrigger>
+            <TabsTrigger value="documents" data-testid="tab-documents">
+              <Upload className="h-4 w-4 mr-2" />
+              Documents
+            </TabsTrigger>
+            <TabsTrigger value="products" data-testid="tab-products">
+              <Download className="h-4 w-4 mr-2" />
+              Products
+            </TabsTrigger>
+          </TabsList>
+
+          {/* OVERVIEW TAB */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+                <CardHeader>
+                  <CardTitle className="text-yellow-400">Active Applications</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold text-white">{applications.length}</div>
+                  <p className="text-neutral-400 text-sm mt-2">In progress</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-black/40 backdrop-blur-md border-emerald-400/20">
+                <CardHeader>
+                  <CardTitle className="text-emerald-400">Total Approved</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold text-white">$1.2M</div>
+                  <p className="text-neutral-400 text-sm mt-2">Lifetime funding</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-black/40 backdrop-blur-md border-blue-400/20">
+                <CardHeader>
+                  <CardTitle className="text-blue-400">Next Action</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-lg font-semibold text-white">Upload Documents</div>
+                  <p className="text-neutral-400 text-sm mt-2">For loan #1</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Actions */}
+            <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+                <CardDescription>Common tasks and resources</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Button
+                    variant="outline"
+                    className="h-auto py-4 flex flex-col items-center gap-2 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10"
+                    data-testid="quick-upload-docs"
+                  >
+                    <Upload className="h-6 w-6 text-yellow-400" />
+                    <span>Upload Docs</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-auto py-4 flex flex-col items-center gap-2 border-emerald-400/30 hover:border-emerald-400 hover:bg-emerald-400/10"
+                    data-testid="quick-check-status"
+                  >
+                    <Clock className="h-6 w-6 text-emerald-400" />
+                    <span>Check Status</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-auto py-4 flex flex-col items-center gap-2 border-blue-400/30 hover:border-blue-400 hover:bg-blue-400/10"
+                    data-testid="quick-download-forms"
+                  >
+                    <Download className="h-6 w-6 text-blue-400" />
+                    <span>Download Forms</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-auto py-4 flex flex-col items-center gap-2 border-purple-400/30 hover:border-purple-400 hover:bg-purple-400/10"
+                    data-testid="quick-contact-broker"
+                  >
+                    <Shield className="h-6 w-6 text-purple-400" />
+                    <span>Contact Broker</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* APPLICATIONS TAB */}
+          <TabsContent value="applications" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Applications List */}
+              <div className="lg:col-span-1">
+                <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+                  <CardHeader>
+                    <CardTitle>Your Applications</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <ScrollArea className="h-[400px]">
+                      {applications.map((app) => (
+                        <div
+                          key={app.id}
+                          className={`p-4 border-b border-white/10 cursor-pointer hover:bg-white/5 transition-colors ${
+                            selectedApp?.id === app.id ? 'bg-white/10' : ''
+                          }`}
+                          onClick={() => setSelectedApp(app)}
+                          data-testid={`application-${app.id}`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <p className="font-semibold text-white">{app.type}</p>
+                              <p className="text-2xl font-bold text-yellow-400 mt-1">{app.amount}</p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Badge className={`${getStatusColor(app.status)} text-white`}>
+                                  {getStatusIcon(app.status)}
+                                  <span className="ml-1">{app.status}</span>
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          <Progress value={app.progress} className="mt-3 h-2" />
+                        </div>
+                      ))}
+                    </ScrollArea>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Application Details */}
+              <div className="lg:col-span-2">
+                {selectedApp && (
+                  <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+                    <CardHeader>
+                      <CardTitle>Application Details</CardTitle>
+                      <CardDescription>Loan ID: #{selectedApp.id}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-neutral-400 text-sm">Type</p>
+                          <p className="text-white font-semibold">{selectedApp.type}</p>
+                        </div>
+                        <div>
+                          <p className="text-neutral-400 text-sm">Amount</p>
+                          <p className="text-white font-semibold">{selectedApp.amount}</p>
+                        </div>
+                        <div>
+                          <p className="text-neutral-400 text-sm">Status</p>
+                          <Badge className={`${getStatusColor(selectedApp.status)} text-white mt-1`}>
+                            {selectedApp.status}
+                          </Badge>
+                        </div>
+                        <div>
+                          <p className="text-neutral-400 text-sm">Progress</p>
+                          <Progress value={selectedApp.progress} className="mt-2 h-2" />
+                        </div>
+                      </div>
+
+                      <Separator className="bg-white/10" />
+
+                      {selectedApp.nextAction && (
+                        <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-4">
+                          <p className="text-yellow-400 font-semibold flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4" />
+                            Next Action Required
+                          </p>
+                          <p className="text-white mt-2">{selectedApp.nextAction}</p>
+                        </div>
+                      )}
+
+                      <div className="flex gap-3">
+                        <Button
+                          className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                          data-testid="button-upload-documents"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Documents
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10"
+                          data-testid="button-view-timeline"
+                        >
+                          <Calendar className="h-4 w-4 mr-2" />
+                          View Timeline
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* DOCUMENTS TAB */}
+          <TabsContent value="documents" className="space-y-6">
+            <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+              <CardHeader>
+                <CardTitle>Document Center</CardTitle>
+                <CardDescription>Upload and manage your loan documents</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Upload Area */}
+                <div className="border-2 border-dashed border-yellow-400/30 rounded-lg p-8 text-center hover:border-yellow-400 transition-colors">
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
+                    id="file-upload"
+                    onChange={(e) => handleFileUpload(e.target.files)}
+                    accept=".pdf,.doc,.docx,.xlsx,.png,.jpg"
+                  />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <Upload className="h-12 w-12 mx-auto text-yellow-400 mb-4" />
+                    <p className="text-white font-semibold">Drop files here or click to upload</p>
+                    <p className="text-neutral-400 text-sm mt-2">
+                      Supported: PDF, DOC, DOCX, Excel, Images
+                    </p>
+                  </label>
+                </div>
+
+                {/* Document Categories */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <Card className="bg-white/5 border-white/10">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-neutral-400 text-sm">Bank Statements</p>
+                          <p className="text-2xl font-bold text-white">3</p>
+                        </div>
+                        <FileText className="h-8 w-8 text-yellow-400" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-white/5 border-white/10">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-neutral-400 text-sm">Tax Returns</p>
+                          <p className="text-2xl font-bold text-white">2</p>
+                        </div>
+                        <FileText className="h-8 w-8 text-emerald-400" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-white/5 border-white/10">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-neutral-400 text-sm">Other</p>
+                          <p className="text-2xl font-bold text-white">5</p>
+                        </div>
+                        <FileText className="h-8 w-8 text-blue-400" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* PRODUCTS TAB */}
+          <TabsContent value="products" className="space-y-6">
+            <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+              <CardHeader>
+                <CardTitle>Loan Products & Resources</CardTitle>
+                <CardDescription>Download product information and application forms</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {LOAN_PRODUCTS.map((product) => (
+                    <Card
+                      key={product.file}
+                      className="bg-white/5 border-white/10 hover:border-yellow-400/30 transition-colors"
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-2xl">{product.icon}</span>
+                              <h3 className="font-semibold text-white">{product.title}</h3>
+                            </div>
+                            <p className="text-neutral-400 text-sm mt-2">{product.description}</p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="w-full mt-4 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10"
+                          onClick={() => handleDownloadProduct(product.file)}
+                          data-testid={`download-${product.file}`}
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Floating Help */}
+      <div className="fixed bottom-6 left-6">
+        <Button
+          className="bg-gradient-to-r from-emerald-400 to-emerald-600 hover:from-emerald-500 hover:to-emerald-700 text-white shadow-lg"
+          data-testid="button-saintbroker-help"
+        >
+          <Shield className="h-4 w-4 mr-2" />
+          Ask SaintBroker
+        </Button>
+      </div>
+    </div>
+  );
+}
