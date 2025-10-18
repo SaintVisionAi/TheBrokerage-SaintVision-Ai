@@ -1,203 +1,270 @@
 import { useQuery } from "@tanstack/react-query";
-import QuickActions from "@/components/dashboard/quick-actions";
-import RecentActivity from "@/components/dashboard/recent-activity";
-import SystemMetrics from "@/components/dashboard/system-metrics";
-import ToneDetector from "@/components/assistant/tone-detector";
-import ChatInterface from "@/components/chat/chat-interface";
-import MemoryAwareAssistant from "@/components/ai/memory-aware-assistant";
-import ChatClient from "@/components/ai/chat-client";
-import FileUploader from "@/components/ai/file-uploader";
-import CRMStream from "@/components/ai/crm-stream";
-import AzureSpeech from "@/components/ai/azure-speech";
-import LeadsList from "@/components/brokerage/leads-list";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Brain, MessageCircle, Upload, Users, Gauge, Activity, Mic, Building2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  FileText,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  XCircle,
+  Users,
+  DollarSign,
+  TrendingUp,
+  Phone,
+  Mail
+} from "lucide-react";
+import { Link } from "wouter";
+
+interface Application {
+  id: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  loanAmount: string;
+  loanType: string;
+  status: 'pending' | 'submitted' | 'incomplete' | 'completed';
+  currentStage: string;
+  applicationDate: string;
+  priority: 'high' | 'medium' | 'low';
+}
+
+interface DashboardStats {
+  totalApplications: number;
+  pending: number;
+  submitted: number;
+  incomplete: number;
+  completed: number;
+  totalLoanValue: string;
+}
 
 export default function Dashboard() {
-  const { data: systemStatus } = useQuery({
-    queryKey: ["/api/system/status"],
+  const { data: applications, isLoading: appsLoading } = useQuery<Application[]>({
+    queryKey: ["/api/admin/applications"],
   });
+
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
+    queryKey: ["/api/admin/stats"],
+  });
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      pending: { color: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30', icon: Clock },
+      submitted: { color: 'bg-blue-500/20 text-blue-400 border-blue-400/30', icon: FileText },
+      incomplete: { color: 'bg-red-500/20 text-red-400 border-red-400/30', icon: AlertCircle },
+      completed: { color: 'bg-green-500/20 text-green-400 border-green-400/30', icon: CheckCircle },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    const Icon = config.icon;
+
+    return (
+      <Badge className={`${config.color} flex items-center gap-1 w-fit`}>
+        <Icon className="w-3 h-3" />
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </Badge>
+    );
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    const colors = {
+      high: 'bg-red-500/20 text-red-400 border-red-400/30',
+      medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-400/30',
+      low: 'bg-gray-500/20 text-gray-400 border-gray-400/30',
+    };
+    
+    return (
+      <Badge className={colors[priority as keyof typeof colors] || colors.medium}>
+        {priority.toUpperCase()}
+      </Badge>
+    );
+  };
+
+  if (appsLoading || statsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-xl">Loading admin dashboard...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
         <header className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                SaintSal™ Dashboard
+                Admin Dashboard
               </h1>
-              <p className="text-slate-300">HACP™ Powered AI Assistant Platform • Where AI meets intuition</p>
+              <p className="text-slate-300">Saint Vision Group - AI Brokerage Platform</p>
             </div>
             <Badge className="bg-green-600/20 text-green-400 border-green-500/30">
-              ✨ Fully Integrated
+              ✨ Live Monitoring
             </Badge>
           </div>
         </header>
 
-        {/* AI Components Showcase */}
-        <Tabs defaultValue="chat" className="mb-8">
-          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50 border-slate-700">
-            <TabsTrigger value="chat" className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" />
-              Chat
-            </TabsTrigger>
-            <TabsTrigger value="memory" className="flex items-center gap-2">
-              <Brain className="w-4 h-4" />
-              Memory
-            </TabsTrigger>
-            <TabsTrigger value="voice" className="flex items-center gap-2">
-              <Mic className="w-4 h-4" />
-              Voice
-            </TabsTrigger>
-            <TabsTrigger value="brain" className="flex items-center gap-2">
-              <Upload className="w-4 h-4" />
-              Brain
-            </TabsTrigger>
-            <TabsTrigger value="crm" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              CRM
-            </TabsTrigger>
-            <TabsTrigger value="metrics" className="flex items-center gap-2">
-              <Gauge className="w-4 h-4" />
-              Metrics
-            </TabsTrigger>
-            <TabsTrigger value="activity" className="flex items-center gap-2">
-              <Activity className="w-4 h-4" />
-              Activity
-            </TabsTrigger>
-            <TabsTrigger value="brokerage" className="flex items-center gap-2">
-              <Building2 className="w-4 h-4" />
-              Brokerage
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="chat" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <ChatClient />
-              <ChatInterface />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="memory" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <MemoryAwareAssistant userId="1" />
-              <ToneDetector />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="voice" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AzureSpeech onTranscription={(text) => console.log('Transcribed:', text)} />
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white mb-4">HACP™ Live Voice Features</h3>
-                <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
-                  <div className="text-center text-slate-400">
-                    <Mic className="w-12 h-12 mx-auto mb-4 text-blue-400" />
-                    <p className="mb-2">Azure Speech Integration</p>
-                    <p className="text-sm">Real-time speech-to-text and text-to-speech</p>
-                    <div className="mt-4 space-y-2">
-                      <Badge variant="outline" className="border-blue-500/30 text-blue-400">Voice Recognition</Badge>
-                      <Badge variant="outline" className="border-purple-500/30 text-purple-400 ml-2">Speech Synthesis</Badge>
-                    </div>
-                  </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Total</p>
+                  <p className="text-3xl font-bold text-white">{stats?.totalApplications || 0}</p>
                 </div>
+                <Users className="w-8 h-8 text-blue-400" />
               </div>
-            </div>
-          </TabsContent>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="brain" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <FileUploader />
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white mb-4">Brain Ingestion Status</h3>
-                <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-700">
-                  <div className="text-center text-slate-400">
-                    <Upload className="w-12 h-12 mx-auto mb-4 text-emerald-400" />
-                    <p className="mb-2">Ready to ingest knowledge</p>
-                    <p className="text-sm">Upload files to expand SaintSal's brain</p>
-                  </div>
+          <Card className="bg-slate-800/50 border-yellow-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Pending</p>
+                  <p className="text-3xl font-bold text-yellow-400">{stats?.pending || 0}</p>
                 </div>
+                <Clock className="w-8 h-8 text-yellow-400" />
               </div>
-            </div>
-          </TabsContent>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="crm" className="mt-6">
-            <CRMStream />
-          </TabsContent>
+          <Card className="bg-slate-800/50 border-blue-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Submitted</p>
+                  <p className="text-3xl font-bold text-blue-400">{stats?.submitted || 0}</p>
+                </div>
+                <FileText className="w-8 h-8 text-blue-400" />
+              </div>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="metrics" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <SystemMetrics />
+          <Card className="bg-slate-800/50 border-red-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Incomplete</p>
+                  <p className="text-3xl font-bold text-red-400">{stats?.incomplete || 0}</p>
+                </div>
+                <AlertCircle className="w-8 h-8 text-red-400" />
               </div>
-              <div>
-                <QuickActions userId="1" />
-              </div>
-            </div>
-          </TabsContent>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="activity" className="mt-6">
-            <RecentActivity userId="1" />
-          </TabsContent>
+          <Card className="bg-slate-800/50 border-green-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Completed</p>
+                  <p className="text-3xl font-bold text-green-400">{stats?.completed || 0}</p>
+                </div>
+                <CheckCircle className="w-8 h-8 text-green-400" />
+              </div>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="brokerage" className="mt-6">
-            <Card className="bg-slate-800/30 border-slate-700">
-              <CardContent className="p-6">
-                <LeadsList />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Integration Status */}
-        <div className="bg-gradient-to-r from-emerald-900/20 to-teal-900/20 rounded-lg p-6 border border-emerald-500/20">
-          <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-            <Badge className="bg-green-600/20 text-green-400 border-green-500/30">
-              ✅ Integration Complete
-            </Badge>
-            SaintSal™ Platform Status
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-600/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <MessageCircle className="w-6 h-6 text-green-400" />
+          <Card className="bg-slate-800/50 border-emerald-500/30">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-slate-400 text-sm">Total Value</p>
+                  <p className="text-2xl font-bold text-emerald-400">{stats?.totalLoanValue || "$0"}</p>
+                </div>
+                <DollarSign className="w-8 h-8 text-emerald-400" />
               </div>
-              <p className="text-sm text-slate-300">OpenAI Chat</p>
-              <Badge variant="outline" className="border-green-500/30 text-green-400 text-xs">Ready</Badge>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Brain className="w-6 h-6 text-purple-400" />
-              </div>
-              <p className="text-sm text-slate-300">Memory Assistant</p>
-              <Badge variant="outline" className="border-purple-500/30 text-purple-400 text-xs">Active</Badge>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Mic className="w-6 h-6 text-blue-400" />
-              </div>
-              <p className="text-sm text-slate-300">Azure Speech</p>
-              <Badge variant="outline" className="border-blue-500/30 text-blue-400 text-xs">Live</Badge>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-emerald-600/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Upload className="w-6 h-6 text-emerald-400" />
-              </div>
-              <p className="text-sm text-slate-300">Brain Ingestion</p>
-              <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 text-xs">Ready</Badge>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-orange-600/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Users className="w-6 h-6 text-orange-400" />
-              </div>
-              <p className="text-sm text-slate-300">CRM Stream</p>
-              <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-xs">Live</Badge>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Applications Table */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center justify-between">
+              <span>All Client Applications</span>
+              <Button className="bg-green-400 hover:bg-green-500 text-black font-bold" data-testid="button-refresh">
+                Refresh
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!applications || applications.length === 0 ? (
+              <div className="text-center py-12">
+                <FileText className="w-16 h-16 mx-auto text-slate-600 mb-4" />
+                <p className="text-slate-400 text-lg">No applications yet</p>
+                <p className="text-slate-500 text-sm mt-2">Applications will appear here once clients start submitting</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-slate-700 hover:bg-slate-800/50">
+                    <TableHead className="text-slate-300">Client</TableHead>
+                    <TableHead className="text-slate-300">Contact</TableHead>
+                    <TableHead className="text-slate-300">Loan Type</TableHead>
+                    <TableHead className="text-slate-300">Amount</TableHead>
+                    <TableHead className="text-slate-300">Status</TableHead>
+                    <TableHead className="text-slate-300">Stage</TableHead>
+                    <TableHead className="text-slate-300">Priority</TableHead>
+                    <TableHead className="text-slate-300">Date</TableHead>
+                    <TableHead className="text-slate-300">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {applications.map((app) => (
+                    <TableRow key={app.id} className="border-slate-700 hover:bg-slate-800/50" data-testid={`row-application-${app.id}`}>
+                      <TableCell className="text-white font-medium" data-testid={`text-client-${app.id}`}>
+                        {app.clientName}
+                      </TableCell>
+                      <TableCell className="text-slate-300">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1 text-xs">
+                            <Mail className="w-3 h-3" />
+                            {app.clientEmail}
+                          </div>
+                          <div className="flex items-center gap-1 text-xs">
+                            <Phone className="w-3 h-3" />
+                            {app.clientPhone}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-slate-300">{app.loanType}</TableCell>
+                      <TableCell className="text-green-400 font-semibold">{app.loanAmount}</TableCell>
+                      <TableCell data-testid={`status-${app.id}`}>
+                        {getStatusBadge(app.status)}
+                      </TableCell>
+                      <TableCell className="text-slate-300 text-sm">{app.currentStage}</TableCell>
+                      <TableCell>
+                        {getPriorityBadge(app.priority)}
+                      </TableCell>
+                      <TableCell className="text-slate-400 text-sm">{app.applicationDate}</TableCell>
+                      <TableCell>
+                        <Button 
+                          size="sm" 
+                          className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-400/30"
+                          data-testid={`button-view-${app.id}`}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

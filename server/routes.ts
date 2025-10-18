@@ -1412,7 +1412,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           monetaryValue: opportunities.monetaryValue,
           status: opportunities.status,
           priority: opportunities.priority,
-          stage: opportunities.stage,
+          stageName: opportunities.stageName,
           oppCreatedAt: opportunities.createdAt,
           contactId: contacts.id,
           firstName: contacts.firstName,
@@ -1433,7 +1433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           monetaryValue: opportunities.monetaryValue,
           status: opportunities.status,
           priority: opportunities.priority,
-          stage: opportunities.stage,
+          stageName: opportunities.stageName,
           oppCreatedAt: opportunities.createdAt,
           contactId: contacts.id,
           firstName: contacts.firstName,
@@ -1493,7 +1493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ];
 
       // Get current stage index using EXACT match
-      const normalizedStage = (opp.stage || 'new_lead').toLowerCase().trim();
+      const normalizedStage = (opp.stageName || 'new_lead').toLowerCase().trim();
       const currentStageIndex = stageMapping[normalizedStage] ?? 0;
 
       // Mark stages as completed/current/pending
@@ -1516,7 +1516,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           loanAmount: `$${(opp.monetaryValue || 0).toLocaleString()}`,
           loanType: opp.division?.replace(/_/g, ' ').toUpperCase() || 'Lending',
           applicationDate: new Date(opp.contactCreatedAt).toLocaleDateString(),
-          currentStage: opp.stage || 'New Lead',
+          currentStage: opp.stageName || 'New Lead',
           priority: opp.priority || 'medium',
           status: opp.status || 'Active',
           estimatedFunding: opp.priority === 'hot' ? '3-5 business days' : '7-10 business days'
@@ -1541,6 +1541,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch client portal data" });
     }
   });
+
+  // Admin Dashboard Endpoints
+  app.get("/api/admin/applications", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { db } = await import('./db');
+      const { opportunities, contacts } = await import('@shared/schema');
+      const { eq, desc } = await import('drizzle-orm');
+      
+      const apps = await db.select({
+        oppId: opportunities.id,
+        contactId: contacts.id,
+        firstName: contacts.firstName,
+        lastName: contacts.lastName,
+        email: contacts.email,
+        phone: contacts.phone,
+        monetaryValue: opportunities.monetaryValue,
+        division: opportunities.division,
+        status: opportunities.status,
+        priority: opportunities.priority,
+        stageName: opportunities.stageName,
+        createdAt: opportunities.createdAt
+      })
+      .from(opportunities)
+      .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
+      .orderBy(desc(opportunities.createdAt));
+
+      const applications = apps.map(app => ({
+        id: app.oppId.toString(),
+        clientName: `${app.firstName || ''} ${app.lastName || ''}`.trim() || 'Unknown Client',
+        clientEmail: app.email || 'N/A',
+        clientPhone: app.phone || 'N/A',
+        loanAmount: `$${(app.monetaryValue || 0).toLocaleString()}`,
+        loanType: app.division?.replace(/_/g, ' ').toUpperCase() || 'Lending',
+        status: mapStageToStatus(app.stageName || 'new_lead'),
+        currentStage: app.stageName || 'New Lead',
+        applicationDate: new Date(app.createdAt).toLocaleDateString(),
+        priority: app.priority || 'medium'
+      }));
+
+      res.json(applications);
+    } catch (error: any) {
+      console.error("Admin applications error:", error);
+      res.status(500).json({ error: "Failed to fetch applications" });
+    }
+  });
+
+  app.get("/api/admin/stats", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { db } = await import('./db');
+      const { opportunities } = await import('@shared/schema');
+      const { sql } = await import('drizzle-orm');
+      
+      const allOpps = await db.select().from(opportunities);
+      
+      const stats = {
+        totalApplications: allOpps.length,
+        pending: 0,
+        submitted: 0,
+        incomplete: 0,
+        completed: 0,
+        totalLoanValue: '$0'
+      };
+
+      let totalValue = 0;
+      
+      allOpps.forEach(opp => {
+        const status = mapStageToStatus(opp.stageName || 'new_lead');
+        if (status === 'pending') stats.pending++;
+        else if (status === 'submitted') stats.submitted++;
+        else if (status === 'incomplete') stats.incomplete++;
+        else if (status === 'completed') stats.completed++;
+        
+        totalValue += opp.monetaryValue || 0;
+      });
+
+      stats.totalLoanValue = `$${(totalValue / 1000000).toFixed(1)}M`;
+
+      res.json(stats);
+    } catch (error: any) {
+      console.error("Admin stats error:", error);
+      res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  // Helper function to map pipeline stage to application status
+  function mapStageToStatus(stage: string): 'pending' | 'submitted' | 'incomplete' | 'completed' {
+    const normalized = stage.toLowerCase().trim();
+    
+    if (normalized.includes('new') || normalized.includes('contacted')) {
+      return 'pending';
+    }
+    if (normalized.includes('pre') || normalized.includes('qualified') || normalized.includes('sent')) {
+      return 'submitted';
+    }
+    if (normalized.includes('document') && normalized.includes('pending')) {
+      return 'incomplete';
+    }
+    if (normalized.includes('funded') || normalized.includes('signature')) {
+      return 'completed';
+    }
+    
+    return 'pending';
+  }
 
   // SaintBroker Enhanced API Endpoints
   app.post("/api/saint-broker/chat", async (req, res) => {
