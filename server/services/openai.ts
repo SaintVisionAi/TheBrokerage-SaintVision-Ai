@@ -3,7 +3,12 @@ import OpenAI from "openai";
 // OpenAI client configuration with explicit validation and fail-fast
 // Supports both Azure OpenAI and standard OpenAI API
 function createOpenAIClient(): OpenAI {
+  // TEMPORARY: Azure credentials invalid, using standard OpenAI
   // Determine which API to use (Azure has priority if configured)
+  const useAzure = false; // Disabled until Azure credentials are updated
+  
+  // Keeping Azure code for when credentials are fixed
+  /* 
   const useAzure = !!(
     process.env.AZURE_AI_FOUNDRY_KEY && 
     process.env.AZURE_AI_FOUNDRY_ENDPOINT
@@ -26,6 +31,7 @@ function createOpenAIClient(): OpenAI {
       defaultHeaders: { 'api-key': process.env.AZURE_AI_FOUNDRY_KEY }
     });
   }
+  */
   
   // Standard OpenAI API
   console.log("🟢 Configuring standard OpenAI client...");
