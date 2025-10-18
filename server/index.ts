@@ -5,6 +5,10 @@ import { initializeDatabase } from "./db-init";
 import rateLimit from 'express-rate-limit';
 
 const app = express();
+
+// Enable trust proxy for Replit's infrastructure (required for rate limiting)
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
