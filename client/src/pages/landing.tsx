@@ -28,11 +28,21 @@ import SaintBrokerEnhanced from '@/components/ai/saint-broker-enhanced';
 
 export default function Landing() {
   const [scrollY, setScrollY] = useState(0);
+  const [showSaintBroker, setShowSaintBroker] = useState(true); // Show immediately on load
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    // Auto-show SaintBroker with lending message after 2 seconds
+    const timer = setTimeout(() => {
+      setShowSaintBroker(true);
+    }, 2000);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timer);
+    };
   }, []);
 
   const brokerageServices = [
@@ -124,25 +134,31 @@ export default function Landing() {
       <GlobalHeader />
 
       {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex items-start justify-center pt-64">
+      <section className="relative z-10 min-h-screen flex items-start justify-center pt-48">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          {/* Main Headline */}
-          <h1 className="text-7xl md:text-8xl font-light tracking-tight mb-4 leading-none">
-            <span className="bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">
-              "The Brokerage"
+          {/* URGENT LENDING CTA - PROMINENT */}
+          <div className="mb-6 animate-pulse">
+            <Badge className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-lg px-6 py-3 border-0">
+              💰 Get $50K-$5M Business Funding in 24-48 Hours
+            </Badge>
+          </div>
+          
+          {/* Main Headline - LENDING FOCUSED */}
+          <h1 className="text-7xl md:text-8xl font-bold tracking-tight mb-4 leading-none">
+            <span className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+              Business Lending
+            </span>
+            <br />
+            <span className="text-5xl md:text-6xl bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">
+              Made Simple
             </span>
           </h1>
 
-          {/* By Saint Vision Technologies */}
-          <p className="text-2xl md:text-3xl text-white/70 font-light mb-3">
-            By Saint Vision Technologies
-          </p>
-
-          {/* Responsible Intelligence - Royal Neon Blue */}
+          {/* AI-Powered - Royal Neon Blue */}
           <p className="text-3xl md:text-4xl font-semibold mb-3 tracking-wide bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 bg-clip-text text-transparent" style={{
             textShadow: '0 0 40px rgba(59, 130, 246, 0.5)'
           }}>
-            Responsible Intelligence
+            AI-Powered Instant Approval
           </p>
 
           {/* by cookin.io - Clickable */}
@@ -186,10 +202,10 @@ export default function Landing() {
             </p>
           </div>
 
-          {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-white/70 mb-12 max-w-4xl mx-auto leading-relaxed font-light">
-            Transform opportunities into success with innovative strategies, technology, and unparalleled expertise. 
-            <span className="text-white"> Faith-aligned. Patent-protected. GHL integrated.</span>
+          {/* Subtitle - LENDING FOCUSED */}
+          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed font-medium">
+            Get approved for <span className="text-yellow-400 font-bold">$50K to $5M</span> in business funding. 
+            <span className="text-emerald-400"> No hard credit check. 24-hour approval. 13 lending partners.</span>
           </p>
 
           {/* Trusted Tech Stack */}
@@ -210,25 +226,26 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons - LENDING FOCUSED */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Link href="/apply">
-              <Button size="lg" className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700 px-8 py-4 text-lg font-semibold" data-testid="button-get-started">
-                Get Started Today
-                <ArrowRight className="w-5 h-5 ml-2" />
+              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-10 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30 animate-pulse" data-testid="button-apply-funding">
+                💰 Apply for Funding Now
+                <ArrowRight className="w-6 h-6 ml-2" />
               </Button>
             </Link>
             <Button
               size="lg"
-              className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-8 py-4 text-lg font-semibold border-0"
-              data-testid="button-view-services"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-6 text-xl font-semibold border-0 shadow-lg shadow-blue-500/30"
+              data-testid="button-chat-saintbroker"
               onClick={() => {
-                const servicesSection = document.getElementById('services');
-                servicesSection?.scrollIntoView({ behavior: 'smooth' });
+                setShowSaintBroker(true);
+                // Send a lending-focused message to SaintBroker
+                window.postMessage({ type: 'SAINTBROKER_MESSAGE', message: 'I need funding for my business' }, '*');
               }}
             >
-              View Services
-              <ArrowRight className="w-5 h-5 ml-2" />
+              💬 Chat with SaintBroker AI
+              <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
           </div>
 

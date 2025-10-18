@@ -61,9 +61,9 @@ export default function Login() {
           description: `Welcome back, ${data.user.username || data.user.email}`,
         });
 
-        // Immediate redirect for admin/broker users
-        const role = data.user.role;
-        const targetUrl = (role === "admin" || role === "broker") ? "/dashboard" : "/client-portal";
+        // Redirect to admin dashboard for all logged in users
+        // Admin dashboard shows all applications and metrics
+        const targetUrl = "/admin";
         
         // Direct navigation without delay
         setLocation(targetUrl);

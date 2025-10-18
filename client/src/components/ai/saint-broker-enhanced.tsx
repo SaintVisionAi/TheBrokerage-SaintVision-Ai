@@ -62,13 +62,13 @@ interface Signature {
 
 export default function SaintBrokerEnhanced() {
   const { toast } = useToast();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Auto-open on page load
   const [activeTab, setActiveTab] = useState('chat');
   
-  // Chat State
+  // Chat State - Lending-focused greeting
   const [messages, setMessages] = useState<Message[]>([{
     role: 'assistant',
-    content: "👋 Welcome to Saint Vision Group! I'm SaintBroker, your 24/7 AI concierge for **Business Lending** ($50K-$5M, rates from 9%), **Real Estate Services**, and **Investment Suite** (9-12% returns). I have full access to your documents, notes, and signatures. How can I help you grow your business today?",
+    content: "🎯 **Need Business Funding Fast?** I'm SaintBroker AI, and I can get you approved for **$50K to $5M in 24-48 hours!** \n\n✅ **No hard credit check**\n✅ **13 lending partners ready**\n✅ **Rates starting at 9%**\n\nJust tell me: How much funding do you need and what's it for? I'll match you with the perfect lender instantly!",
     timestamp: new Date()
   }]);
   const [input, setInput] = useState('');
@@ -101,6 +101,24 @@ export default function SaintBrokerEnhanced() {
       loadUserData();
     }
   }, [isOpen]);
+
+  // Listen for messages from landing page buttons
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'SAINTBROKER_MESSAGE' && event.data.message) {
+        setIsOpen(true);
+        setInput(event.data.message);
+        // Auto-send the message
+        setTimeout(() => {
+          const button = document.querySelector('[data-testid="button-send-message"]') as HTMLButtonElement;
+          if (button) button.click();
+        }, 500);
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const loadUserData = async () => {
     try {

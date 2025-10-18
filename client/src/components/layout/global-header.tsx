@@ -56,8 +56,15 @@ export default function GlobalHeader() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8 text-sm">
+          {/* Desktop Navigation - LENDING FOCUSED */}
+          <div className="hidden lg:flex items-center gap-6 text-sm">
+            {/* PRIMARY LENDING CTA */}
+            <Link href="/apply">
+              <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-4 py-2 font-bold animate-pulse">
+                💰 Get Funding Now
+              </Button>
+            </Link>
+            
             {/* Products Dropdown */}
             <div className="relative group">
               <button 
@@ -117,8 +124,8 @@ export default function GlobalHeader() {
             </div>
 
             {/* Direct Links */}
-            <Link href="/apply" className={`transition-colors ${location === "/apply" ? "text-yellow-400 font-medium" : "text-white/80 hover:text-white"}`}>
-              Apply Now
+            <Link href="/lending" className={`transition-colors ${location === "/lending" ? "text-yellow-400 font-medium" : "text-white/80 hover:text-white"}`}>
+              Business Lending
             </Link>
             <Link href="/about" className={`transition-colors ${location === "/about" ? "text-yellow-400 font-medium" : "text-white/80 hover:text-white"}`}>
               About
