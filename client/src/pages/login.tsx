@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { FileText, MessageSquare, TrendingUp, Sparkles, Shield, Zap, Clock } from "lucide-react";
-import svgLogo from "@assets/SVGAILOGO_1760757764272.png";
+import svgLogo from "../assets/logo.png";
 
 export default function Login() {
   const [, setLocation] = useLocation();
