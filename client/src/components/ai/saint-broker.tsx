@@ -162,7 +162,7 @@ User message: ${input}`
       console.error('SaintBroker error:', error);
       const errorMessage: Message = {
         role: 'assistant',
-        content: "I apologize for the technical difficulty. Please try again or contact us directly at contact@saintvisiongroup.com",
+        content: "I apologize for the technical difficulty. Please try again or contact us directly at saints@hacp.ai",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);

@@ -40,8 +40,8 @@ export default function Contact() {
       icon: Mail,
       title: "Email Us",
       description: "Get in touch via email",
-      contact: "hello@saintvisionai.com",
-      action: "mailto:hello@saintvisionai.com"
+      contact: "saints@hacp.ai",
+      action: "mailto:saints@hacp.ai"
     },
     {
       icon: Phone,

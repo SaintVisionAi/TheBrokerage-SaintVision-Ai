@@ -218,11 +218,11 @@ export default function ADA() {
                 <Mail className="w-8 h-8 text-green-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">Email Us</h3>
                 <a 
-                  href="mailto:accessibility@saintvisiongroup.com" 
+                  href="mailto:support@cookin.io" 
                   className="text-green-400 hover:text-green-300 transition-colors"
                   data-testid="link-email-accessibility"
                 >
-                  accessibility@saintvisiongroup.com
+                  support@cookin.io
                 </a>
               </CardContent>
             </Card>

@@ -110,7 +110,7 @@ export default function BrokerClientAgreement({ clientData }: BrokerClientAgreem
                 <p>Saint Vision Group™</p>
                 <p className="text-sm text-gray-600">Licensed Real Estate Brokerage</p>
                 <p className="text-sm text-gray-600">License #: [STATE LICENSE #]</p>
-                <p className="text-sm text-gray-600">contact@saintvisiongroup.com</p>
+                <p className="text-sm text-gray-600">saints@hacp.ai</p>
               </div>
             </div>
           </div>

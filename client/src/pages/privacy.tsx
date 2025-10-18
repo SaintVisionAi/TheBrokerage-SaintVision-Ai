@@ -269,7 +269,7 @@ export default function Privacy() {
                   </p>
                   <div className="bg-slate-700/30 rounded-lg p-4">
                     <p className="mb-2">
-                      <strong>Email:</strong> privacy@saintvisionai.com
+                      <strong>Email:</strong> support@cookin.io
                     </p>
                     <p className="mb-2">
                       <strong>Address:</strong> Saint Vision Group LLC<br />

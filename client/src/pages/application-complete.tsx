@@ -149,12 +149,12 @@ export default function ApplicationCompletePage() {
                     +1 (949) 755-0720
                   </a>
                   <a 
-                    href="mailto:lending@saintvisiongroup.com"
+                    href="mailto:saints@hacp.ai"
                     className="text-yellow-400 hover:text-yellow-500 font-medium flex items-center gap-2"
                     data-testid="link-contact-email"
                   >
                     <Mail className="h-4 w-4" />
-                    lending@saintvisiongroup.com
+                    saints@hacp.ai
                   </a>
                 </div>
               </div>
