@@ -139,13 +139,13 @@ export default function Landing() {
           {/* TOP CTAs - Just the two buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Link href="/apply">
-              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-12 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30" data-testid="button-apply-top">
-                💰 Apply Now - Get Funded
+              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-12 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30 min-w-[250px]" data-testid="button-apply-top">
+                💰 Get Funded Now
                 <ArrowRight className="w-6 h-6 ml-2" />
               </Button>
             </Link>
             <Link href="/signup">
-              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-10 py-6 text-xl font-semibold border-0 shadow-lg shadow-blue-500/30" data-testid="button-create-account-top">
+              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-12 py-6 text-xl font-bold border-0 shadow-lg shadow-blue-500/30 min-w-[250px]" data-testid="button-create-account-top">
                 🚀 Create Account
                 <ArrowRight className="w-6 h-6 ml-2" />
               </Button>

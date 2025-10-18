@@ -34,7 +34,7 @@ export default function GlobalHeader() {
   ];
 
   return (
-    <nav className="sticky top-0 w-full z-50 bg-black/95 backdrop-blur-sm border-b border-slate-800">
+    <nav className="sticky top-0 w-full z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
