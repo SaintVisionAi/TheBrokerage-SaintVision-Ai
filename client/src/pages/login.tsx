@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { FileText, MessageSquare, TrendingUp, Sparkles, Shield, Zap, Clock } from "lucide-react";
+import svgLogo from "@assets/SVGAILOGO_1760757764272.png";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -91,8 +92,13 @@ export default function Login() {
           
           {/* Logo & Title */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl mb-4 shadow-2xl shadow-yellow-400/20">
-              <span className="text-black font-bold text-3xl">S</span>
+            <div className="inline-flex items-center justify-center mb-4">
+              <img 
+                src={svgLogo} 
+                alt="Saint Vision Group AI Brokerage" 
+                className="w-32 h-32 object-contain"
+                data-testid="img-logo"
+              />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent mb-2">
               Saint Vision Group
