@@ -119,6 +119,17 @@ export default function ClientHub() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // GHL Workflow Quick Actions
+  const quickActions = [
+    { id: 'start_application', label: 'Start New Application', icon: Plus, color: 'bg-emerald-500', workflow: 'new_loan_app' },
+    { id: 'upload_docs', label: 'Upload Documents', icon: Upload, color: 'bg-blue-500', workflow: 'doc_upload' },
+    { id: 'schedule_call', label: 'Schedule Call', icon: Calendar, color: 'bg-purple-500', workflow: 'schedule_consultation' },
+    { id: 'check_status', label: 'Check Status', icon: AlertCircle, color: 'bg-yellow-500', workflow: 'status_check' },
+    { id: 'get_prequalified', label: 'Get Pre-Qualified', icon: CheckCircle, color: 'bg-green-500', workflow: 'prequalification' },
+    { id: 'contact_broker', label: 'Contact Broker', icon: Send, color: 'bg-indigo-500', workflow: 'contact_broker' }
+  ];
+  
   const [applications, setApplications] = useState<LoanApplication[]>([
     {
       id: '1',
@@ -132,6 +143,35 @@ export default function ClientHub() {
     }
   ]);
   const [selectedApp, setSelectedApp] = useState<LoanApplication | null>(applications[0]);
+
+  // GHL Workflow Handler - Triggers automation workflows
+  const handleGHLWorkflow = async (workflow: string) => {
+    try {
+      // Trigger GHL workflow via API
+      const response = await fetch('/api/ghl/trigger-workflow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          workflow,
+          contactId: 'current-user-id', // Will get from auth context
+          source: 'client-hub'
+        })
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "✅ Workflow Started",
+          description: "Your request is being processed. We'll notify you of next steps.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start workflow. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const handleFileUpload = (files: FileList | null) => {
     if (!files) return;
@@ -276,21 +316,43 @@ export default function ClientHub() {
               </Card>
             </div>
 
-            {/* Quick Actions */}
-            <Card className="bg-black/40 backdrop-blur-md border-yellow-400/20">
+            {/* CENTRAL COMMAND CENTER - Quick Actions */}
+            <Card className="bg-gradient-to-br from-yellow-400/10 to-emerald-400/10 backdrop-blur-md border-2 border-yellow-400/40">
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Common tasks and resources</CardDescription>
+                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-emerald-400 bg-clip-text text-transparent">
+                  🎯 THE CLIENT HUB - Everything In One Place
+                </CardTitle>
+                <CardDescription className="text-white/80">
+                  Your central command center - All services, automation, and tools at your fingertips
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                  {quickActions.map(action => (
+                    <Button
+                      key={action.id}
+                      variant="outline"
+                      className={`h-auto py-6 flex flex-col items-center gap-3 ${action.color} bg-opacity-20 border-2 hover:scale-105 transition-all duration-200`}
+                      onClick={() => handleGHLWorkflow(action.workflow)}
+                      data-testid={`quick-${action.id}`}
+                    >
+                      <action.icon className="h-8 w-8 text-white" />
+                      <span className="text-white font-semibold text-sm">{action.label}</span>
+                    </Button>
+                  ))}
+                </div>
+                
+                {/* Original Quick Actions Row */}
+                <Separator className="my-4" />
+                <p className="text-xs text-white/60 mb-3">Additional Resources</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <Button
                     variant="outline"
-                    className="h-auto py-4 flex flex-col items-center gap-2 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10"
+                    className="h-auto py-3 flex flex-col items-center gap-2 border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10"
                     data-testid="quick-upload-docs"
                   >
-                    <Upload className="h-6 w-6 text-yellow-400" />
-                    <span>Upload Docs</span>
+                    <FileText className="h-5 w-5 text-yellow-400" />
+                    <span className="text-xs">View Products</span>
                   </Button>
                   <Button
                     variant="outline"
