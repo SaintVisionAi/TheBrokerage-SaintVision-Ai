@@ -58,8 +58,11 @@ interface WorkspaceFile {
   type: 'document' | 'application' | 'image' | 'contract';
   size: string;
   modified: string;
-  status: 'pending' | 'verified' | 'processing' | 'complete';
+  status: 'pending' | 'verified' | 'processing' | 'complete' | 'awaiting_signature' | 'signed';
   progress?: number;
+  signatureRequired?: boolean;
+  signedBy?: string;
+  signedAt?: string;
 }
 
 interface QuickAction {
@@ -77,10 +80,62 @@ export default function ClientHub() {
   const [saintBrokerInput, setSaintBrokerInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [workspaceFiles, setWorkspaceFiles] = useState<WorkspaceFile[]>([
-    { id: '1', name: 'Business_Plan_2025.pdf', type: 'document', size: '2.4 MB', modified: '2 hours ago', status: 'verified' },
-    { id: '2', name: 'Tax_Returns_2024.pdf', type: 'document', size: '1.8 MB', modified: '1 day ago', status: 'verified' },
-    { id: '3', name: 'Equipment_Invoice.pdf', type: 'document', size: '456 KB', modified: '3 days ago', status: 'processing', progress: 65 },
-    { id: '4', name: 'Loan_Application.pdf', type: 'application', size: '892 KB', modified: '5 days ago', status: 'complete' },
+    { 
+      id: '1', 
+      name: 'Equipment_Loan_Agreement.pdf', 
+      type: 'contract', 
+      size: '2.4 MB', 
+      modified: '2 hours ago', 
+      status: 'awaiting_signature',
+      signatureRequired: true 
+    },
+    { 
+      id: '2', 
+      name: 'Personal_Guarantee_Form.pdf', 
+      type: 'contract', 
+      size: '1.2 MB', 
+      modified: '2 hours ago', 
+      status: 'awaiting_signature',
+      signatureRequired: true 
+    },
+    { 
+      id: '3', 
+      name: 'Tax_Returns_2024.pdf', 
+      type: 'document', 
+      size: '1.8 MB', 
+      modified: '1 day ago', 
+      status: 'signed',
+      signatureRequired: true,
+      signedBy: 'Ryan Capatosto',
+      signedAt: 'Yesterday at 3:45 PM'
+    },
+    { 
+      id: '4', 
+      name: 'Bank_Statements_Q4.pdf', 
+      type: 'document', 
+      size: '456 KB', 
+      modified: '3 days ago', 
+      status: 'verified' 
+    },
+    { 
+      id: '5', 
+      name: 'Business_Plan_2025.pdf', 
+      type: 'document', 
+      size: '892 KB', 
+      modified: '5 days ago', 
+      status: 'complete' 
+    },
+    { 
+      id: '6', 
+      name: 'Equipment_Invoice.pdf', 
+      type: 'document', 
+      size: '1.1 MB', 
+      modified: '1 week ago', 
+      status: 'signed',
+      signatureRequired: true,
+      signedBy: 'Ryan Capatosto',
+      signedAt: '3 days ago'
+    },
   ]);
 
   const [recentActions] = useState([
@@ -166,11 +221,37 @@ export default function ClientHub() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'complete': return 'text-emerald-400';
+      case 'signed': return 'text-emerald-400';
       case 'verified': return 'text-blue-400';
       case 'processing': return 'text-yellow-400';
+      case 'awaiting_signature': return 'text-orange-400';
       case 'pending': return 'text-gray-400';
       default: return 'text-gray-400';
     }
+  };
+
+  const handleSignDocument = (fileId: string, fileName: string) => {
+    toast({
+      title: "📝 Opening GHL Signature Portal",
+      description: `Redirecting to sign ${fileName}...`,
+    });
+    
+    // Simulate signing process
+    setTimeout(() => {
+      setWorkspaceFiles(prev => prev.map(f => 
+        f.id === fileId ? { 
+          ...f, 
+          status: 'signed', 
+          signedBy: 'Ryan Capatosto',
+          signedAt: new Date().toLocaleString()
+        } : f
+      ));
+      
+      toast({
+        title: "✅ Document Signed!",
+        description: "Your signature has been captured successfully.",
+      });
+    }, 3000);
   };
 
   return (
@@ -349,6 +430,49 @@ export default function ClientHub() {
                 ))}
               </div>
 
+              {/* Signature Status Tracker */}
+              {workspaceFiles.filter(f => f.status === 'awaiting_signature').length > 0 && (
+                <Card className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 border-orange-400/30">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-orange-400/20 flex items-center justify-center">
+                          <FileSignature className="w-5 h-5 text-orange-400" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-orange-400">Documents Awaiting Signature</CardTitle>
+                          <CardDescription>Sign these documents to move forward with funding</CardDescription>
+                        </div>
+                      </div>
+                      <Badge className="bg-orange-400/20 text-orange-400 border-orange-400/30">
+                        {workspaceFiles.filter(f => f.status === 'awaiting_signature').length} Pending
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      {workspaceFiles.filter(f => f.status === 'awaiting_signature').map((file) => (
+                        <div key={file.id} className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-orange-400/20">
+                          <div className="flex items-center gap-3">
+                            <FileSignature className="w-5 h-5 text-orange-400" />
+                            <div>
+                              <p className="text-sm font-medium text-white">{file.name}</p>
+                              <p className="text-xs text-gray-400">Uploaded {file.modified}</p>
+                            </div>
+                          </div>
+                          <Button 
+                            onClick={() => handleSignDocument(file.id, file.name)}
+                            className="bg-orange-400 hover:bg-orange-500 text-black font-semibold px-3 py-1 text-xs"
+                          >
+                            Sign Now
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Split View - Activity Feed & Files */}
               <div className="grid grid-cols-2 gap-6">
                 {/* Recent Activity */}
@@ -394,24 +518,48 @@ export default function ClientHub() {
                     <ScrollArea className="h-[400px] pr-4">
                       <div className="space-y-2">
                         {workspaceFiles.map((file) => (
-                          <div key={file.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
-                            <div className="flex items-center gap-3">
+                          <div key={file.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors" data-testid={`file-${file.id}`}>
+                            <div className="flex items-center gap-3 flex-1">
                               {getFileIcon(file.type)}
-                              <div>
-                                <p className="text-sm font-medium text-white">{file.name}</p>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-white" data-testid={`filename-${file.id}`}>{file.name}</p>
                                 <p className="text-xs text-gray-400">{file.size} • {file.modified}</p>
+                                {file.status === 'signed' && file.signedBy && (
+                                  <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+                                    <CheckCircle className="w-3 h-3" />
+                                    Signed by {file.signedBy} • {file.signedAt}
+                                  </p>
+                                )}
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              {file.progress !== undefined && file.progress < 100 ? (
+                              {file.status === 'awaiting_signature' ? (
+                                <Button 
+                                  onClick={() => handleSignDocument(file.id, file.name)}
+                                  size="sm"
+                                  className="bg-orange-400 hover:bg-orange-500 text-black font-semibold text-xs"
+                                  data-testid={`sign-button-${file.id}`}
+                                >
+                                  <FileSignature className="w-3 h-3 mr-1" />
+                                  Sign
+                                </Button>
+                              ) : file.progress !== undefined && file.progress < 100 ? (
                                 <div className="flex items-center gap-2">
                                   <Progress value={file.progress} className="w-20 h-1" />
                                   <span className="text-xs text-yellow-400">{file.progress}%</span>
                                 </div>
                               ) : (
-                                <span className={cn("text-xs font-medium", getStatusColor(file.status))}>
-                                  {file.status}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className={cn("text-xs font-medium px-2 py-1 rounded", 
+                                    file.status === 'signed' ? 'bg-emerald-400/20 text-emerald-400' :
+                                    file.status === 'verified' ? 'bg-blue-400/20 text-blue-400' :
+                                    file.status === 'complete' ? 'bg-emerald-400/20 text-emerald-400' :
+                                    'bg-gray-400/20 text-gray-400'
+                                  )} data-testid={`file-status-${file.id}`}>
+                                    {file.status === 'signed' && <CheckCircle className="w-3 h-3 inline mr-1" />}
+                                    {file.status}
+                                  </span>
+                                </div>
                               )}
                             </div>
                           </div>
