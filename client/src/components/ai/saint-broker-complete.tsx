@@ -387,17 +387,17 @@ export default function SaintBrokerWidget() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-white z-50 hover:scale-110"
+        className="fixed bottom-6 right-4 md:right-6 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-white z-50 hover:scale-110"
       >
-        <MessageSquare className="w-7 h-7" />
+        <MessageSquare className="w-6 h-6 md:w-7 md:h-7" />
       </button>
     );
   }
   
   return (
-    <div className="fixed bottom-6 right-6 w-[450px] h-[700px] bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl shadow-2xl flex flex-col z-50 border border-yellow-500/20">
+    <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 w-full md:w-[450px] h-[100vh] md:h-[700px] bg-gradient-to-br from-gray-900 via-gray-800 to-black md:rounded-2xl shadow-2xl flex flex-col z-50 border border-yellow-500/20">
       {/* Header */}
-      <div className="bg-gradient-to-r from-yellow-600 to-yellow-500 p-4 rounded-t-2xl flex items-center justify-between">
+      <div className="bg-gradient-to-r from-yellow-600 to-yellow-500 p-3 md:p-4 md:rounded-t-2xl flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
             <span className="text-yellow-500 font-bold text-sm">SV</span>
@@ -426,7 +426,7 @@ export default function SaintBrokerWidget() {
       <div className="bg-black/40 border-b border-gray-700 flex">
         <button
           onClick={() => setActiveTab('chat')}
-          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+          className={`flex-1 py-2 md:py-3 px-2 md:px-4 text-xs md:text-sm font-medium transition-colors ${
             activeTab === 'chat'
               ? 'text-yellow-500 border-b-2 border-yellow-500'
               : 'text-gray-400 hover:text-gray-300'
@@ -437,7 +437,7 @@ export default function SaintBrokerWidget() {
         </button>
         <button
           onClick={() => setActiveTab('docs')}
-          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+          className={`flex-1 py-2 md:py-3 px-2 md:px-4 text-xs md:text-sm font-medium transition-colors ${
             activeTab === 'docs'
               ? 'text-yellow-500 border-b-2 border-yellow-500'
               : 'text-gray-400 hover:text-gray-300'
@@ -448,7 +448,7 @@ export default function SaintBrokerWidget() {
         </button>
         <button
           onClick={() => setActiveTab('notes')}
-          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+          className={`flex-1 py-2 md:py-3 px-2 md:px-4 text-xs md:text-sm font-medium transition-colors ${
             activeTab === 'notes'
               ? 'text-yellow-500 border-b-2 border-yellow-500'
               : 'text-gray-400 hover:text-gray-300'
@@ -459,7 +459,7 @@ export default function SaintBrokerWidget() {
         </button>
         <button
           onClick={() => setActiveTab('signs')}
-          className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${
+          className={`flex-1 py-2 md:py-3 px-2 md:px-4 text-xs md:text-sm font-medium transition-colors ${
             activeTab === 'signs'
               ? 'text-yellow-500 border-b-2 border-yellow-500'
               : 'text-gray-400 hover:text-gray-300'
@@ -477,14 +477,14 @@ export default function SaintBrokerWidget() {
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => handleQuickAction('business_loan')}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-yellow-600 hover:to-yellow-500 p-3 rounded-lg transition-all duration-300 flex flex-col items-center gap-2 text-gray-300 hover:text-white border border-gray-600 hover:border-yellow-500"
+              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-yellow-600 hover:to-yellow-500 p-2 md:p-3 rounded-lg transition-all duration-300 flex flex-col items-center gap-2 text-gray-300 hover:text-white border border-gray-600 hover:border-yellow-500"
             >
               <DollarSign className="w-6 h-6" />
               <span className="text-xs font-medium">Business Loan</span>
             </button>
             <button
               onClick={() => handleQuickAction('real_estate')}
-              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-yellow-600 hover:to-yellow-500 p-3 rounded-lg transition-all duration-300 flex flex-col items-center gap-2 text-gray-300 hover:text-white border border-gray-600 hover:border-yellow-500"
+              className="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-yellow-600 hover:to-yellow-500 p-2 md:p-3 rounded-lg transition-all duration-300 flex flex-col items-center gap-2 text-gray-300 hover:text-white border border-gray-600 hover:border-yellow-500"
             >
               <Home className="w-6 h-6" />
               <span className="text-xs font-medium">Real Estate</span>
@@ -592,7 +592,7 @@ export default function SaintBrokerWidget() {
       
       {/* Input Area - ALWAYS AT BOTTOM */}
       {activeTab === 'chat' && (
-        <div className="border-t border-gray-700 bg-black/40 p-4">
+        <div className="border-t border-gray-700 bg-black/40 p-3 md:p-4 safe-area-inset-bottom">
           {/* Voice Mode Indicator */}
           {isVoiceMode && (
             <div className="mb-2 text-center">
@@ -606,7 +606,7 @@ export default function SaintBrokerWidget() {
             {/* Voice Mode Toggle */}
             <button
               onClick={toggleVoiceMode}
-              className={`p-3 rounded-lg transition-all duration-300 ${
+              className={`p-2 md:p-2 md:p-3 rounded-lg transition-all duration-300 ${
                 isVoiceMode
                   ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
                   : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
@@ -666,7 +666,7 @@ export default function SaintBrokerWidget() {
                 setAudioEnabled(!audioEnabled);
                 if (!audioEnabled) stopSpeaking();
               }}
-              className={`p-3 rounded-lg transition-colors ${
+              className={`p-2 md:p-3 rounded-lg transition-colors ${
                 audioEnabled
                   ? 'bg-gray-700 hover:bg-gray-600 text-yellow-500'
                   : 'bg-gray-700 hover:bg-gray-600 text-gray-400'
@@ -680,7 +680,7 @@ export default function SaintBrokerWidget() {
             <button
               onClick={() => handleSend()}
               disabled={!input.trim() || isLoading || isVoiceMode}
-              className="bg-gradient-to-br from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-lg transition-all duration-300 disabled:hover:from-yellow-500 disabled:hover:to-yellow-600"
+              className="bg-gradient-to-br from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-2 md:p-3 rounded-lg transition-all duration-300 disabled:hover:from-yellow-500 disabled:hover:to-yellow-600"
               title="Send message"
             >
               {isLoading ? (
