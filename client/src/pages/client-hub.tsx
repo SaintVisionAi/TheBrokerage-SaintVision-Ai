@@ -381,6 +381,66 @@ export default function ClientHub() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* ALL SERVICES DASHBOARD - Everything at a Glance */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Commercial Lending */}
+              <Card className="bg-gradient-to-br from-yellow-400/20 to-yellow-600/10 backdrop-blur-md border-yellow-400/40 hover:scale-105 transition-all cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="text-yellow-400">💰 Commercial Lending</CardTitle>
+                  <CardDescription className="text-white/70">$50K - $5M Business Funding</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="text-3xl font-bold text-white">9%+ Rates</div>
+                  <p className="text-sm text-white/60">13 Partner Network • AI-Powered Routing</p>
+                  <Button 
+                    className="w-full bg-yellow-400 text-black hover:bg-yellow-300"
+                    onClick={() => handleGHLWorkflow('new_loan_app')}
+                    data-testid="service-lending"
+                  >
+                    Apply Now →
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Real Estate */}
+              <Card className="bg-gradient-to-br from-emerald-400/20 to-emerald-600/10 backdrop-blur-md border-emerald-400/40 hover:scale-105 transition-all cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="text-emerald-400">🏢 Real Estate</CardTitle>
+                  <CardDescription className="text-white/70">All 50 States Coverage</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="text-3xl font-bold text-white">Full Service</div>
+                  <p className="text-sm text-white/60">Buy • Sell • Finance • Invest</p>
+                  <Button 
+                    className="w-full bg-emerald-400 text-black hover:bg-emerald-300"
+                    onClick={() => setActiveTab('property-search')}
+                    data-testid="service-realestate"
+                  >
+                    Search Properties →
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Investment Suite */}
+              <Card className="bg-gradient-to-br from-purple-400/20 to-purple-600/10 backdrop-blur-md border-purple-400/40 hover:scale-105 transition-all cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="text-purple-400">📈 Investment Suite</CardTitle>
+                  <CardDescription className="text-white/70">Faith-Aligned Returns</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="text-3xl font-bold text-white">9-12% Fixed</div>
+                  <p className="text-sm text-white/60">Secure • Ethical • Growth-Focused</p>
+                  <Button 
+                    className="w-full bg-purple-400 text-black hover:bg-purple-300"
+                    onClick={() => setActiveTab('roi-calculator')}
+                    data-testid="service-investment"
+                  >
+                    Calculate ROI →
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* APPLICATIONS TAB */}
