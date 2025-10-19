@@ -34,7 +34,7 @@ import {
   applicationDocuments
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -289,6 +289,70 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!sig) throw new Error("Signature not found");
     return sig;
+  }
+
+  // Loan Products operations
+  async getLoanProducts(): Promise<LoanProduct[]> {
+    return await db
+      .select()
+      .from(loanProducts)
+      .where(eq(loanProducts.active, true))
+      .orderBy(loanProducts.priority);
+  }
+
+  async getLoanProductsByCategory(category: string): Promise<LoanProduct[]> {
+    return await db
+      .select()
+      .from(loanProducts)
+      .where(
+        and(
+          eq(loanProducts.category, category),
+          eq(loanProducts.active, true)
+        )
+      )
+      .orderBy(loanProducts.priority);
+  }
+
+  async createLoanProduct(insertProduct: InsertLoanProduct): Promise<LoanProduct> {
+    const [product] = await db
+      .insert(loanProducts)
+      .values(insertProduct)
+      .returning();
+    return product;
+  }
+
+  // Application Signatures operations
+  async getApplicationSignature(applicationId: string): Promise<ApplicationSignature | undefined> {
+    const [signature] = await db
+      .select()
+      .from(applicationSignatures)
+      .where(eq(applicationSignatures.applicationId, applicationId));
+    return signature || undefined;
+  }
+
+  async createApplicationSignature(insertSig: InsertApplicationSignature): Promise<ApplicationSignature> {
+    const [signature] = await db
+      .insert(applicationSignatures)
+      .values(insertSig)
+      .returning();
+    return signature;
+  }
+
+  // Application Documents operations
+  async getApplicationDocuments(applicationId: string): Promise<ApplicationDocument[]> {
+    return await db
+      .select()
+      .from(applicationDocuments)
+      .where(eq(applicationDocuments.applicationId, applicationId))
+      .orderBy(applicationDocuments.createdAt);
+  }
+
+  async createApplicationDocument(insertDoc: InsertApplicationDocument): Promise<ApplicationDocument> {
+    const [document] = await db
+      .insert(applicationDocuments)
+      .values(insertDoc)
+      .returning();
+    return document;
   }
 }
 

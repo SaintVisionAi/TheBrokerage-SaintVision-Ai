@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
 import LoanCalculator from '@/components/calculators/loan-calculator';
@@ -19,11 +23,38 @@ import {
   ArrowRight,
   Percent,
   Zap,
-  FileText
+  FileText,
+  Building,
+  CreditCard,
+  BadgeCheck,
+  Timer,
+  ChevronRight
 } from 'lucide-react';
+import { useLocation } from 'wouter';
+
+interface LoanProduct {
+  id: string;
+  name: string;
+  category: string;
+  minAmount: number;
+  maxAmount: number;
+  minRate: string;
+  maxRate: string;
+  terms: string;
+  minCredit: number;
+  speedDays: number;
+  requirements: string[] | any;
+  features: string[] | any;
+  disclosures: string;
+  description: string;
+  priority: number;
+  active: boolean;
+}
 
 export default function Lending() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -35,6 +66,26 @@ export default function Lending() {
     notes: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch loan products from API
+  const { data: loanProducts = [], isLoading: isLoadingProducts } = useQuery<LoanProduct[]>({
+    queryKey: ['/api/loan-products']
+  });
+
+  // Seed loan products if none exist
+  useEffect(() => {
+    if (!isLoadingProducts && loanProducts.length === 0) {
+      fetch('/api/loan-products/seed', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            console.log('✅ Loan products seeded:', data.message);
+            window.location.reload(); // Reload to fetch seeded products
+          }
+        })
+        .catch(err => console.error('Failed to seed loan products:', err));
+    }
+  }, [isLoadingProducts, loanProducts.length]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,82 +169,44 @@ export default function Lending() {
     { icon: Shield, title: "No Collateral Required", description: "Unsecured options available for qualified borrowers" }
   ];
 
-  const loanTypeOptions = [
-    "Working Capital",
-    "Equipment Financing", 
-    "Commercial Real Estate",
-    "Business Expansion",
-    "Inventory Financing",
-    "Bridge Loan",
-    "Line of Credit",
-    "Other"
-  ];
+  const handleApplyNow = (product: LoanProduct) => {
+    setSelectedProduct(product.id);
+    // Navigate to apply page with pre-selected product
+    setLocation(`/apply?product=${encodeURIComponent(product.name)}&category=${product.category}`);
+  };
 
-  const loanProducts = [
-    {
-      icon: <DollarSign className="h-8 w-8 text-yellow-400" />,
-      title: "Term Loan",
-      rates: "7.99% APR | $25K - $2M",
-      description: "Traditional APR structure with no pre-payment penalties. Perfect for established businesses seeking long-term financing.",
-      features: ["Traditional APR structure", "No pre-payment penalties", "Monthly payments", "Fast funding in 1-3 days"]
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-yellow-400" />,
-      title: "Working Capital",
-      rates: "Same Day Funding | $10K - $500K",
-      description: "Fast access to capital for day-to-day operations. Bad credit accepted, liens and judgements OK.",
-      features: ["Same day funding available", "Bad credit accepted", "Liens/judgements OK", "No minimum FICO required"]
-    },
-    {
-      icon: <TrendingUp className="h-8 w-8 text-yellow-400" />,
-      title: "AR Financing",
-      rates: "Low Cost | $10K - $5M",
-      description: "Leverage your accounts receivable with a revolving line of credit. Long-term financing for larger amounts.",
-      features: ["Low cost financing", "Revolving line of credit", "Leverage your receivables", "Longer terms available"]
-    },
-    {
-      icon: <TrendingUp className="h-8 w-8 text-yellow-400" />,
-      title: "Equipment Financing",
-      rates: "Competitive | $10K - $5M",
-      description: "Finance new or used equipment with low or no down payment. Take advantage of Section 179 tax benefits.",
-      features: ["Low or NO down payment", "Tax benefits (Section 179)", "Multi-year longer terms", "Keep cash flow intact"]
-    },
-    {
-      icon: <DollarSign className="h-8 w-8 text-yellow-400" />,
-      title: "Line of Credit",
-      rates: "Competitive | $10K - $1M",
-      description: "Draw as needed and only pay interest on funds you use. Flexible access to capital whenever you need it.",
-      features: ["Only pay interest on funds drawn", "Credit available as needed", "Draw as many times as you need", "Fast approvals"]
-    },
-    {
-      icon: <Shield className="h-8 w-8 text-yellow-400" />,
-      title: "Fix & Flip",
-      rates: "8.99% | $50K - $2M",
-      description: "Real estate investors: Get 80-100% purchase funding plus 100% rehab funding. Quick closings in 3-7 days.",
-      features: ["80-100% purchase funding", "100% rehab funding", "Quick closings", "Experienced investor programs"]
-    },
-    {
-      icon: <Shield className="h-8 w-8 text-yellow-400" />,
-      title: "Real Estate Loan",
-      rates: "Traditional APR | $100K - $10M+",
-      description: "Commercial real estate financing with large amounts, low rates, and long-term stability up to 25 years.",
-      features: ["Large funding amounts", "Low rates", "5-25 year terms", "Commercial real estate financing"]
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-yellow-400" />,
-      title: "Business Credit Building",
-      rates: "No Personal Guarantee",
-      description: "Build business credit not linked to your SSN. Access high-limit Visa/Mastercard without personal credit checks.",
-      features: ["No personal guarantee", "Build credit for your EIN", "High-limit revolving accounts", "No personal credit check"]
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-yellow-400" />,
-      title: "Cannabusiness Financing",
-      rates: "24hr Funding | $50K - $1M",
-      description: "Cannabis industry specialists. No real estate collateral needed with funds available in 24 hours.",
-      features: ["No real estate collateral needed", "Funds in 24 hours", "Cannabis industry expertise", "Limited documentation required"]
+  const formatAmount = (amount: number) => {
+    if (amount >= 1000000) {
+      return `$${(amount / 1000000).toFixed(1)}M`;
+    } else if (amount >= 1000) {
+      return `$${(amount / 1000).toFixed(0)}K`;
     }
-  ];
+    return `$${amount.toLocaleString()}`;
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch(category.toLowerCase()) {
+      case 'mca': return <Zap className="h-5 w-5" />;
+      case 'term loan': return <DollarSign className="h-5 w-5" />;
+      case 'equipment': return <Building className="h-5 w-5" />;
+      case 'sba': return <Shield className="h-5 w-5" />;
+      case 'real estate': return <Building className="h-5 w-5" />;
+      case 'startup': return <TrendingUp className="h-5 w-5" />;
+      default: return <CreditCard className="h-5 w-5" />;
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    switch(category.toLowerCase()) {
+      case 'mca': return 'bg-blue-100 text-blue-800';
+      case 'term loan': return 'bg-green-100 text-green-800';
+      case 'equipment': return 'bg-purple-100 text-purple-800';
+      case 'sba': return 'bg-orange-100 text-orange-800';
+      case 'real estate': return 'bg-indigo-100 text-indigo-800';
+      case 'startup': return 'bg-pink-100 text-pink-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-black text-white">

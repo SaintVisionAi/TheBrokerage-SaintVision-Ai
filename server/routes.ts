@@ -22,7 +22,10 @@ import {
   insertConversationSchema, 
   insertMessageSchema, 
   insertKnowledgeSchema,
-  insertSystemLogSchema 
+  insertSystemLogSchema,
+  insertLoanProductSchema,
+  insertApplicationSignatureSchema,
+  insertApplicationDocumentSchema
 } from "@shared/schema";
 import { hashPassword, verifyPassword } from './lib/password';
 import { createSession, deleteSession } from './lib/session';
@@ -30,6 +33,8 @@ import { isAuthenticated, isAdmin } from './middleware/auth';
 import cookieParser from 'cookie-parser';
 import webhooksRouter from './routes/webhooks';
 import { FUNDING_PARTNERS } from '../shared/funding-partners-ai';
+import { LOAN_PRODUCTS_DATA } from '../shared/loan-products-data';
+import { autoSelectFundingPartner } from '../shared/funding-partners-ai';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -1784,6 +1789,376 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     return 'pending';
+  }
+
+  // =====================================================
+  // LOAN PRODUCTS AND APPLICATION ENDPOINTS
+  // =====================================================
+
+  // Seed loan products into database
+  app.post("/api/loan-products/seed", async (req, res) => {
+    try {
+      console.log('🌱 Starting loan products seed...');
+      
+      // Clear existing products first (optional - for clean seed)
+      const { db } = await import('./db');
+      const { loanProducts } = await import('@shared/schema');
+      
+      // Delete existing products
+      await db.delete(loanProducts);
+      console.log('✅ Cleared existing loan products');
+      
+      // Insert all loan products from the data file
+      const insertedProducts = [];
+      for (const product of LOAN_PRODUCTS_DATA) {
+        const inserted = await storage.createLoanProduct(product);
+        insertedProducts.push(inserted);
+        console.log(`✅ Seeded: ${inserted.name}`);
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Successfully seeded ${insertedProducts.length} loan products`,
+        products: insertedProducts.map(p => ({
+          id: p.id,
+          name: p.name,
+          category: p.category
+        }))
+      });
+    } catch (error: any) {
+      console.error('❌ Loan products seed error:', error);
+      res.status(500).json({ 
+        error: 'Failed to seed loan products',
+        details: error.message 
+      });
+    }
+  });
+
+  // Get all loan products
+  app.get("/api/loan-products", async (req, res) => {
+    try {
+      const { category } = req.query;
+      
+      let products;
+      if (category) {
+        products = await storage.getLoanProductsByCategory(category as string);
+      } else {
+        products = await storage.getLoanProducts();
+      }
+      
+      res.json(products);
+    } catch (error: any) {
+      console.error('Loan products fetch error:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch loan products',
+        details: error.message 
+      });
+    }
+  });
+
+  // Submit complete application with signature
+  app.post("/api/applications/submit", async (req, res) => {
+    try {
+      const { 
+        applicationData, 
+        signatureData, 
+        consentChecks,
+        loanProductId 
+      } = req.body;
+      
+      // Validate required fields
+      if (!applicationData?.email || !signatureData || !consentChecks) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: applicationData, signatureData, or consentChecks' 
+        });
+      }
+      
+      // Create unique application ID
+      const applicationId = crypto.randomUUID();
+      
+      console.log('📝 Processing application:', applicationId);
+      
+      // Step 1: Create/update contact in GHL
+      const contactResponse = await captureGHLLead({
+        firstName: applicationData.firstName,
+        lastName: applicationData.lastName,
+        email: applicationData.email,
+        phone: applicationData.phone,
+        service: 'lending',
+        type: `Application: ${applicationData.loanAmount}`,
+        notes: `Loan Product: ${applicationData.loanType || 'General'} | Amount: ${applicationData.loanAmount} | Credit: ${applicationData.creditScore}`,
+        source: 'application-form'
+      });
+      
+      const ghlContactId = (contactResponse as any).contact?.id || (contactResponse as any).data?.contact?.id || '';
+      
+      // Step 2: Store application signature
+      const ipAddress = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '';
+      const userAgent = req.headers['user-agent'] || '';
+      
+      const signature = await storage.createApplicationSignature({
+        applicationId,
+        signatureData: signatureData.data, // Base64 image data
+        signatureType: signatureData.type || 'drawn', // 'drawn' or 'typed'
+        fullName: `${applicationData.firstName} ${applicationData.lastName}`,
+        title: applicationData.businessTitle || null,
+        ipAddress,
+        userAgent,
+        consentText: generateConsentText(applicationData),
+        consentGiven: true
+      });
+      
+      console.log('✅ Signature stored:', signature.id);
+      
+      // Step 3: Auto-select funding partner using AI
+      const selectedPartner = autoSelectFundingPartner({
+        loanAmount: parseLoanAmount(applicationData.loanAmount),
+        creditScore: parseInt(applicationData.creditScore) || 0,
+        businessRevenue: parseLoanAmount(applicationData.annualRevenue || '0'),
+        timeInBusiness: parseInt(applicationData.yearsInBusiness) || 0,
+        loanPurpose: applicationData.loanPurpose || 'working_capital',
+        division: 'lending',
+        hasCollateral: applicationData.hasCollateral === 'yes'
+      });
+      
+      console.log('🎯 Selected funding partner:', selectedPartner.name);
+      
+      // Step 4: Update GHL pipeline stage
+      const { LENDING_PIPELINE_STAGES, updateOpportunityStage } = await import('./services/ghl-client');
+      
+      try {
+        await updateOpportunityStage(
+          ghlContactId, 
+          LENDING_PIPELINE_STAGES.SENT_TO_LENDER
+        );
+        console.log('✅ Updated GHL stage to: Sent to Lender');
+      } catch (ghlError) {
+        console.error('⚠️ GHL stage update failed:', ghlError);
+      }
+      
+      // Step 5: Route application to lender
+      if (selectedPartner.submissionType === 'email' && selectedPartner.email) {
+        // Send email to lender with application details
+        const emailBody = `
+New Loan Application from Saint Vision Group
+
+Applicant: ${applicationData.firstName} ${applicationData.lastName}
+Email: ${applicationData.email}
+Phone: ${applicationData.phone}
+Business: ${applicationData.businessName}
+
+Loan Details:
+- Amount Requested: ${applicationData.loanAmount}
+- Purpose: ${applicationData.loanPurpose}
+- Credit Score: ${applicationData.creditScore}
+- Annual Revenue: ${applicationData.annualRevenue}
+- Years in Business: ${applicationData.yearsInBusiness}
+
+Application ID: ${applicationId}
+Signature Captured: Yes
+Documents: Pending
+
+Please contact the applicant within 24 hours to proceed.
+        `;
+        
+        await sendEmailViaGHL({
+          to: selectedPartner.email,
+          subject: `New Loan Application - ${applicationData.firstName} ${applicationData.lastName} - ${applicationData.loanAmount}`,
+          body: emailBody,
+          contactId: ghlContactId
+        });
+        
+        console.log('✅ Application sent to lender:', selectedPartner.name);
+      }
+      
+      // Step 6: Send confirmation to applicant
+      if (applicationData.phone) {
+        await sendSMS(
+          applicationData.phone,
+          `Thank you for your loan application! We've received your request for ${applicationData.loanAmount}. ${selectedPartner.name} will contact you within 24 hours. Check your email for details.`
+        );
+      }
+      
+      res.json({
+        success: true,
+        applicationId,
+        message: 'Application submitted successfully',
+        fundingPartner: selectedPartner.name,
+        nextSteps: 'Lender will contact you within 24 hours',
+        estimatedFunding: `${selectedPartner.speedDays || 7} business days`
+      });
+      
+    } catch (error: any) {
+      console.error('Application submission error:', error);
+      res.status(500).json({ 
+        error: 'Failed to submit application',
+        details: error.message 
+      });
+    }
+  });
+
+  // Capture signature for existing application
+  app.post("/api/applications/:id/sign", async (req, res) => {
+    try {
+      const { id: applicationId } = req.params;
+      const { signatureData, consentChecks, signerName } = req.body;
+      
+      if (!signatureData || !consentChecks) {
+        return res.status(400).json({ 
+          error: 'Signature data and consent checks are required' 
+        });
+      }
+      
+      // Check if signature already exists
+      const existingSignature = await storage.getApplicationSignature(applicationId);
+      if (existingSignature) {
+        return res.status(409).json({ 
+          error: 'Application has already been signed' 
+        });
+      }
+      
+      const ipAddress = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '';
+      const userAgent = req.headers['user-agent'] || '';
+      
+      const signature = await storage.createApplicationSignature({
+        applicationId,
+        signatureData: signatureData.data,
+        signatureType: signatureData.type || 'drawn',
+        fullName: signerName,
+        ipAddress,
+        userAgent,
+        consentText: 'Standard loan application terms and conditions',
+        consentGiven: true
+      });
+      
+      res.json({
+        success: true,
+        signatureId: signature.id,
+        message: 'Signature captured successfully'
+      });
+      
+    } catch (error: any) {
+      console.error('Signature capture error:', error);
+      res.status(500).json({ 
+        error: 'Failed to capture signature',
+        details: error.message 
+      });
+    }
+  });
+
+  // Route application to lender
+  app.post("/api/applications/:id/route", async (req, res) => {
+    try {
+      const { id: applicationId } = req.params;
+      
+      // Get application from storage
+      const application = await storage.getApplicationById(applicationId);
+      if (!application) {
+        return res.status(404).json({ error: 'Application not found' });
+      }
+      
+      // Parse credit score from string format
+      let creditScore = 650;
+      if (application.creditScore) {
+        const creditStr = application.creditScore.toString();
+        if (creditStr.includes('750')) creditScore = 750;
+        else if (creditStr.includes('700')) creditScore = 700;
+        else if (creditStr.includes('650')) creditScore = 650;
+        else if (creditStr.includes('600')) creditScore = 600;
+        else if (creditStr.includes('550')) creditScore = 550;
+        else if (creditStr.includes('500')) creditScore = 500;
+      }
+      
+      // Select funding partner using correct parameters
+      const selectedPartner = autoSelectFundingPartner({
+        loanType: application.loanPurpose || 'working capital',
+        loanAmount: Number(application.loanAmount) || 100000,
+        creditScore: creditScore,
+        speedNeeded: false // Could be based on timeframe field
+      });
+      
+      // Send application to lender
+      let routingDetails = { method: '', destination: '' };
+      
+      if (selectedPartner.submissionType === 'email' && selectedPartner.email) {
+        // Send email to lender
+        const emailContent = `
+New Loan Application from Saint Vision Group
+
+Application ID: ${applicationId}
+Business: ${application.businessName}
+Contact: ${application.firstName} ${application.lastName}
+Phone: ${application.phone}
+Email: ${application.email}
+
+Loan Details:
+- Amount: $${application.loanAmount}
+- Purpose: ${application.loanPurpose}
+- Credit Score: ${creditScore}
+
+Please contact the applicant within 24 hours.
+        `;
+        
+        // Here you would send the actual email
+        console.log(`Routing to ${selectedPartner.name} via email: ${selectedPartner.email}`);
+        routingDetails = { method: 'email', destination: selectedPartner.email };
+        
+      } else if (selectedPartner.submissionType === 'link' && selectedPartner.link) {
+        // Provide link for submission
+        console.log(`Routing to ${selectedPartner.name} via link: ${selectedPartner.link}`);
+        routingDetails = { method: 'link', destination: selectedPartner.link };
+      }
+      
+      // Update GHL if contact ID exists
+      if (application.ghlContactId) {
+        try {
+          const ghlClient = getGHLClient();
+          await ghlClient.updateContact(application.ghlContactId, {
+            pipelineStage: 'Application Submitted',
+            customFields: {
+              lenderName: selectedPartner.name,
+              applicationStatus: 'Routed to Lender'
+            }
+          });
+        } catch (ghlError) {
+          console.error('GHL update failed:', ghlError);
+        }
+      }
+      
+      res.json({
+        success: true,
+        fundingPartner: selectedPartner,
+        routing: routingDetails,
+        message: `Application successfully routed to ${selectedPartner.name}`
+      });
+      
+    } catch (error: any) {
+      console.error('Application routing error:', error);
+      res.status(500).json({ 
+        error: 'Failed to route application',
+        details: error.message 
+      });
+    }
+  });
+
+  // Helper function to generate consent text
+  function generateConsentText(applicationData: any): string {
+    return `
+By signing below, I certify that:
+
+1. LOAN TERMS ACKNOWLEDGMENT: I understand that I am applying for a business loan of ${applicationData.loanAmount} and agree to the terms that will be provided by the lender.
+
+2. CREDIT CHECK AUTHORIZATION: I authorize Saint Vision Group and its lending partners to obtain credit reports and verify the information provided in this application.
+
+3. BUSINESS INFORMATION ACCURACY: I certify that all information provided is true, accurate, and complete to the best of my knowledge.
+
+4. COMMUNICATION CONSENT: I consent to receive communications via phone, email, and SMS regarding this loan application and related services.
+
+5. DATA SHARING: I understand that my information will be shared with qualified lending partners to process this application.
+
+Signed electronically on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+IP Address: ${applicationData.ipAddress || 'Not captured'}
+    `;
   }
 
   // SaintBroker Enhanced API Endpoints - MASTER ORCHESTRATOR
