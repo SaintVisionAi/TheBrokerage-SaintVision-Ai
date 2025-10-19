@@ -14,9 +14,10 @@ export function useChat(userId: string, conversationId: string | null) {
   const queryClient = useQueryClient();
 
   // Get messages for current conversation
+  // DISABLED: No message history endpoint exists - keeping stateless
   const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
-    queryKey: ["/api/chat/messages", conversationId],
-    enabled: !!conversationId,
+    queryKey: ["disabled-messages", conversationId],
+    enabled: false, // Disabled until message persistence is implemented
   });
 
   // Send message mutation - FIXED to use working endpoint!
@@ -41,9 +42,10 @@ export function useChat(userId: string, conversationId: string | null) {
       }
 
       // Invalidate messages to refresh the list
-      queryClient.invalidateQueries({
-        queryKey: ["/api/chat/messages", conversationId],
-      });
+      // DISABLED: No message history endpoint to invalidate
+      // queryClient.invalidateQueries({
+      //   queryKey: ["disabled-messages", conversationId],
+      // });
     },
   });
 
