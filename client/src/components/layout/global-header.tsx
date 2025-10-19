@@ -141,9 +141,21 @@ export default function GlobalHeader() {
               </Link>
               
               <Link href="/apply">
-                <Button className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold shadow-lg hover:shadow-xl hover:shadow-yellow-500/20 transition-all">
-                  Get Started →
-                </Button>
+                <div className="relative">
+                  <div className="absolute -top-3 -right-3 z-10">
+                    <span className="flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                  </div>
+                  <Button className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold shadow-lg hover:shadow-xl hover:shadow-yellow-500/20 transition-all group relative overflow-hidden">
+                    <div className="flex flex-col items-start">
+                      <span className="text-xs font-normal">AI Pre-Qualify Instantly</span>
+                      <span className="text-sm">Get Started →</span>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  </Button>
+                </div>
               </Link>
             </div>
 
