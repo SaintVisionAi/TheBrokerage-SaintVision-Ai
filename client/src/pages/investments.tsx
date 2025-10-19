@@ -265,7 +265,7 @@ export default function Investments() {
       <GlobalFooter />
       
       {/* AI Concierge */}
-      <SaintBrokerComplete />
+      <SaintBrokerEnhanced />
     </div>
   );
 }
