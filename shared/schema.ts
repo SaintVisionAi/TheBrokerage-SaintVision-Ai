@@ -278,6 +278,59 @@ export const chatMessages = pgTable("chat_messages", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Loan Products table - stores details for each loan type
+export const loanProducts = pgTable("loan_products", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 255 }).notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // MCA, Term Loan, Equipment, Real Estate, SBA
+  minAmount: integer("min_amount").notNull(),
+  maxAmount: integer("max_amount").notNull(),
+  minRate: varchar("min_rate", { length: 20 }), // "9.99%" or "Factor 1.15"
+  maxRate: varchar("max_rate", { length: 20 }), // "29.99%" or "Factor 1.45"
+  terms: varchar("terms", { length: 100 }), // "3-24 months", "5-30 years"
+  minCredit: integer("min_credit"),
+  speedDays: integer("speed_days"), // How fast funding happens
+  requirements: jsonb("requirements"), // Array of requirements
+  features: jsonb("features"), // Array of features/benefits
+  disclosures: text("disclosures"), // Legal disclosures
+  description: text("description"),
+  priority: integer("priority").default(0),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Application Signatures table - stores e-signatures and consent
+export const applicationSignatures = pgTable("application_signatures", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  applicationId: varchar("application_id").notNull(), // Links to application/opportunity
+  signatureData: text("signature_data").notNull(), // Base64 signature image or DocuSign envelope ID
+  signatureType: varchar("signature_type", { length: 50 }).notNull(), // 'drawn', 'typed', 'docusign'
+  fullName: varchar("full_name", { length: 255 }).notNull(),
+  title: varchar("title", { length: 100 }),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  userAgent: text("user_agent"),
+  consentText: text("consent_text").notNull(), // What they agreed to
+  consentGiven: boolean("consent_given").default(true),
+  documentUrl: text("document_url"), // Link to signed document
+  signedAt: timestamp("signed_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Application Documents table - stores uploaded documents for applications
+export const applicationDocuments = pgTable("application_documents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  applicationId: varchar("application_id").notNull(),
+  documentType: varchar("document_type", { length: 100 }).notNull(), // bank_statement, tax_return, etc.
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  fileUrl: text("file_url").notNull(),
+  fileSize: integer("file_size"),
+  mimeType: varchar("mime_type", { length: 100 }),
+  uploadedBy: varchar("uploaded_by").references(() => users.id),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas for new tables
 export const insertContactSchema = createInsertSchema(contacts).omit({
   id: true,
@@ -316,6 +369,23 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
   createdAt: true,
 });
 
+export const insertLoanProductSchema = createInsertSchema(loanProducts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertApplicationSignatureSchema = createInsertSchema(applicationSignatures).omit({
+  id: true,
+  createdAt: true,
+  signedAt: true,
+});
+
+export const insertApplicationDocumentSchema = createInsertSchema(applicationDocuments).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertConversation = z.infer<typeof insertConversationSchema>;
@@ -346,3 +416,9 @@ export type InsertSmsMessage = z.infer<typeof insertSmsMessageSchema>;
 export type SmsMessage = typeof smsMessages.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertLoanProduct = z.infer<typeof insertLoanProductSchema>;
+export type LoanProduct = typeof loanProducts.$inferSelect;
+export type InsertApplicationSignature = z.infer<typeof insertApplicationSignatureSchema>;
+export type ApplicationSignature = typeof applicationSignatures.$inferSelect;
+export type InsertApplicationDocument = z.infer<typeof insertApplicationDocumentSchema>;
+export type ApplicationDocument = typeof applicationDocuments.$inferSelect;

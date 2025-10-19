@@ -15,6 +15,12 @@ import {
   type InsertDocument,
   type Signature,
   type InsertSignature,
+  type LoanProduct,
+  type InsertLoanProduct,
+  type ApplicationSignature,
+  type InsertApplicationSignature,
+  type ApplicationDocument,
+  type InsertApplicationDocument,
   users,
   conversations,
   messages,
@@ -22,7 +28,10 @@ import {
   systemLogs,
   clientNotes,
   documents,
-  signatures
+  signatures,
+  loanProducts,
+  applicationSignatures,
+  applicationDocuments
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -70,6 +79,19 @@ export interface IStorage {
   getUserSignatures(userId: string): Promise<Signature[]>;
   createSignature(sig: InsertSignature): Promise<Signature>;
   updateSignature(id: string, updates: Partial<InsertSignature>): Promise<Signature>;
+
+  // Loan Products operations
+  getLoanProducts(): Promise<LoanProduct[]>;
+  getLoanProductsByCategory(category: string): Promise<LoanProduct[]>;
+  createLoanProduct(product: InsertLoanProduct): Promise<LoanProduct>;
+  
+  // Application Signatures operations
+  getApplicationSignature(applicationId: string): Promise<ApplicationSignature | undefined>;
+  createApplicationSignature(sig: InsertApplicationSignature): Promise<ApplicationSignature>;
+  
+  // Application Documents operations
+  getApplicationDocuments(applicationId: string): Promise<ApplicationDocument[]>;
+  createApplicationDocument(doc: InsertApplicationDocument): Promise<ApplicationDocument>;
 }
 
 export class DatabaseStorage implements IStorage {
