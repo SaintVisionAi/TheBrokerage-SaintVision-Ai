@@ -237,9 +237,10 @@ export default function SaintBrokerWidget() {
     
     try {
       // Call SaintBroker AI
-      const response = await fetch('/api/saint-broker', {
+      const response = await fetch('/api/saint-broker/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for auth context
         body: JSON.stringify({
           message: text,
           conversationHistory: messages.map(m => ({
@@ -249,6 +250,11 @@ export default function SaintBrokerWidget() {
           context: {
             source: 'website_widget',
             hasDocuments: documents.length > 0,
+            documentCount: documents.length,
+            noteCount: 0,
+            pendingSignatures: 0,
+            hasClientHub: true,
+            clientHubUrl: '/client-hub'
           },
         }),
       });

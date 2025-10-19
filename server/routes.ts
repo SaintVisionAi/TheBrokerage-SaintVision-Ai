@@ -1787,13 +1787,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // SaintBroker Enhanced API Endpoints - MASTER ORCHESTRATOR
-  // FIXED: Added authentication middleware to get user context
-  app.post("/api/saint-broker/chat", isAuthenticated, async (req, res) => {
+  // FIXED: Made authentication optional for public access
+  app.post("/api/saint-broker/chat", async (req, res) => {
     try {
       const { message, context } = req.body;
-      const userId = req.user?.userId || 'demo-user';
-      const userRole = req.user?.role || 'client';
-      const userEmail = req.user?.email || 'unknown';
+      // Allow both authenticated and guest users
+      const userId = req.user?.userId || req.session?.user?.id || 'guest-user';
+      const userRole = req.user?.role || req.session?.user?.role || 'guest';
+      const userEmail = req.user?.email || req.session?.user?.email || 'guest@saintbrokerai.com';
 
       // BUILD CONTEXT-AWARE DATA FOR SAINTBROKER ORCHESTRATOR
       let userContext = {

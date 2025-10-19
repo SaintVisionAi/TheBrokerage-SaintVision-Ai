@@ -240,6 +240,8 @@ export class SaintBrokerAI {
       opportunityId?: string;
       division?: 'investment' | 'real-estate' | 'lending';
       stage?: string;
+      userRole?: string;
+      isAdmin?: boolean;
     };
   }): Promise<{
     response: string;
@@ -250,8 +252,23 @@ export class SaintBrokerAI {
     const requestId = metrics.startRequest(CONFIG.models.primary);
     
     try {
+      // 🧠 INTEGRATE KNOWLEDGE BASE SEARCH
+      let knowledgeContext = '';
+      try {
+        const { knowledgeBaseService } = await import('../../services/knowledge-base');
+        const results = await knowledgeBaseService.searchKnowledge(params.message, undefined, 3);
+        
+        if (results.length > 0) {
+          knowledgeContext = '\n\n📚 RELEVANT KNOWLEDGE:\n' +
+            results.map((r: any) => `- ${r.filename}: ${r.content.substring(0, 300)}...`).join('\n\n');
+          console.log(`🧠 Found ${results.length} relevant knowledge chunks for query`);
+        }
+      } catch (kbError) {
+        console.warn('Knowledge base search failed:', kbError);
+      }
+      
       // Build system prompt based on context
-      const systemPrompt = this.buildSystemPrompt(params.context);
+      const systemPrompt = this.buildSystemPrompt(params.context) + knowledgeContext;
       
       // Build conversation messages
       const messages = [
@@ -367,13 +384,26 @@ export class SaintBrokerAI {
     opportunityId?: string;
     division?: 'investment' | 'real-estate' | 'lending';
     stage?: string;
+    userRole?: string;
+    isAdmin?: boolean;
   }): string {
-    const base = `You are SaintBroker AI, the intelligent assistant for Saint Vision Group - a premier investment, real estate, and lending brokerage.
+    const base = `You are SaintBroker AI, the intelligent assistant for Saint Vision Group - a premier AI-powered brokerage platform.
 
-You are professional, knowledgeable, and helpful. You guide clients through:
-- Investment opportunities (private equity, real estate funds)
-- Real estate transactions (buying, selling, property management)
-- Commercial and residential lending (pre-qualification to funding)
+FUNDING PARTNER ROUTING INTELLIGENCE:
+- Equipment financing → Commercial Capital Connect (specialists)
+- Real Estate projects → Easy Street Capital (BRRRR/STR) or Trinity Bay (Fix&Flip)
+- Startup with 700+ credit → Rich Mee (0% SLOC up to $100K)
+- SBA loans → SB Lending Source (650+ credit required)
+- General business ($50K-$5M) → SVG In-House first
+- Urgent MCA/Working Capital → SVG Partner Network (1-3 day funding)
+- Large commercial ($1M+) → Rok Financial
+
+You guide clients through:
+- Commercial Lending ($50K-$5M at 9%+ rates)
+- Real Estate Financing (all 50 states)
+- Investment Suite (9-12% fixed returns, faith-aligned)
+
+${context?.isAdmin ? 'ADMIN MODE: Provide detailed pipeline insights and management advice.' : ''}
 
 Always respond in JSON format with this structure:
 {
