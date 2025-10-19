@@ -12,24 +12,13 @@ import Signup from "@/pages/signup";
 import About from "@/pages/about";
 import Apply from "@/pages/apply";
 import Contact from "@/pages/contact";
-import WarRoom from "@/pages/warroom";
-import Enterprise from "@/pages/enterprise";
-import API from "@/pages/api";
-import Careers from "@/pages/careers";
-import Blog from "@/pages/blog";
-import Documentation from "@/pages/docs";
-import HelpCenter from "@/pages/help";
-import Community from "@/pages/community";
 import Status from "@/pages/status";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import Cookies from "@/pages/cookies";
-import Patent from "@/pages/patent";
-import ADA from "@/pages/ada";
 import RealEstate from "@/pages/real-estate";
 import Lending from "@/pages/lending";
 import Investments from "@/pages/investments";
-import CommercialProducts from "@/pages/commercial-products";
 import ClientPortal from "@/pages/client-portal";
 import ClientHub from "@/pages/client-hub";
 import REBrokerageIntakePage from "@/pages/re-brokerage-intake";
@@ -144,22 +133,11 @@ function Router() {
       <Route path="/real-estate/agreement-preview" component={AgreementPreviewPage} />
       <Route path="/lending" component={Lending} />
       <Route path="/investments" component={Investments} />
-      <Route path="/commercial-products" component={CommercialProducts} />
       <Route path="/upload/:token" component={UploadPortal} />
-      <Route path="/warroom" component={WarRoom} />
-      <Route path="/enterprise" component={Enterprise} />
-      <Route path="/api" component={API} />
-      <Route path="/careers" component={Careers} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/docs" component={Documentation} />
-      <Route path="/help" component={HelpCenter} />
-      <Route path="/community" component={Community} />
       <Route path="/status" component={Status} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route path="/cookies" component={Cookies} />
-      <Route path="/patent" component={Patent} />
-      <Route path="/ada" component={ADA} />
       <Route component={NotFound} />
     </Switch>
   );
