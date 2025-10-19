@@ -34,25 +34,25 @@ export default function GlobalHeader() {
   const isActive = (href: string) => location === href;
 
   return (
-    <nav className="sticky top-0 w-full z-50 bg-gradient-to-r from-neutral-950 via-black to-neutral-900 backdrop-blur-xl border-b border-yellow-400/30 shadow-lg shadow-yellow-400/10">
+    <nav className="sticky top-0 w-full z-50 bg-gradient-to-r from-neutral-950/40 via-black/40 to-neutral-900/40 backdrop-blur-xl border-b border-yellow-400/20 shadow-sm shadow-yellow-400/5">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           
           {/* Logo Section */}
           <Link href="/">
-            <div className="flex items-center gap-3 cursor-pointer group">
+            <div className="flex items-center gap-2.5 cursor-pointer group">
               <img
                 src={svgLogo}
                 alt="Saint Vision Group"
-                className="w-12 h-12 object-contain rounded-lg border border-yellow-400/20 shadow-sm shadow-yellow-400/10 bg-gradient-to-br from-black to-neutral-900 p-1 group-hover:shadow-md group-hover:shadow-yellow-400/20 group-hover:border-yellow-400/40 transition-all duration-300 group-hover:scale-105"
+                className="w-10 h-10 object-contain rounded-lg border border-yellow-400/15 shadow-sm shadow-yellow-400/5 bg-gradient-to-br from-black/60 to-neutral-900/60 p-1 group-hover:shadow-md group-hover:shadow-yellow-400/15 group-hover:border-yellow-400/30 transition-all duration-300 group-hover:scale-105"
               />
-              <div>
-                <div className="text-2xl font-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">
+              <div className="flex items-baseline gap-2">
+                <div className="text-xl font-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
                   Saint Vision Group
                 </div>
-                <div className="text-[11px] text-yellow-400/80 uppercase tracking-widest flex items-center gap-1.5 font-medium">
-                  <Sparkles className="w-3 h-3 text-yellow-400 animate-pulse" />
-                  POWERED BY SAINTBROKER™ AI
+                <div className="text-[10px] text-yellow-400/70 uppercase tracking-wider flex items-center gap-1 font-medium">
+                  <Sparkles className="w-2.5 h-2.5 text-yellow-400 animate-pulse" />
+                  <span className="hidden sm:inline">POWERED BY</span> SAINTBROKER™ <span className="hidden sm:inline">AI</span>
                 </div>
               </div>
             </div>
