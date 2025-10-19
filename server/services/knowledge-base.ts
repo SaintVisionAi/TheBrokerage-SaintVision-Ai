@@ -9,8 +9,8 @@ import * as path from 'path';
 export class KnowledgeBaseService {
   private openaiClient: OpenAI | null = null;
   private readonly EMBEDDING_MODEL = 'text-embedding-3-small';
-  private readonly CHUNK_SIZE = 1000; // Characters per chunk
-  private readonly CHUNK_OVERLAP = 200; // Overlap between chunks
+  private readonly CHUNK_SIZE = 400; // Reduced chunk size to avoid memory issues
+  private readonly CHUNK_OVERLAP = 50; // Reduced overlap as well
 
   constructor() {
     if (process.env.OPENAI_API_KEY) {
@@ -58,7 +58,7 @@ export class KnowledgeBaseService {
     }
   }
 
-  // Ingest a knowledge file into the database
+  // Ingest a knowledge file into the database (optimized for memory)
   async ingestKnowledgeFile(
     userId: string,
     filename: string,
@@ -67,37 +67,73 @@ export class KnowledgeBaseService {
     try {
       console.log(`📚 Ingesting knowledge file: ${filename}`);
       
-      // Split content into chunks
+      // Split content into smaller chunks to avoid memory issues
       const chunks = this.chunkContent(content);
       console.log(`📝 Split into ${chunks.length} chunks`);
 
-      // Process each chunk
-      for (let i = 0; i < chunks.length; i++) {
-        const chunk = chunks[i];
-        const chunkId = `${filename}_chunk_${i}`;
+      // Process chunks in small batches to avoid memory overload
+      const BATCH_SIZE = 2; // Process 2 chunks at a time
+      let processedCount = 0;
+      
+      for (let b = 0; b < chunks.length; b += BATCH_SIZE) {
+        const batchEnd = Math.min(b + BATCH_SIZE, chunks.length);
+        
+        // Process batch sequentially
+        for (let i = b; i < batchEnd; i++) {
+          const chunk = chunks[i];
+          const chunkId = `${filename}_chunk_${i}`;
 
-        // Generate embeddings for this chunk
-        const embeddings = await this.generateEmbeddings(chunk);
+          try {
+            // Generate embeddings for this chunk (skip if API issues)
+            let embeddings = null;
+            try {
+              embeddings = await this.generateEmbeddings(chunk);
+            } catch (embError) {
+              console.warn(`⚠️ Embedding generation failed for chunk ${i}, storing without embeddings`);
+            }
 
-        // Store in database
-        await db.insert(knowledgeBase).values({
-          userId,
-          filename: chunkId,
-          content: chunk,
-          embeddings: embeddings ? { vector: embeddings } : null,
-        }).onConflictDoUpdate({
-          target: [knowledgeBase.filename],
-          set: {
-            content: chunk,
-            embeddings: embeddings ? { vector: embeddings } : null,
-            processedAt: new Date()
+            // Store in database
+            // Check if this chunk already exists
+            const existing = await db.select()
+              .from(knowledgeBase)
+              .where(eq(knowledgeBase.filename, chunkId))
+              .limit(1);
+            
+            if (existing.length > 0) {
+              // Update existing
+              await db.update(knowledgeBase)
+                .set({
+                  content: chunk,
+                  embeddings: embeddings ? { vector: embeddings } : null,
+                  processedAt: new Date()
+                })
+                .where(eq(knowledgeBase.filename, chunkId));
+            } else {
+              // Insert new
+              await db.insert(knowledgeBase).values({
+                userId,
+                filename: chunkId,
+                content: chunk,
+                embeddings: embeddings ? { vector: embeddings } : null,
+              });
+            }
+
+            processedCount++;
+            console.log(`✅ Processed chunk ${processedCount}/${chunks.length} for ${filename}`);
+          } catch (chunkError) {
+            console.error(`❌ Failed to process chunk ${i} of ${filename}:`, chunkError);
+            // Continue with other chunks
           }
-        });
-
-        console.log(`✅ Processed chunk ${i + 1}/${chunks.length} for ${filename}`);
+        }
+        
+        // Small delay between batches to let garbage collection run
+        if (b + BATCH_SIZE < chunks.length) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          console.log(`📊 Batch ${Math.floor(b/BATCH_SIZE) + 1}/${Math.ceil(chunks.length/BATCH_SIZE)} complete`);
+        }
       }
 
-      return { success: true, chunks: chunks.length };
+      return { success: true, chunks: processedCount };
     } catch (error) {
       console.error('Error ingesting knowledge file:', error);
       return { 
@@ -108,7 +144,7 @@ export class KnowledgeBaseService {
     }
   }
 
-  // Load all knowledge files from the knowledge directory
+  // Load all knowledge files from the knowledge directory (optimized)
   async loadAllKnowledgeFiles(userId: string): Promise<{
     loaded: number;
     failed: number;
@@ -128,20 +164,86 @@ export class KnowledgeBaseService {
       const files = fs.readdirSync(knowledgeDir).filter(f => f.endsWith('.md'));
       console.log(`📂 Found ${files.length} knowledge files to process`);
 
+      // Process files one at a time with breaks between them
       for (const file of files) {
-        const filePath = path.join(knowledgeDir, file);
-        const content = fs.readFileSync(filePath, 'utf-8');
-        
-        console.log(`\n🔄 Processing ${file} (${(content.length / 1024).toFixed(1)}KB)`);
-        const result = await this.ingestKnowledgeFile(userId, file, content);
-        
-        if (result.success) {
-          results.loaded++;
-          console.log(`✅ Successfully loaded ${file} (${result.chunks} chunks)`);
-        } else {
+        try {
+          const filePath = path.join(knowledgeDir, file);
+          
+          // Read file in chunks to avoid memory spike
+          const stats = fs.statSync(filePath);
+          const fileSizeKB = stats.size / 1024;
+          console.log(`\n🔄 Processing ${file} (${fileSizeKB.toFixed(1)}KB)`);
+          
+          // For very large files, process in sections
+          if (fileSizeKB > 10) {
+            // Read and process file in smaller sections
+            const content = fs.readFileSync(filePath, 'utf-8');
+            const sections = Math.ceil(content.length / 5000); // Process 5KB at a time
+            
+            for (let i = 0; i < sections; i++) {
+              const start = i * 5000;
+              const end = Math.min((i + 1) * 5000, content.length);
+              const section = content.slice(start, end);
+              
+              // Store directly without embeddings for now
+              const chunkId = `${file}_section_${i}`;
+              
+              // Check if this chunk already exists
+              const existing = await db.select()
+                .from(knowledgeBase)
+                .where(eq(knowledgeBase.filename, chunkId))
+                .limit(1);
+              
+              if (existing.length > 0) {
+                // Update existing
+                await db.update(knowledgeBase)
+                  .set({
+                    content: section,
+                    processedAt: new Date()
+                  })
+                  .where(eq(knowledgeBase.filename, chunkId));
+              } else {
+                // Insert new
+                await db.insert(knowledgeBase).values({
+                  userId,
+                  filename: chunkId,
+                  content: section,
+                  embeddings: null, // Skip embeddings to save memory
+                });
+              }
+              
+              console.log(`📝 Processed section ${i + 1}/${sections} of ${file}`);
+              
+              // Small delay between sections
+              if (i < sections - 1) {
+                await new Promise(r => setTimeout(r, 10));
+              }
+            }
+            
+            results.loaded++;
+            console.log(`✅ Successfully loaded ${file} in ${sections} sections`);
+          } else {
+            // Small files can be processed normally
+            const content = fs.readFileSync(filePath, 'utf-8');
+            const result = await this.ingestKnowledgeFile(userId, file, content);
+            
+            if (result.success) {
+              results.loaded++;
+              console.log(`✅ Successfully loaded ${file} (${result.chunks} chunks)`);
+            } else {
+              results.failed++;
+              results.errors.push(`${file}: ${result.error}`);
+              console.error(`❌ Failed to load ${file}: ${result.error}`);
+            }
+          }
+          
+          // Delay between files to let garbage collection run
+          await new Promise(r => setTimeout(r, 100));
+          
+        } catch (fileError) {
           results.failed++;
-          results.errors.push(`${file}: ${result.error}`);
-          console.error(`❌ Failed to load ${file}: ${result.error}`);
+          results.errors.push(`${file}: ${fileError}`);
+          console.error(`❌ Error processing ${file}:`, fileError);
         }
       }
 

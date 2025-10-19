@@ -2273,7 +2273,28 @@ IMPORTANT: You are SaintBroker AI, the master orchestrator. Respond based on the
   app.post("/api/knowledge/load", async (req: any, res) => {
     try {
       console.log('🧠 Starting knowledge base ingestion...');
-      const userId = req.session?.user?.id || 'system';
+      
+      // Get or create a system user for knowledge base
+      let userId = req.session?.user?.id;
+      
+      if (!userId) {
+        // Try to find or create a system user
+        const systemUser = await storage.getUserByEmail('system@saintbrokerai.com');
+        if (systemUser) {
+          userId = systemUser.id;
+        } else {
+          // Create a system user for knowledge base
+          const hashedPassword = await hashPassword('SystemUser2024!');
+          const newUser = await storage.createUser({
+            email: 'system@saintbrokerai.com',
+            username: 'saintbroker_system',
+            name: 'SaintBroker AI System',
+            password: hashedPassword,
+          });
+          userId = newUser.id;
+          console.log('Created system user for knowledge base');
+        }
+      }
       
       // Load all knowledge files from the server/knowledge directory
       const result = await knowledgeBaseService.loadAllKnowledgeFiles(userId);
