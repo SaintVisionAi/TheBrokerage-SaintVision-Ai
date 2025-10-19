@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { knowledgeBaseService } from './knowledge-base';
 
 // AI Model Providers Configuration - CLAUDE 4.5 IS THE BEAST!
 export enum AIProvider {
@@ -99,14 +100,38 @@ class AIOrchestrator {
     }
   }
 
-  // Generate response with automatic fallback
+  // Generate response with automatic fallback and knowledge base integration
   async generateResponse(
     prompt: string,
     systemPrompt: string = '',
     provider: AIProvider = AIProvider.CLAUDE,
     options: any = {}
-  ): Promise<{ content: string; provider: string; processingTime: number }> {
+  ): Promise<{ content: string; provider: string; processingTime: number; knowledgeUsed?: boolean }> {
     const startTime = Date.now();
+    
+    // Search knowledge base for relevant context
+    let knowledgeContext = '';
+    let knowledgeUsed = false;
+    
+    try {
+      const knowledgeResults = await knowledgeBaseService.searchKnowledge(prompt, options.userId, 3);
+      
+      if (knowledgeResults.length > 0) {
+        knowledgeContext = '\n\n📚 RELEVANT KNOWLEDGE FROM SAINTBROKER AI BRAIN:\n' +
+          knowledgeResults.map((r, i) => 
+            `[${i+1}] ${r.filename}:\n${r.content.substring(0, 500)}...`
+          ).join('\n\n');
+        knowledgeUsed = true;
+        console.log(`🧠 Found ${knowledgeResults.length} relevant knowledge chunks`);
+      }
+    } catch (error) {
+      console.warn('Knowledge base search failed:', error);
+    }
+    
+    // Enhance prompt with knowledge context
+    const enhancedPrompt = knowledgeContext 
+      ? prompt + knowledgeContext + '\n\n🎯 USE THE ABOVE KNOWLEDGE TO PROVIDE AN EXPERT RESPONSE.'
+      : prompt;
     
     try {
       let content = '';
@@ -114,7 +139,7 @@ class AIOrchestrator {
 
       // Try primary provider first
       try {
-        content = await this.callProvider(provider, prompt, systemPrompt, options);
+        content = await this.callProvider(provider, enhancedPrompt, systemPrompt, options);
       } catch (error) {
         console.warn(`Primary provider ${provider} failed, trying fallbacks...`);
         
@@ -128,7 +153,7 @@ class AIOrchestrator {
 
         for (const fallback of fallbackChain) {
           try {
-            content = await this.callProvider(fallback, prompt, systemPrompt, options);
+            content = await this.callProvider(fallback, enhancedPrompt, systemPrompt, options);
             usedProvider = fallback;
             console.log(`✅ Fallback to ${fallback} successful`);
             break;
@@ -145,7 +170,8 @@ class AIOrchestrator {
       return {
         content,
         provider: usedProvider,
-        processingTime: Date.now() - startTime
+        processingTime: Date.now() - startTime,
+        knowledgeUsed
       };
     } catch (error) {
       console.error('AI Orchestrator error:', error);

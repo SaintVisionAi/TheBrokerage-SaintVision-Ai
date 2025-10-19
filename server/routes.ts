@@ -13,6 +13,7 @@ import { qualifyLead } from "./services/ai-qualification";
 import { EMAIL_CONFIG, SMS_CONFIG } from "./config/email";
 import { documentStorage } from "./services/document-storage";
 import { sendDocumentRequest } from "./services/document-automation";
+import { knowledgeBaseService } from "./services/knowledge-base";
 import multer from 'multer';
 import express from 'express';
 import crypto from 'crypto';
@@ -2265,6 +2266,84 @@ IMPORTANT: You are SaintBroker AI, the master orchestrator. Respond based on the
 
   // Serve uploaded files
   app.use('/uploads', express.static('uploads'));
+
+  // ========== KNOWLEDGE BASE ROUTES ==========
+  
+  // Load all knowledge files into the database
+  app.post("/api/knowledge/load", async (req: any, res) => {
+    try {
+      console.log('🧠 Starting knowledge base ingestion...');
+      const userId = req.session?.user?.id || 'system';
+      
+      // Load all knowledge files from the server/knowledge directory
+      const result = await knowledgeBaseService.loadAllKnowledgeFiles(userId);
+      
+      res.json({
+        success: true,
+        message: `Loaded ${result.loaded} knowledge files`,
+        details: {
+          loaded: result.loaded,
+          failed: result.failed,
+          errors: result.errors
+        }
+      });
+    } catch (error: any) {
+      console.error('Error loading knowledge base:', error);
+      res.status(500).json({ 
+        error: "Failed to load knowledge base",
+        details: error.message 
+      });
+    }
+  });
+
+  // Search knowledge base
+  app.post("/api/knowledge/search", async (req: any, res) => {
+    try {
+      const { query, limit = 5 } = req.body;
+      const userId = req.session?.user?.id;
+      
+      if (!query) {
+        return res.status(400).json({ error: "Query is required" });
+      }
+      
+      const results = await knowledgeBaseService.searchKnowledge(query, userId, limit);
+      res.json({ results });
+    } catch (error: any) {
+      console.error('Error searching knowledge base:', error);
+      res.status(500).json({ error: "Failed to search knowledge base" });
+    }
+  });
+
+  // Get knowledge base statistics
+  app.get("/api/knowledge/stats", async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      const stats = await knowledgeBaseService.getKnowledgeStats(userId);
+      res.json(stats);
+    } catch (error: any) {
+      console.error('Error getting knowledge stats:', error);
+      res.status(500).json({ error: "Failed to get knowledge statistics" });
+    }
+  });
+
+  // Clear user's knowledge base
+  app.delete("/api/knowledge", async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      
+      const success = await knowledgeBaseService.clearUserKnowledge(userId);
+      res.json({ 
+        success, 
+        message: success ? "Knowledge base cleared" : "Failed to clear knowledge base" 
+      });
+    } catch (error: any) {
+      console.error('Error clearing knowledge base:', error);
+      res.status(500).json({ error: "Failed to clear knowledge base" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
