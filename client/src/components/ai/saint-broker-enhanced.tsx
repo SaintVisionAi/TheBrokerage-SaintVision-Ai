@@ -564,7 +564,7 @@ export default function SaintBrokerEnhanced() {
         </TabsList>
 
         {/* CHAT TAB */}
-        <TabsContent value="chat" className="flex-1 flex flex-col mt-0 overflow-hidden">
+        <TabsContent value="chat" className="flex-1 flex flex-col mt-0 h-full overflow-hidden">
           {/* Quick Actions at top */}
           {messages.length <= 1 && (
             <div className="border-b border-white/10 p-2 md:p-3 bg-white/5 backdrop-blur-sm">
@@ -619,7 +619,7 @@ export default function SaintBrokerEnhanced() {
           )}
           
           {/* Messages scroll area */}
-          <ScrollArea className="flex-1 p-4 overflow-y-auto" ref={scrollRef}>
+          <ScrollArea className="flex-1 p-4 overflow-y-auto min-h-0" ref={scrollRef}>
             <div className="space-y-4">
               {messages.map((msg, idx) => (
                 <div
