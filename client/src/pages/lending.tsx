@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
 import LoanCalculator from '@/components/calculators/loan-calculator';
-import SaintBrokerComplete from '@/components/ai/saint-broker-complete';
+import SaintBrokerEnhanced from '@/components/ai/saint-broker-enhanced';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -339,37 +339,45 @@ export default function Lending() {
         </div>
       </section>
 
-      {/* Resources Section */}
+      {/* Why Choose Saint Vision Section */}
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Lending Resources</h2>
-            <p className="text-white/60 text-lg">Download our comprehensive guides</p>
+            <h2 className="text-4xl font-bold mb-4">Why Saint Vision Group?</h2>
+            <p className="text-white/60 text-lg">Real funding, real results - powered by AI and human expertise</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              "Business Credit Building Guide",
-              "SBA Loan Application Checklist", 
-              "Equipment Financing Overview"
-            ].map((resource: string, index: number) => (
-              <div 
-                key={index}
-                className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all cursor-pointer"
-                data-testid={`resource-${index}`}
-              >
-                <FileText className="w-8 h-8 text-yellow-400 mb-4" />
-                <h3 className="text-lg font-bold mb-2">{resource}</h3>
-                <p className="text-white/60 text-sm mb-4">PDF Download</p>
-                <Button 
-                  variant="outline" 
-                  className="border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/10 w-full"
-                  data-testid={`button-download-${index}`}
-                >
-                  Download
-                </Button>
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center mb-4">
+                <Clock className="w-6 h-6 text-black" />
               </div>
-            ))}
+              <h3 className="text-xl font-bold mb-2">24-Hour Decisions</h3>
+              <p className="text-white/60">SaintBroker AI analyzes your application instantly, providing preliminary approval in minutes and final decision within 24 hours.</p>
+            </div>
+            
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-black" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">No Collateral Required</h3>
+              <p className="text-white/60">Qualified businesses get funding based on revenue and cash flow, not assets. Keep your property and equipment safe.</p>
+            </div>
+            
+            <div className="bg-neutral-900/50 border border-neutral-900/50 rounded-xl p-6 hover:border-yellow-400/50 transition-all">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg flex items-center justify-center mb-4">
+                <TrendingUp className="w-6 h-6 text-black" />
+              </div>
+              <h3 className="text-xl font-bold mb-2">13 Funding Partners</h3>
+              <p className="text-white/60">Our AI matches you with the perfect lender from our network, ensuring the best rates and terms for your specific needs.</p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <div className="inline-flex items-center gap-2 bg-emerald-400/10 border border-emerald-400/30 rounded-full px-6 py-3">
+              <CheckCircle className="w-5 h-5 text-emerald-400" />
+              <span className="text-emerald-400 font-semibold">100% Free to Apply • No Obligation • No Credit Pull Until Approval</span>
+            </div>
           </div>
         </div>
       </section>
@@ -406,7 +414,7 @@ export default function Lending() {
       <GlobalFooter />
       
       {/* AI Concierge */}
-      <SaintBrokerComplete />
+      <SaintBrokerEnhanced />
     </div>
   );
 }
