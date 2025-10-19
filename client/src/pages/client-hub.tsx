@@ -27,7 +27,9 @@ import {
   Plus,
   Calculator,
   Search,
-  Building2
+  Building2,
+  MessageCircle,
+  Sparkles
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -378,6 +380,62 @@ export default function ClientHub() {
                     <Shield className="h-6 w-6 text-purple-400" />
                     <span>Contact Broker</span>
                   </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* AI ASSISTANT HELP - Claude AI Integration */}
+            <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-md border-2 border-blue-400/60 mb-6">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                  <Sparkles className="h-6 w-6 text-blue-400" />
+                  <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                    SaintBroker AI™ Assistant - Powered by Claude
+                  </span>
+                </CardTitle>
+                <CardDescription className="text-white/80">
+                  Your AI-powered brokerage assistant is here to help with applications, questions, and guidance
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold py-6"
+                    onClick={() => {
+                      // Toggle SaintBroker widget
+                      const widget = document.querySelector('#saint-broker-widget');
+                      if (widget) {
+                        const event = new CustomEvent('toggle-saint-broker');
+                        window.dispatchEvent(event);
+                      }
+                    }}
+                    data-testid="open-ai-assistant"
+                  >
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    Chat with SaintBroker AI
+                  </Button>
+                  <div className="flex-1 grid grid-cols-2 gap-2">
+                    <Button
+                      variant="outline"
+                      className="text-xs py-2 border-blue-400/30 hover:bg-blue-400/10"
+                      onClick={() => handleGHLWorkflow('prequalification')}
+                    >
+                      Get Pre-Qualified
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="text-xs py-2 border-purple-400/30 hover:bg-purple-400/10"
+                      onClick={() => handleGHLWorkflow('schedule_consultation')}
+                    >
+                      Book Consultation
+                    </Button>
+                  </div>
+                </div>
+                <div className="mt-4 p-3 bg-black/30 rounded-lg">
+                  <p className="text-sm text-white/70">
+                    💡 <span className="font-semibold">Pro Tip:</span> Ask SaintBroker AI about loan options, requirements, or to help fill out applications. 
+                    Available 24/7 with instant responses powered by Claude 3.5 Sonnet.
+                  </p>
                 </div>
               </CardContent>
             </Card>
