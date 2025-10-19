@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
 import LoanCalculator from '@/components/calculators/loan-calculator';
-import SaintBrokerEnhanced from '@/components/ai/saint-broker-enhanced';
+import SaintBrokerComplete from '@/components/ai/saint-broker-complete';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -406,7 +406,7 @@ export default function Lending() {
       <GlobalFooter />
       
       {/* AI Concierge */}
-      <SaintBrokerEnhanced />
+      <SaintBrokerComplete />
     </div>
   );
 }

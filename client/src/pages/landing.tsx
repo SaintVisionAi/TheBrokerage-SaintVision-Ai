@@ -24,7 +24,7 @@ import {
 import { Link } from 'wouter';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
-import SaintBrokerEnhanced from '@/components/ai/saint-broker-enhanced';
+import SaintBrokerComplete from '@/components/ai/saint-broker-complete';
 
 export default function Landing() {
   const [scrollY, setScrollY] = useState(0);
@@ -594,7 +594,7 @@ export default function Landing() {
       <GlobalFooter />
       
       {/* AI Concierge */}
-      <SaintBrokerEnhanced />
+      <SaintBrokerComplete />
     </div>
   );
 }

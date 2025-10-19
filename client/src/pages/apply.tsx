@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
-import SaintBrokerEnhanced from '@/components/ai/saint-broker-enhanced';
+import SaintBrokerComplete from '@/components/ai/saint-broker-complete';
 import { 
   CheckCircle,
   DollarSign,
@@ -553,7 +553,7 @@ export default function Apply() {
       <GlobalFooter />
       
       {/* AI Concierge */}
-      <SaintBrokerEnhanced />
+      <SaintBrokerComplete />
     </div>
   );
 }
