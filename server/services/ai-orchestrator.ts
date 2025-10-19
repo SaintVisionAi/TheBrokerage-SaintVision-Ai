@@ -2,9 +2,9 @@ import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// AI Model Providers Configuration - CLAUDE IS PRIMARY!
+// AI Model Providers Configuration - CLAUDE 4.5 IS THE BEAST!
 export enum AIProvider {
-  CLAUDE = 'claude-3-5-sonnet',      // ⭐ MAIN MAN - Claude 3.5 Sonnet (PRIMARY)
+  CLAUDE = 'claude-4-5-sonnet',      // 🔥 BEAST MODE - Claude 4.5 Sonnet (PRIMARY)
   CLAUDE_HAIKU = 'claude-3-haiku',   // Claude Haiku for fast responses
   GPT5_FAST = 'gpt-5-fast',          // Azure AI Foundry GPT-5
   GROK3 = 'grok-3-biz',              // Azure AI Gateway Grok
@@ -26,15 +26,15 @@ class AIOrchestrator {
   }
 
   private initializeClients() {
-    // ⭐ CLAUDE - THE MAIN MAN - PRIMARY AI BRAIN
+    // 🔥 CLAUDE 4.5 - BEAST MODE - PRIMARY AI BRAIN
     if (process.env.ANTHROPIC_API_KEY) {
-      console.log('⭐ Initializing Claude 3.5 Sonnet - PRIMARY AI BRAIN with MAX TOKENS...');
+      console.log('🔥 Initializing Claude Sonnet 4.5 - BEAST MODE PRIMARY AI with MAX EFFICIENCY...');
       this.claudeClient = new Anthropic({
         apiKey: process.env.ANTHROPIC_API_KEY,
         maxRetries: 3,
-        // Support for up to 1M tokens!
+        // Claude 4.5 - MASSIVE context window support!
       });
-      console.log('✅ Claude configured with 200K context window + extended output support!');
+      console.log('✅ Claude 4.5 configured: 8192 tokens output, 0.4 temp for focused accuracy!');
     }
 
     // Azure GPT-5 FAST
@@ -164,12 +164,12 @@ class AIOrchestrator {
       case AIProvider.CLAUDE:
         if (!this.claudeClient) throw new Error('Claude not configured');
         const claudeResponse = await this.claudeClient.messages.create({
-          model: 'claude-3-5-sonnet-20241022', // Latest Claude 3.5 Sonnet
-          max_tokens: options.maxTokens || 8192, // Increased default for better responses
-          temperature: options.temperature || 0.7,
+          model: 'claude-sonnet-4-5-20250929', // 🔥 LATEST Claude Sonnet 4.5 - BEAST MODE!
+          max_tokens: options.maxTokens || 8192, // MAX TOKENS for comprehensive responses
+          temperature: options.temperature || 0.4, // OPTIMAL 0.4 for focused, accurate responses
           system: systemPrompt,
           messages: [{ role: 'user', content: prompt }],
-          // Claude supports up to 200K context window!
+          // Claude 4.5 supports MASSIVE context windows!
         });
         return claudeResponse.content[0].type === 'text' 
           ? claudeResponse.content[0].text 
