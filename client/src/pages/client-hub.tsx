@@ -85,7 +85,7 @@ export default function ClientHub() {
   const [saintBrokerInput, setSaintBrokerInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isChatExpanded, setIsChatExpanded] = useState(false);
-  const { messages, sendMessage, isLoading } = useChat();
+  const { messages, sendMessage, isLoading } = useChat('user-123', 'hub-chat');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [chatInput, setChatInput] = useState('');
   const [workspaceFiles, setWorkspaceFiles] = useState<WorkspaceFile[]>([
