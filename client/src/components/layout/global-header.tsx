@@ -44,15 +44,14 @@ export default function GlobalHeader() {
               <img
                 src={svgLogo}
                 alt="Saint Vision Group"
-                className="w-10 h-10 object-contain rounded-lg border border-yellow-400/15 shadow-sm shadow-yellow-400/5 bg-gradient-to-br from-black/60 to-neutral-900/60 p-1 group-hover:shadow-md group-hover:shadow-yellow-400/15 group-hover:border-yellow-400/30 transition-all duration-300 group-hover:scale-105"
+                className="w-10 h-10 object-contain rounded-md border border-yellow-400/10 bg-black/30 p-0.5 group-hover:border-yellow-400/20 transition-all duration-300"
               />
-              <div className="flex items-baseline gap-2">
-                <div className="text-xl font-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+              <div className="flex flex-col">
+                <div className="text-lg font-bold text-yellow-400 whitespace-nowrap">
                   Saint Vision Group
                 </div>
-                <div className="text-[10px] text-yellow-400/70 uppercase tracking-wider flex items-center gap-1 font-medium">
-                  <Sparkles className="w-2.5 h-2.5 text-yellow-400 animate-pulse" />
-                  <span className="hidden sm:inline">POWERED BY</span> SAINTBROKER™ <span className="hidden sm:inline">AI</span>
+                <div className="text-[10px] text-yellow-400/70 uppercase tracking-wider whitespace-nowrap">
+                  Cookin Knowledge
                 </div>
               </div>
             </div>
