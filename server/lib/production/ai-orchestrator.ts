@@ -340,13 +340,13 @@ export class SaintBrokerAI {
     conversationHistory?: Array<{ role: string; content: string }>;
     context?: any;
   }): Promise<any> {
-    const requestId = metrics.startRequest('claude-3-5-sonnet');
+    const requestId = metrics.startRequest('claude-3-opus');
     
     try {
       const systemPrompt = this.buildSystemPrompt(params.context);
       
       const message = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-opus-20240229',  // Using Claude 3 Opus as fallback
         max_tokens: 1000,
         system: systemPrompt,
         messages: [
