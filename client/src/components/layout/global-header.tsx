@@ -44,7 +44,7 @@ export default function GlobalHeader() {
               <img
                 src={svgLogo}
                 alt="Saint Vision Group"
-                className="w-12 h-12 object-contain rounded-xl border-2 border-yellow-400/60 shadow-xl shadow-yellow-400/30 bg-gradient-to-br from-black to-neutral-900 p-1.5 group-hover:shadow-yellow-400/50 group-hover:border-yellow-400 transition-all duration-300 group-hover:scale-105"
+                className="w-12 h-12 object-contain rounded-lg border border-yellow-400/20 shadow-sm shadow-yellow-400/10 bg-gradient-to-br from-black to-neutral-900 p-1 group-hover:shadow-md group-hover:shadow-yellow-400/20 group-hover:border-yellow-400/40 transition-all duration-300 group-hover:scale-105"
               />
               <div>
                 <div className="text-2xl font-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">
