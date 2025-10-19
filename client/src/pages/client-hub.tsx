@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -47,10 +47,15 @@ import {
   Database,
   Layers,
   Terminal,
-  Code2
+  Code2,
+  ChevronDown,
+  ChevronUp,
+  MessageSquare,
+  X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useChat } from '@/hooks/use-chat';
 
 interface WorkspaceFile {
   id: string;
@@ -79,6 +84,10 @@ export default function ClientHub() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const [saintBrokerInput, setSaintBrokerInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isChatExpanded, setIsChatExpanded] = useState(false);
+  const { messages, sendMessage, isLoading } = useChat();
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [chatInput, setChatInput] = useState('');
   const [workspaceFiles, setWorkspaceFiles] = useState<WorkspaceFile[]>([
     { 
       id: '1', 
@@ -254,6 +263,25 @@ export default function ClientHub() {
     }, 3000);
   };
 
+  const handleSendChatMessage = async () => {
+    if (!chatInput.trim() || isLoading) return;
+    
+    const message = chatInput;
+    setChatInput('');
+    
+    await sendMessage(message);
+  };
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (scrollAreaRef.current && isChatExpanded) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [messages, isChatExpanded]);
+
   return (
     <div className="min-h-screen bg-black flex">
       {/* Left Panel - Navigation & SaintBroker Command Center */}
@@ -285,45 +313,143 @@ export default function ClientHub() {
           </div>
         </div>
 
-        {/* SaintBroker AI Input */}
-        <div className="p-4 border-b border-yellow-400/20">
-          <div className="relative">
-            <Sparkles className="absolute left-3 top-3 w-5 h-5 text-yellow-400" />
-            <Textarea
-              placeholder="Tell SaintBroker what you need...&#10;'I need $500K for equipment'&#10;'Show me my loan status'&#10;'Generate application for real estate'"
-              value={saintBrokerInput}
-              onChange={(e) => setSaintBrokerInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && e.shiftKey === false) {
-                  e.preventDefault();
-                  handleSaintBrokerSubmit();
-                }
-              }}
-              className="w-full pl-10 pr-4 py-3 bg-black/50 border border-yellow-400/30 rounded-lg text-white placeholder:text-gray-500 resize-none h-24 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400"
-            />
-            <Button
-              onClick={handleSaintBrokerSubmit}
-              disabled={isProcessing || !saintBrokerInput.trim()}
-              className={cn(
-                "absolute bottom-2 right-2 px-3 py-1 text-xs",
-                "bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
+        {/* SaintBroker AI Chat Section */}
+        <div className="border-b border-yellow-400/20">
+          {!isChatExpanded ? (
+            // Collapsed state - clever messaging
+            <button
+              onClick={() => setIsChatExpanded(true)}
+              className="w-full p-4 text-left hover:bg-yellow-400/5 transition-colors group"
             >
-              {isProcessing ? (
-                <>
-                  <Activity className="w-3 h-3 mr-1 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <Zap className="w-3 h-3 mr-1" />
-                  Execute
-                </>
-              )}
-            </Button>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">Press Enter to send • Shift+Enter for new line</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-yellow-400 group-hover:animate-pulse" />
+                  <div>
+                    <p className="text-sm font-medium text-yellow-400">Talk to SaintBroker™</p>
+                    <p className="text-xs text-gray-400">When you need your guy who just knocks this sh*t out...</p>
+                  </div>
+                </div>
+                <ChevronDown className="w-4 h-4 text-yellow-400 group-hover:text-yellow-300" />
+              </div>
+            </button>
+          ) : (
+            // Expanded state - full chat
+            <div className="flex flex-col h-[500px]">
+              {/* Chat Header */}
+              <div className="px-4 py-3 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-black" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-yellow-400">SaintBroker™ AI</p>
+                    <p className="text-xs text-emerald-400 flex items-center gap-1">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                      Online • Ready to crush it
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsChatExpanded(false)}
+                  className="p-1 hover:bg-white/10 rounded transition-colors"
+                >
+                  <ChevronUp className="w-4 h-4 text-yellow-400" />
+                </button>
+              </div>
+
+              {/* Chat Messages */}
+              <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+                <div className="space-y-4">
+                  {messages.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Bot className="w-12 h-12 text-yellow-400/40 mx-auto mb-3" />
+                      <p className="text-sm text-gray-400">Start a conversation with SaintBroker AI</p>
+                      <p className="text-xs text-gray-500 mt-2">I'll handle everything from funding to documents</p>
+                    </div>
+                  ) : (
+                    messages.map((msg, idx) => (
+                      <div
+                        key={idx}
+                        className={cn(
+                          "flex gap-3",
+                          msg.role === 'user' ? 'justify-end' : 'justify-start'
+                        )}
+                      >
+                        {msg.role === 'assistant' && (
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center flex-shrink-0">
+                            <Brain className="w-5 h-5 text-black" />
+                          </div>
+                        )}
+                        <div
+                          className={cn(
+                            "max-w-[70%] px-4 py-2 rounded-lg",
+                            msg.role === 'user'
+                              ? 'bg-yellow-400/20 text-white'
+                              : 'bg-black/50 text-white border border-yellow-400/20'
+                          )}
+                        >
+                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(msg.timestamp || '').toLocaleTimeString()}
+                          </p>
+                        </div>
+                        {msg.role === 'user' && (
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs font-bold text-black">RC</span>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                  {isLoading && (
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                        <Brain className="w-5 h-5 text-black animate-pulse" />
+                      </div>
+                      <div className="bg-black/50 px-4 py-2 rounded-lg border border-yellow-400/20">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" />
+                          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+
+              {/* Chat Input */}
+              <div className="p-3 border-t border-yellow-400/20">
+                <div className="flex gap-2">
+                  <Input
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendChatMessage();
+                      }
+                    }}
+                    placeholder="Ask me anything... funding, documents, applications"
+                    className="flex-1 bg-black/50 border-yellow-400/30 text-white placeholder:text-gray-500 focus:border-yellow-400"
+                    disabled={isLoading}
+                  />
+                  <Button
+                    onClick={handleSendChatMessage}
+                    disabled={!chatInput.trim() || isLoading}
+                    className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
+                  >
+                    {isLoading ? (
+                      <Activity className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Send className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Enter to send • Shift+Enter for new line</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Navigation Menu */}
