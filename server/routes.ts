@@ -18,6 +18,9 @@ import multer from 'multer';
 import express from 'express';
 import crypto from 'crypto';
 import { setupVoiceRoutes } from './routes/voice';
+import rateLimit from 'express-rate-limit';
+import { encrypt, decrypt, redactSSN, isValidBase64 } from './lib/encryption';
+import { applicationSubmitSchema, sanitizeInput, isValidSSN } from './lib/validation';
 import { 
   insertConversationSchema, 
   insertMessageSchema, 
@@ -1857,28 +1860,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Submit complete application with signature
-  app.post("/api/applications/submit", async (req, res) => {
+  // Create rate limiter for application submissions
+  const applicationRateLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour window
+    max: 5, // Max 5 applications per hour per IP
+    message: 'Too many application submissions from this IP. Please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+  
+  // SECURE Application Submission Endpoint - WITH AUTHENTICATION & ENCRYPTION
+  app.post("/api/applications/submit", 
+    isAuthenticated,  // SECURITY FIX: Require authentication
+    applicationRateLimiter,  // SECURITY FIX: Rate limiting
+    async (req, res) => {
     try {
-      const { 
-        applicationData, 
-        signatureData, 
-        consentChecks,
-        loanProductId 
-      } = req.body;
+      // SECURITY FIX: Validate and sanitize all input with Zod
+      const validationResult = applicationSubmitSchema.safeParse(req.body);
       
-      // Validate required fields
-      if (!applicationData?.email || !signatureData || !consentChecks) {
+      if (!validationResult.success) {
         return res.status(400).json({ 
-          error: 'Missing required fields: applicationData, signatureData, or consentChecks' 
+          error: 'Validation failed',
+          details: validationResult.error.errors 
+        });
+      }
+      
+      // Sanitize all input data to prevent injection attacks
+      const sanitizedData = sanitizeInput(validationResult.data);
+      const { applicationData, signatureData, consentChecks, loanProductId } = sanitizedData;
+      
+      // Validate signature data format
+      if (!isValidBase64(signatureData.data)) {
+        return res.status(400).json({ 
+          error: 'Invalid signature data format' 
+        });
+      }
+      
+      // Validate SSN if provided
+      if (applicationData.ssn && !isValidSSN(applicationData.ssn)) {
+        return res.status(400).json({ 
+          error: 'Invalid SSN format' 
         });
       }
       
       // Create unique application ID
       const applicationId = crypto.randomUUID();
+      const ipAddress = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '';
+      const userAgent = req.headers['user-agent'] || '';
+      const userId = req.user?.userId || 'anonymous';
       
-      console.log('📝 Processing application:', applicationId);
+      console.log('🔒 Secure Processing application:', applicationId, 'by user:', userId);
       
-      // Step 1: Create/update contact in GHL
+      // SECURITY FIX: Encrypt sensitive data before ANY storage or transmission
+      const encryptedSSN = applicationData.ssn ? encrypt(applicationData.ssn) : null;
+      const encryptedSignature = encrypt(signatureData.data);
+      const redactedSSN = applicationData.ssn ? redactSSN(applicationData.ssn) : null;
+      
+      // SECURITY FIX: Create audit log entry FIRST
+      await storage.createSystemLog({
+        userId,
+        action: 'application_submitted',
+        details: {
+          applicationId,
+          email: applicationData.email,
+          businessName: applicationData.businessName,
+          loanAmount: applicationData.loanAmount,
+          ipAddress,
+          userAgent,
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+      // Step 1: Create/update contact in GHL with REDACTED info only
       const contactResponse = await captureGHLLead({
         firstName: applicationData.firstName,
         lastName: applicationData.lastName,
@@ -1892,23 +1945,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const ghlContactId = (contactResponse as any).contact?.id || (contactResponse as any).data?.contact?.id || '';
       
-      // Step 2: Store application signature
-      const ipAddress = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '';
-      const userAgent = req.headers['user-agent'] || '';
-      
+      // Step 2: Store ENCRYPTED application signature
       const signature = await storage.createApplicationSignature({
         applicationId,
-        signatureData: signatureData.data, // Base64 image data
-        signatureType: signatureData.type || 'drawn', // 'drawn' or 'typed'
+        signatureData: encryptedSignature,  // ENCRYPTED signature data
+        signatureType: signatureData.type || 'drawn',
         fullName: `${applicationData.firstName} ${applicationData.lastName}`,
         title: applicationData.businessTitle || null,
         ipAddress,
         userAgent,
-        consentText: generateConsentText(applicationData),
+        consentText: generateConsentText({ ...applicationData, ipAddress }),
         consentGiven: true
       });
       
-      console.log('✅ Signature stored:', signature.id);
+      console.log('✅ Encrypted signature stored:', signature.id);
+      
+      // Store encrypted PII in secure document storage (if SSN provided)
+      if (encryptedSSN) {
+        await storage.createApplicationDocument({
+          applicationId,
+          documentType: 'ssn_encrypted',
+          fileName: 'pii_data.enc',
+          fileUrl: '',  // Not stored as file
+          fileSize: 0,
+          mimeType: 'application/encrypted',
+          metadata: { ssn: encryptedSSN, redacted: redactedSSN }
+        });
+      }
       
       // Step 3: Auto-select funding partner using AI
       const selectedPartner = autoSelectFundingPartner({
@@ -1936,9 +1999,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('⚠️ GHL stage update failed:', ghlError);
       }
       
-      // Step 5: Route application to lender
+      // Step 5: Route application to lender - NEVER include SSN or signature
       if (selectedPartner.submissionType === 'email' && selectedPartner.email) {
-        // Send email to lender with application details
+        // Send email with REDACTED information only
         const emailBody = `
 New Loan Application from Saint Vision Group
 
@@ -1951,11 +2014,12 @@ Loan Details:
 - Amount Requested: ${applicationData.loanAmount}
 - Purpose: ${applicationData.loanPurpose}
 - Credit Score: ${applicationData.creditScore}
-- Annual Revenue: ${applicationData.annualRevenue}
+- Annual Revenue: ${applicationData.annualRevenue || 'Not provided'}
 - Years in Business: ${applicationData.yearsInBusiness}
 
 Application ID: ${applicationId}
-Signature Captured: Yes
+Signature Captured: Yes (Encrypted)
+SSN: ${redactedSSN || 'Not provided'}
 Documents: Pending
 
 Please contact the applicant within 24 hours to proceed.
@@ -1979,20 +2043,35 @@ Please contact the applicant within 24 hours to proceed.
         );
       }
       
+      // SECURITY FIX: Return minimal information - NO sensitive data
       res.json({
         success: true,
         applicationId,
         message: 'Application submitted successfully',
-        fundingPartner: selectedPartner.name,
-        nextSteps: 'Lender will contact you within 24 hours',
-        estimatedFunding: `${selectedPartner.speedDays || 7} business days`
+        nextSteps: 'Lender will contact you within 24 hours'
+        // REMOVED: fundingPartner, estimatedFunding - minimize data exposure
       });
       
     } catch (error: any) {
       console.error('Application submission error:', error);
+      
+      // Log failed submission attempt
+      if (req.user?.userId) {
+        await storage.createSystemLog({
+          userId: req.user.userId,
+          action: 'application_submission_failed',
+          details: {
+            error: error.message,
+            ipAddress: req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || '',
+            timestamp: new Date().toISOString()
+          }
+        });
+      }
+      
       res.status(500).json({ 
         error: 'Failed to submit application',
-        details: error.message 
+        // SECURITY FIX: Don't expose internal error details
+        message: 'An error occurred processing your application. Please try again.'
       });
     }
   });

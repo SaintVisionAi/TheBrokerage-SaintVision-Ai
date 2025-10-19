@@ -196,12 +196,25 @@ export default function Apply() {
     try {
       const formData = form.getValues();
       
-      // Submit application with all data
+      // Prepare consent checks from form data
+      const consentChecks = {
+        creditCheck: formData.consentCreditCheck,
+        businessVerification: formData.consentBusinessVerification,
+        termsAcceptance: formData.consentTerms,
+        privacyPolicy: formData.consentPrivacy
+      };
+      
+      // Submit application with correct structure
       const response = await apiRequest('POST', '/api/applications/submit', {
-        ...formData,
-        signature: signatureData,
-        signatureType: 'electronic',
-        signedAt: new Date().toISOString()
+        applicationData: {
+          ...formData,
+          email: formData.email,
+          phone: formData.phone,
+          businessName: formData.businessName
+        },
+        signatureData: signatureData,
+        consentChecks: consentChecks,
+        loanProductId: formData.loanProduct
       });
 
       // Parse the JSON response
