@@ -34,9 +34,9 @@ export default function GlobalHeader() {
   const isActive = (href: string) => location === href;
 
   return (
-    <nav className="sticky top-0 w-full z-50 bg-black/95 backdrop-blur-md border-b border-yellow-500/20">
+    <nav className="sticky top-0 w-full z-50 bg-gradient-to-r from-neutral-950 via-black to-neutral-900 backdrop-blur-xl border-b border-yellow-400/30 shadow-lg shadow-yellow-400/10">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           
           {/* Logo Section */}
           <Link href="/">
@@ -44,14 +44,14 @@ export default function GlobalHeader() {
               <img
                 src={svgLogo}
                 alt="Saint Vision Group"
-                className="w-10 h-10 object-contain rounded-xl border border-yellow-500/40 shadow-lg shadow-yellow-500/20 bg-gradient-to-br from-neutral-900 to-black p-1 group-hover:shadow-yellow-500/40 transition-all duration-300"
+                className="w-12 h-12 object-contain rounded-xl border-2 border-yellow-400/60 shadow-xl shadow-yellow-400/30 bg-gradient-to-br from-black to-neutral-900 p-1.5 group-hover:shadow-yellow-400/50 group-hover:border-yellow-400 transition-all duration-300 group-hover:scale-105"
               />
               <div>
-                <div className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                <div className="text-2xl font-black bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-lg">
                   Saint Vision Group
                 </div>
-                <div className="text-[10px] text-gray-500 uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="w-2.5 h-2.5 text-yellow-500" />
+                <div className="text-[11px] text-yellow-400/80 uppercase tracking-widest flex items-center gap-1.5 font-medium">
+                  <Sparkles className="w-3 h-3 text-yellow-400 animate-pulse" />
                   POWERED BY SAINTBROKER™ AI
                 </div>
               </div>
@@ -143,17 +143,20 @@ export default function GlobalHeader() {
               <Link href="/apply">
                 <div className="relative">
                   <div className="absolute -top-3 -right-3 z-10">
-                    <span className="flex h-3 w-3">
+                    <span className="flex h-4 w-4">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                      <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 shadow-lg shadow-emerald-500/50"></span>
                     </span>
                   </div>
-                  <Button className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold shadow-lg hover:shadow-xl hover:shadow-yellow-500/20 transition-all group relative overflow-hidden">
+                  <Button className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-black shadow-xl shadow-yellow-500/30 hover:shadow-2xl hover:shadow-yellow-500/40 transition-all group relative overflow-hidden transform hover:scale-105 px-6 py-3 border border-yellow-300/50">
                     <div className="flex flex-col items-start">
-                      <span className="text-xs font-normal">AI Pre-Qualify Instantly</span>
-                      <span className="text-sm">Get Started →</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider">AI Pre-Qualify</span>
+                      <span className="text-base font-black flex items-center gap-1">
+                        Get Started 
+                        <span className="text-lg">→</span>
+                      </span>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </Button>
                 </div>
               </Link>
