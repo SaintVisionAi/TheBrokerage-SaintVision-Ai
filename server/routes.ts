@@ -1871,7 +1871,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // SECURE Application Submission Endpoint - WITH AUTHENTICATION & ENCRYPTION
   app.post("/api/applications/submit", 
-    isAuthenticated,  // SECURITY FIX: Require authentication
     applicationRateLimiter,  // SECURITY FIX: Rate limiting
     async (req, res) => {
     try {
