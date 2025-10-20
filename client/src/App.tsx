@@ -8,6 +8,9 @@ import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
+import VerifyEmail from "@/pages/verify-email";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
 import About from "@/pages/about";
 import Apply from "@/pages/apply";
 import Contact from "@/pages/contact";
@@ -112,6 +115,9 @@ function Router() {
       <Route path="/" component={Landing} />
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
+      <Route path="/verify-email/:token" component={VerifyEmail} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password/:token" component={ResetPassword} />
       <Route path="/dashboard" component={ProtectedDashboard} />
       <Route path="/admin" component={ProtectedDashboard} />
       <Route path="/client-portal" component={ProtectedClientPortal} />

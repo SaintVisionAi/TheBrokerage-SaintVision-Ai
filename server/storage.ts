@@ -44,6 +44,12 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserCrmId(userId: string, crmContactId: string): Promise<User>;
+  updateUserPassword(userId: string, hashedPassword: string): Promise<User>;
+  updateUserEmailVerified(userId: string, verified: boolean): Promise<User>;
+  updateUserVerificationToken(userId: string, token: string | null, expires: Date | null): Promise<User>;
+  updateUserPasswordResetToken(userId: string, token: string | null, expires: Date | null): Promise<User>;
+  getUserByVerificationToken(token: string): Promise<User | undefined>;
+  getUserByPasswordResetToken(token: string): Promise<User | undefined>;
   
   // Conversation operations
   getConversations(userId: string): Promise<Conversation[]>;
@@ -126,6 +132,75 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!user) throw new Error("User not found");
     return user;
+  }
+
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ password: hashedPassword, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async updateUserEmailVerified(userId: string, verified: boolean): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        emailVerified: verified,
+        verificationToken: null,
+        verificationTokenExpires: null,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async updateUserVerificationToken(userId: string, token: string | null, expires: Date | null): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        verificationToken: token,
+        verificationTokenExpires: expires,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async updateUserPasswordResetToken(userId: string, token: string | null, expires: Date | null): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        passwordResetToken: token,
+        passwordResetExpires: expires,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.verificationToken, token));
+    return user || undefined;
+  }
+
+  async getUserByPasswordResetToken(token: string): Promise<User | undefined> {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.passwordResetToken, token));
+    return user || undefined;
   }
 
   async getConversations(userId: string): Promise<Conversation[]> {

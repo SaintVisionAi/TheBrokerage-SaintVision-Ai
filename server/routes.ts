@@ -18,6 +18,7 @@ import multer from 'multer';
 import express from 'express';
 import crypto from 'crypto';
 import { setupVoiceRoutes } from './routes/voice';
+import { registerEmailVerificationRoutes } from './routes/email-verification';
 import rateLimit from 'express-rate-limit';
 import { encrypt, decrypt, redactSSN, isValidBase64 } from './lib/encryption';
 import { applicationSubmitSchema, sanitizeInput, isValidSSN } from './lib/validation';
@@ -97,6 +98,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Setup voice routes for speech-to-text and text-to-speech
   setupVoiceRoutes(app);
+  
+  // Setup email verification and password reset routes
+  registerEmailVerificationRoutes(app, storage);
 
   // Authentication Routes
   app.post("/api/auth/signup", async (req, res) => {
@@ -123,8 +127,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser({
         username,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        emailVerified: false // New users need to verify their email
       });
+      
+      // Generate verification token
+      const token = crypto.randomBytes(32).toString('hex');
+      const expires = new Date();
+      expires.setHours(expires.getHours() + 24); // 24 hour expiry
+      
+      // Save verification token
+      await storage.updateUserVerificationToken(user.id, token, expires);
+      
+      // TODO: Send verification email here
+      // For now, log it (in production, integrate with GHL or SendGrid)
+      console.log(`🔔 New User Signup - Verification needed:`);
+      console.log(`Email: ${email}`);
+      console.log(`Token: ${token}`);
+      console.log(`Verification URL: ${process.env.FRONTEND_URL || 'https://saintvisionai.com'}/verify-email/${token}`);
 
       createSession(res, {
         userId: user.id,
@@ -139,8 +159,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: user.id,
           email: user.email,
           username: user.username,
-          role: user.role
-        }
+          role: user.role,
+          emailVerified: user.emailVerified
+        },
+        message: "Account created! Please check your email to verify your account."
       });
     } catch (error: any) {
       res.status(500).json({ 

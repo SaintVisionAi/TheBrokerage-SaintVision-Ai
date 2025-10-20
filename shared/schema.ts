@@ -29,6 +29,13 @@ export const users = pgTable("users", {
   role: varchar("role", { length: 50 }).default("client"), // admin, broker, client
   plan: varchar("plan", { length: 50 }).default("free"),
   crmContactId: text("crm_contact_id"),
+  // Email verification fields
+  emailVerified: boolean("email_verified").default(false),
+  verificationToken: text("verification_token"),
+  verificationTokenExpires: timestamp("verification_token_expires"),
+  // Password reset fields
+  passwordResetToken: text("password_reset_token"),
+  passwordResetExpires: timestamp("password_reset_expires"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
