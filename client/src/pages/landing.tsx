@@ -544,6 +544,8 @@ export default function Landing() {
         </div>
       </section>
 
+      <SaintBrokerButton variant="floating" />
+
       {/* Why Choose Saint Vision Group - Stats */}
       <section className="relative z-10 py-16 bg-black/95 border-t border-neutral-800">
         <div className="max-w-6xl mx-auto px-6">
