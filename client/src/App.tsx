@@ -172,6 +172,41 @@ function Router() {
   );
 }
 
+function FloatingButton() {
+  const { isOpen, openChat } = useSaintBroker();
+
+  if (isOpen) return null;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-40">
+      {/* Pulsing glow ring */}
+      <div className="absolute inset-0 rounded-full bg-yellow-400/30 blur-xl animate-pulse" />
+      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400/40 to-yellow-600/40 animate-ping" />
+
+      <button
+        onClick={openChat}
+        className="relative h-16 w-16 rounded-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-500 shadow-2xl hover:shadow-yellow-400/50 transition-all duration-300 hover:scale-110 border-2 border-yellow-300/50 flex items-center justify-center"
+        data-testid="button-floating-saintbroker"
+        title="Chat with SaintBroker"
+      >
+        <svg
+          className="h-7 w-7 text-charcoal-900 animate-pulse"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 10V3L4 14h7v7l9-11h-7z"
+          />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -179,6 +214,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <FloatingButton />
           <SaintBrokerGlobal />
         </TooltipProvider>
       </SaintBrokerProvider>
