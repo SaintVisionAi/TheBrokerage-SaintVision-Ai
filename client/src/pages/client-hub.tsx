@@ -31,6 +31,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useChat } from '@/hooks/use-chat';
+import GlobalHeader from '@/components/layout/global-header';
 
 export default function ClientHub() {
   const { toast } = useToast();
