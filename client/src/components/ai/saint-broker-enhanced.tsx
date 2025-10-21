@@ -596,47 +596,47 @@ export default function SaintBrokerEnhanced() {
               <div className="grid grid-cols-2 gap-1 md:gap-2 auto-rows-max">
                 <Button
                   variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  className="h-auto py-2 px-2 text-left flex flex-col items-start gap-0.5 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                   onClick={() => {
                     setInput("I need a business loan for my company");
                   }}
                   data-testid="quick-action-loan"
                 >
-                  <span className="text-lg">💰</span>
-                  <span className="text-xs text-white font-medium leading-tight">Business Loan</span>
+                  <span className="text-base">💰</span>
+                  <span className="text-[10px] md:text-xs text-white font-medium leading-tight">Business Loan</span>
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  className="h-auto py-2 px-2 text-left flex flex-col items-start gap-0.5 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                   onClick={() => {
                     setInput("Tell me about real estate financing options");
                   }}
                   data-testid="quick-action-real-estate"
                 >
-                  <span className="text-lg">🏠</span>
-                  <span className="text-xs text-white font-medium leading-tight">Real Estate</span>
+                  <span className="text-base">🏠</span>
+                  <span className="text-[10px] md:text-xs text-white font-medium leading-tight">Real Estate</span>
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  className="h-auto py-2 px-2 text-left flex flex-col items-start gap-0.5 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                   onClick={() => {
                     setInput("What investment opportunities do you offer?");
                   }}
                   data-testid="quick-action-investments"
                 >
-                  <span className="text-lg">📈</span>
-                  <span className="text-xs text-white font-medium leading-tight">Investments</span>
+                  <span className="text-base">📈</span>
+                  <span className="text-[10px] md:text-xs text-white font-medium leading-tight">Investments</span>
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
+                  className="h-auto py-2 px-2 text-left flex flex-col items-start gap-0.5 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
                   onClick={() => {
                     setInput("What's the status of my loan application?");
                   }}
                   data-testid="quick-action-check-status"
                 >
-                  <span className="text-lg">⏱️</span>
-                  <span className="text-xs text-white font-medium leading-tight">Loan Status</span>
+                  <span className="text-base">⏱️</span>
+                  <span className="text-[10px] md:text-xs text-white font-medium leading-tight">Loan Status</span>
                 </Button>
               </div>
             </div>
