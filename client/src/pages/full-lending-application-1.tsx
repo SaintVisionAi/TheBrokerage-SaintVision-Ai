@@ -60,13 +60,14 @@ export default function FullLendingApplicationPage() {
 
   const onSubmit = async (data: ApplicationFormValues) => {
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch('/api/ghl/form-submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           formId: '0zcz0ZlG2eEddg94wcbq', // Full Lending Application form from GHL
           formData: {
@@ -88,7 +89,12 @@ export default function FullLendingApplicationPage() {
         })
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error('Invalid response from server');
+      }
 
       if (response.ok && result.success) {
         toast({
