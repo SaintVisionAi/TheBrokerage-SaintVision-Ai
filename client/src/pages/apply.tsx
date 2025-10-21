@@ -61,7 +61,7 @@ export default function Apply() {
 
   const onSubmit = async (data: PreQualFormValues) => {
     setIsSubmitting(true);
-    
+
     try {
       // 🔥 SUBMIT TO GHL FORM
       const response = await fetch('/api/ghl/form-submit', {
@@ -69,6 +69,7 @@ export default function Apply() {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           formId: 'gPGc1pTZGRvxybqPpDRL', // Apply Now SVG2 form from GHL
           formData: {
@@ -90,7 +91,12 @@ export default function Apply() {
         })
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error('Invalid response from server');
+      }
 
       if (response.ok && result.success) {
         setIsSuccess(true);
@@ -109,7 +115,7 @@ export default function Apply() {
       }
     } catch (error: any) {
       console.error('Form submission error:', error);
-      
+
       toast({
         title: "Submission Error",
         description: error.message || "Something went wrong. Please call us at (949) 546-1123",
