@@ -1824,25 +1824,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/loan-products/seed", async (req, res) => {
     try {
       console.log('🌱 Starting loan products seed...');
-      
+
       // Clear existing products first (optional - for clean seed)
       const { db } = await import('./db');
       const { loanProducts } = await import('@shared/schema');
-      
+
       // Delete existing products
       await db.delete(loanProducts);
       console.log('✅ Cleared existing loan products');
-      
+
       // Insert all loan products from the data file
       const insertedProducts = [];
       for (const product of LOAN_PRODUCTS_DATA) {
-        const inserted = await storage.createLoanProduct(product);
-        insertedProducts.push(inserted);
-        console.log(`✅ Seeded: ${inserted.name}`);
+        try {
+          const inserted = await storage.createLoanProduct(product);
+          insertedProducts.push(inserted);
+          console.log(`✅ Seeded: ${inserted.name}`);
+        } catch (productError: any) {
+          console.warn(`⚠️  Failed to seed product: ${product.name}`, productError.message);
+          // Continue with next product even if one fails
+        }
       }
-      
-      res.json({ 
-        success: true, 
+
+      if (insertedProducts.length === 0) {
+        return res.status(500).json({
+          error: 'Failed to seed loan products',
+          details: 'No products could be inserted'
+        });
+      }
+
+      return res.json({
+        success: true,
         message: `Successfully seeded ${insertedProducts.length} loan products`,
         products: insertedProducts.map(p => ({
           id: p.id,
@@ -1852,9 +1864,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('❌ Loan products seed error:', error);
-      res.status(500).json({ 
+      return res.status(500).json({
         error: 'Failed to seed loan products',
-        details: error.message 
+        details: error.message
       });
     }
   });
