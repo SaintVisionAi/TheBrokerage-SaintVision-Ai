@@ -200,21 +200,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const isValid = await verifyPassword(password, user.password);
       if (!isValid) {
-        return res.status(401).json({ 
-          success: false, 
-          message: "Invalid email or password" 
+        return res.status(401).json({
+          success: false,
+          message: "Invalid email or password"
         });
       }
 
-      createSession(res, {
+      const sessionData = {
         userId: user.id,
         email: user.email!,
         role: user.role!,
         username: user.username!
-      });
+      };
+
+      // Create session cookie AND return JWT token
+      const jwtToken = createSession(res, sessionData);
 
       res.json({
         success: true,
+        token: jwtToken,
         user: {
           id: user.id,
           email: user.email,
