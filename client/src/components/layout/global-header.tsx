@@ -110,15 +110,11 @@ export default function GlobalHeader() {
             <Link href="/client-hub" className={`px-4 py-2 font-medium transition-colors ${isActive("/client-hub") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
               Client Hub
             </Link>
-            
-            <Link href="/apply" className={`px-4 py-2 font-medium transition-colors ${isActive("/apply") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
-              Apply Now
-            </Link>
-            
+
             <Link href="/about" className={`px-4 py-2 font-medium transition-colors ${isActive("/about") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
               About
             </Link>
-            
+
             <Link href="/contact" className={`px-4 py-2 font-medium transition-colors ${isActive("/contact") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
               Contact
             </Link>
