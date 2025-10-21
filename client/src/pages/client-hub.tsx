@@ -808,8 +808,8 @@ export default function ClientHub() {
                       className={cn(
                         'max-w-xs px-3 py-2 rounded-lg text-sm',
                         msg.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
+                          ? 'bg-yellow-400 text-black'
+                          : 'bg-neutral-800/80 text-white/80 border border-yellow-400/20'
                       )}
                     >
                       {msg.content}
@@ -820,11 +820,11 @@ export default function ClientHub() {
               {chatLoading && (
                 <div className="flex gap-2">
                   <span className="text-xl">🤖</span>
-                  <div className="bg-gray-100 px-3 py-2 rounded-lg">
+                  <div className="bg-neutral-800/80 border border-yellow-400/20 px-3 py-2 rounded-lg">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                     </div>
                   </div>
                 </div>
@@ -832,7 +832,7 @@ export default function ClientHub() {
             </div>
           </ScrollArea>
 
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-yellow-400/20 p-4">
             <div className="flex gap-2">
               <Input
                 value={chatInput}
@@ -844,13 +844,13 @@ export default function ClientHub() {
                   }
                 }}
                 placeholder="Ask anything..."
-                className="text-sm border-gray-300"
+                className="text-sm border-yellow-400/20 bg-white/10 text-white placeholder:text-white/40"
                 disabled={chatLoading}
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={!chatInput.trim() || chatLoading}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-yellow-400 hover:bg-yellow-300 text-black"
                 size="sm"
               >
                 <Send className="w-4 h-4" />
