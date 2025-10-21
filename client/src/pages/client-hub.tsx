@@ -794,7 +794,7 @@ export default function ClientHub() {
                             </div>
                             <div className="flex items-center gap-2">
                               {file.status === 'awaiting_signature' ? (
-                                <Button 
+                                <Button
                                   onClick={() => handleSignDocument(file.id, file.name)}
                                   size="sm"
                                   className="bg-orange-400 hover:bg-orange-500 text-black font-semibold text-xs"
@@ -810,7 +810,16 @@ export default function ClientHub() {
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-2">
-                                  <span className={cn("text-xs font-medium px-2 py-1 rounded", 
+                                  <Button
+                                    onClick={() => setSelectedFileForVision(file as any)}
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/10 text-xs px-2"
+                                  >
+                                    <Eye className="w-3 h-3 mr-1" />
+                                    Preview
+                                  </Button>
+                                  <span className={cn("text-xs font-medium px-2 py-1 rounded",
                                     file.status === 'signed' ? 'bg-emerald-400/20 text-emerald-400' :
                                     file.status === 'verified' ? 'bg-blue-400/20 text-blue-400' :
                                     file.status === 'complete' ? 'bg-emerald-400/20 text-emerald-400' :
