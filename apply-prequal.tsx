@@ -14,6 +14,7 @@ import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
 import { Loader2, CheckCircle } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { useGHLSubmit, GHL_FORMS } from '@/hooks/useGHLSubmit';
 
 // Pre-Qualification Form Schema
 const preQualSchema = z.object({
@@ -37,6 +38,7 @@ export default function ApplyPreQual() {
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const { submitToGHL } = useGHLSubmit();
 
   const form = useForm<PreQualFormValues>({
     resolver: zodResolver(preQualSchema),
@@ -55,27 +57,22 @@ export default function ApplyPreQual() {
     setIsSubmitting(true);
     
     try {
-      // Post to your GHL lead-capture endpoint
-      const response = await fetch('/api/ghl/lead-capture', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          loanAmount: data.loanAmount,
-          type: data.loanPurpose,
-          source: 'pre-qualification-form',
-          notes: `Loan Purpose: ${data.loanPurpose}`
-        })
-      });
+      // Map your form fields to GHL field names
+      const ghlData = {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        loan_amount: data.loanAmount,
+        loan_purpose: data.loanPurpose,
+        consent_sms: data.consentSMS ? 'yes' : 'no',
+        source: 'pre-qualification-form'
+      };
 
-      const result = await response.json();
+      // Submit DIRECTLY to GHL
+      const result = await submitToGHL(GHL_FORMS.PRE_QUAL, ghlData);
 
-      if (response.ok) {
+      if (result.success) {
         setIsSuccess(true);
         
         toast({
@@ -83,20 +80,18 @@ export default function ApplyPreQual() {
           description: "We've received your pre-qualification request. Check your email for next steps!",
           duration: 5000
         });
-
-        // Redirect to client portal or success page after 2 seconds
+        
+        // Optional: redirect after delay
         setTimeout(() => {
-          setLocation('/client-portal');
-        }, 2000);
+          setLocation('/');
+        }, 3000);
       } else {
         throw new Error(result.error || 'Submission failed');
       }
     } catch (error) {
-      console.error('Form submission error:', error);
-      
       toast({
         title: "Submission Error",
-        description: "Something went wrong. Please try again or contact support.",
+        description: error instanceof Error ? error.message : 'Please try again',
         variant: "destructive"
       });
     } finally {
@@ -108,19 +103,22 @@ export default function ApplyPreQual() {
     return (
       <>
         <GlobalHeader />
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center px-4 py-12">
-          <Card className="w-full max-w-md border-emerald-500/20 bg-slate-900/50 backdrop-blur">
-            <CardContent className="pt-12 text-center">
-              <div className="mx-auto w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6">
-                <CheckCircle className="w-10 h-10 text-emerald-500" />
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md bg-slate-800/90 border-slate-700">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
+                <h2 className="text-2xl font-bold text-white">Application Submitted!</h2>
+                <p className="text-slate-300">
+                  Thank you for applying with Saint Vision Group. We'll review your information and contact you shortly.
+                </p>
+                <Button 
+                  onClick={() => setLocation('/')}
+                  className="w-full"
+                >
+                  Return to Home
+                </Button>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-4">Application Submitted!</h2>
-              <p className="text-slate-300 mb-6">
-                Thank you for your interest! We've received your pre-qualification request and will contact you within 24 hours.
-              </p>
-              <p className="text-sm text-slate-400">
-                Check your email for next steps and your portal login information.
-              </p>
             </CardContent>
           </Card>
         </div>
@@ -132,15 +130,25 @@ export default function ApplyPreQual() {
   return (
     <>
       <GlobalHeader />
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-12">
-        <div className="max-w-2xl mx-auto">
-          <Card className="border-slate-700 bg-slate-900/50 backdrop-blur">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 py-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-white mb-3">Pre-Qualification Application</h1>
+            <p className="text-xl text-slate-300">
+              Start your journey with Saint Vision Group
+            </p>
+          </div>
+
+          {/* Form Card */}
+          <Card className="bg-slate-800/90 border-slate-700">
             <CardHeader>
-              <CardTitle className="text-3xl text-white">Business Loan Pre-Qualification</CardTitle>
-              <CardDescription className="text-slate-300 text-lg">
-                Get pre-qualified in 60 seconds. No impact to your credit score.
+              <CardTitle className="text-white">Business Loan Pre-Qualification</CardTitle>
+              <CardDescription className="text-slate-400">
+                Complete this form to get pre-qualified for a business loan. We'll review your information and get back to you within 24 hours.
               </CardDescription>
             </CardHeader>
+
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -176,7 +184,7 @@ export default function ApplyPreQual() {
                             <FormControl>
                               <Input 
                                 {...field} 
-                                placeholder="Smith"
+                                placeholder="Doe"
                                 className="bg-slate-800 border-slate-700 text-white"
                               />
                             </FormControl>
@@ -186,60 +194,61 @@ export default function ApplyPreQual() {
                       />
                     </div>
 
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-white">Email Address</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="email"
-                              placeholder="john@company.com"
-                              className="bg-slate-800 border-slate-700 text-white"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Email</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                type="email"
+                                placeholder="john@example.com"
+                                className="bg-slate-800 border-slate-700 text-white"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-white">Phone Number</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="tel"
-                              placeholder="(555) 123-4567"
-                              className="bg-slate-800 border-slate-700 text-white"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-white">Phone</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                type="tel"
+                                placeholder="(555) 123-4567"
+                                className="bg-slate-800 border-slate-700 text-white"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
 
-                  {/* Loan Details */}
-                  <div className="space-y-4 pt-4 border-t border-slate-700">
+                  {/* Loan Information */}
+                  <div className="space-y-4">
                     <h3 className="text-xl font-semibold text-white">Loan Details</h3>
-                    
+
                     <FormField
                       control={form.control}
                       name="loanAmount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">How much do you need?</FormLabel>
+                          <FormLabel className="text-white">Desired Loan Amount</FormLabel>
                           <FormControl>
                             <Input 
                               {...field} 
-                              type="text"
-                              placeholder="$100,000"
+                              placeholder="$50,000"
                               className="bg-slate-800 border-slate-700 text-white"
                             />
                           </FormControl>
@@ -253,18 +262,18 @@ export default function ApplyPreQual() {
                       name="loanPurpose"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white">What will you use it for?</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <FormLabel className="text-white">Loan Purpose</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
-                                <SelectValue placeholder="Select purpose" />
+                                <SelectValue placeholder="Select loan purpose" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="bg-slate-800 border-slate-700">
+                            <SelectContent>
                               <SelectItem value="working-capital">Working Capital</SelectItem>
                               <SelectItem value="equipment">Equipment Purchase</SelectItem>
                               <SelectItem value="expansion">Business Expansion</SelectItem>
-                              <SelectItem value="refinance">Refinance Existing Debt</SelectItem>
+                              <SelectItem value="refinance">Refinance</SelectItem>
                               <SelectItem value="other">Other</SelectItem>
                             </SelectContent>
                           </Select>
@@ -275,58 +284,63 @@ export default function ApplyPreQual() {
                   </div>
 
                   {/* Consent */}
-                  <div className="space-y-4 pt-4 border-t border-slate-700">
-                    <FormField
-                      control={form.control}
-                      name="consentSMS"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              className="border-slate-600"
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm text-slate-300">
-                              I consent to receive SMS notifications, alerts & occasional marketing communication from Saint Vision Group LLC. 
-                              Message frequency varies. Message & data rates may apply. 
-                              Text HELP to 949-546-1123 for assistance. You can reply STOP to unsubscribe at any time.
-                            </FormLabel>
-                            <FormMessage />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="consentSMS"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-white">
+                            I consent to receive SMS notifications about my application *
+                          </FormLabel>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
+                  />
 
                   {/* Submit Button */}
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
+                    className="w-full"
                     size="lg"
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Submitting...
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Submitting Application...
                       </>
                     ) : (
-                      'Get Pre-Qualified'
+                      'Submit Pre-Qualification'
                     )}
                   </Button>
 
-                  <Alert className="bg-slate-800/50 border-slate-700">
-                    <AlertDescription className="text-slate-300 text-sm">
-                      🔒 Your information is secure and confidential. This pre-qualification will not affect your credit score.
-                    </AlertDescription>
-                  </Alert>
+                  <p className="text-xs text-center text-slate-400">
+                    By submitting this form, you agree to our Terms of Service and Privacy Policy.
+                  </p>
                 </form>
               </Form>
             </CardContent>
           </Card>
+
+          {/* Back Button */}
+          <div className="text-center mt-6">
+            <Button
+              variant="link"
+              onClick={() => setLocation('/')}
+              disabled={isSubmitting}
+              className="text-white"
+            >
+              ← Back to Home
+            </Button>
+          </div>
         </div>
       </div>
       <GlobalFooter />
