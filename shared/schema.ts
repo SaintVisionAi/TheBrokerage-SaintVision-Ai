@@ -17,27 +17,19 @@ export const sessions = pgTable(
 // Users table - supports both Replit Auth (OAuth) and legacy username/password
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  // OAuth fields (Replit Auth)
   email: varchar("email", { length: 255 }).unique(),
-  firstName: varchar("first_name", { length: 255 }),
-  lastName: varchar("last_name", { length: 255 }),
-  profileImageUrl: varchar("profile_image_url", { length: 500 }),
-  // Legacy fields (backwards compatibility)
+  name: varchar("name", { length: 255 }),
+  role: varchar("role", { length: 50 }),
+  company: varchar("company", { length: 255 }),
   username: varchar("username", { length: 255 }).unique(),
-  password: text("password"), // null for OAuth users
-  // Common fields
-  role: varchar("role", { length: 50 }).default("client"), // admin, broker, client
-  plan: varchar("plan", { length: 50 }).default("free"),
-  crmContactId: text("crm_contact_id"),
-  // Email verification fields
-  emailVerified: boolean("email_verified").default(false),
+  password: text("password"),
+  emailVerified: boolean("email_verified"),
   verificationToken: text("verification_token"),
   verificationTokenExpires: timestamp("verification_token_expires"),
-  // Password reset fields
   passwordResetToken: text("password_reset_token"),
   passwordResetExpires: timestamp("password_reset_expires"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at"),
+  updatedAt: timestamp("updated_at"),
 });
 
 export const conversations = pgTable("conversations", {
