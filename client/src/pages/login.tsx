@@ -55,20 +55,23 @@ export default function Login() {
 
       if (data.success) {
         console.log('[LOGIN] Login successful, user:', data.user);
+        console.log('[LOGIN] Token:', data.token);
+
+        // Store JWT token in localStorage for subsequent requests
+        if (data.token) {
+          localStorage.setItem('authToken', data.token);
+          console.log('[LOGIN] Token stored in localStorage');
+        }
 
         toast({
           title: "Login successful!",
           description: `Welcome back, ${data.user.username || data.user.email}`,
         });
 
-        // Wait a brief moment for session cookie to be set, then refetch auth
-        console.log('[LOGIN] Waiting for session cookie...');
-        await new Promise(resolve => setTimeout(resolve, 500));
-
         // Refetch auth user to populate role and ensure state is synced
         console.log('[LOGIN] Refetching auth user...');
-        const refetchResult = await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
-        console.log('[LOGIN] Refetch result:', refetchResult);
+        await queryClient.refetchQueries({ queryKey: ["/api/auth/user"] });
+        console.log('[LOGIN] Auth user refetched');
 
         console.log('[LOGIN] Navigating to /dashboard');
         // Redirect to dashboard - the ProtectedDashboard component will handle role-based routing
