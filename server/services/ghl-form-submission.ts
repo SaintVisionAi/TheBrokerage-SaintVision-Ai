@@ -82,6 +82,7 @@ const FORM_FIELD_MAPPINGS: { [formId: string]: FieldMapping } = {
 export async function submitFormToGHL(formId: string, formData: Record<string, any>): Promise<any> {
   try {
     console.log(`[GHL] Submitting form ${formId} to GHL...`);
+    console.log(`[GHL] Using location: ${GHL_LOCATION_ID}`);
 
     // Get field mappings for this form
     const fieldMapping = FORM_FIELD_MAPPINGS[formId];
@@ -105,6 +106,11 @@ export async function submitFormToGHL(formId: string, formData: Record<string, a
         }
       }
     }
+
+    // Add location ID to the data
+    mappedData.locationId = GHL_LOCATION_ID;
+
+    console.log(`[GHL] Form data to submit:`, JSON.stringify(mappedData, null, 2));
 
     // Submit to GHL API
     const response = await axios.post(
