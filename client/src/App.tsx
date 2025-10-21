@@ -41,6 +41,7 @@ import ComprehensiveSolutionsPage from "@/pages/comprehensive-solutions";
 import FileHubPage from "@/pages/file-hub";
 import UploadDocumentsPage from "@/pages/upload-documents";
 import FullLendingApplicationPage from "@/pages/full-lending-application-1";
+import SoftCreditPullPage from "@/pages/soft-credit-pull";
 import NotFound from "@/pages/not-found";
 
 function ProtectedDashboard() {
@@ -163,6 +164,7 @@ function Router() {
       <Route path="/file-hub" component={FileHubPage} />
       <Route path="/upload-documents" component={UploadDocumentsPage} />
       <Route path="/full-lending-application-1" component={FullLendingApplicationPage} />
+      <Route path="/soft-credit-pull" component={SoftCreditPullPage} />
       <Route path="/m/account" component={ProtectedClientPortal} />
       <Route component={NotFound} />
     </Switch>
