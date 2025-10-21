@@ -145,27 +145,6 @@ export default function GlobalHeader() {
                   Sign In
                 </Button>
               </Link>
-              
-              <Link href="/apply">
-                <div className="relative">
-                  <div className="absolute -top-3 -right-3 z-10">
-                    <span className="flex h-4 w-4">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 shadow-lg shadow-emerald-500/50"></span>
-                    </span>
-                  </div>
-                  <Button className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-black font-black shadow-xl shadow-yellow-500/30 hover:shadow-2xl hover:shadow-yellow-500/40 transition-all group relative overflow-hidden transform hover:scale-105 px-6 py-3 border border-yellow-300/50">
-                    <div className="flex flex-col items-start">
-                      <span className="text-xs font-semibold uppercase tracking-wider">AI Pre-Qualify</span>
-                      <span className="text-base font-black flex items-center gap-1">
-                        Get Started 
-                        <span className="text-lg">→</span>
-                      </span>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </Button>
-                </div>
-              </Link>
             </div>
 
             {/* Mobile Menu Toggle */}
