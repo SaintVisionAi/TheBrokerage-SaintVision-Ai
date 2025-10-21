@@ -61,6 +61,12 @@ export default {
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
         },
+        charcoal: {
+          "900": "#1a1a1a",
+          "800": "#2d2d2d",
+          "700": "#404040",
+          "600": "#535353",
+        },
       },
       keyframes: {
         "accordion-down": {
