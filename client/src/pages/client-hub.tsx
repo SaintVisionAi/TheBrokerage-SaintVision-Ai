@@ -90,6 +90,10 @@ export default function ClientHub() {
   const { messages, sendMessage, isLoading } = useChat('user-123', 'hub-chat');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [chatInput, setChatInput] = useState('');
+
+  // GHL Data Hooks
+  const { applications, isLoading: appsLoading } = useGHLApplications('user-123');
+  const { portfolio, isLoading: portfolioLoading } = useGHLPortfolio('user-123');
   const [workspaceFiles, setWorkspaceFiles] = useState<WorkspaceFile[]>([
     { 
       id: '1', 
