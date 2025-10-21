@@ -108,6 +108,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup GHL data routes
   app.use('/api/ghl', ghlDataRouter);
 
+  // Setup GHL form routes
+  app.use('/api/ghl-forms', ghlFormsRouter);
+
   // Setup vision analysis routes
   app.use('/api/vision', visionRouter);
 
@@ -1144,7 +1147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Set session cookie for auto-login
           createSession(res, sessionToken);
           
-          console.log(`✅ Step 6.5: User account created and session set for ${email}`);
+          console.log(`��� Step 6.5: User account created and session set for ${email}`);
         } else {
           userAccount = existingUser;
           
