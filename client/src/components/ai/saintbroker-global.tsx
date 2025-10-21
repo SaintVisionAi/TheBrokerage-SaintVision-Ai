@@ -498,21 +498,7 @@ export default function SaintBrokerGlobal() {
   };
 
   if (!isOpen) {
-    return (
-      <div className="fixed bottom-6 right-6 z-50">
-        {/* Pulsing glow ring */}
-        <div className="absolute inset-0 rounded-full bg-yellow-400/30 blur-xl animate-pulse" />
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400/40 to-yellow-600/40 animate-ping" />
-        
-        <Button
-          onClick={() => {}}
-          className="relative h-16 w-16 rounded-full bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-300 hover:via-yellow-400 hover:to-yellow-500 shadow-2xl hover:shadow-yellow-400/50 transition-all duration-300 hover:scale-110 border-2 border-yellow-300/50"
-          data-testid="button-open-saintbroker"
-        >
-          <Sparkles className="h-7 w-7 text-black animate-pulse" />
-        </Button>
-      </div>
-    );
+    return null;
   }
 
   return (
