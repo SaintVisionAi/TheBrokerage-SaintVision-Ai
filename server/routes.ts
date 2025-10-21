@@ -22,6 +22,7 @@ import { registerEmailVerificationRoutes } from './routes/email-verification';
 import ghlDataRouter from './routes/ghl-data';
 import visionRouter from './routes/vision';
 import ghlFormsRouter from './routes/ghl-forms';
+import databaseQueryRouter from './routes/database-query';
 import rateLimit from 'express-rate-limit';
 import { encrypt, decrypt, redactSSN, isValidBase64 } from './lib/encryption';
 import { applicationSubmitSchema, sanitizeInput, isValidSSN } from './lib/validation';
@@ -106,6 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerEmailVerificationRoutes(app, storage);
 
   // Setup GHL data routes
+  app.use('/api', databaseQueryRouter);
   app.use('/api/ghl', ghlDataRouter);
 
   // Setup GHL form routes
