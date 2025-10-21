@@ -1,24 +1,24 @@
-import GHLFormEmbed from '@/components/GHLFormEmbed';
+import RealEstateForm from '@/components/forms/ghl-real-estate';
+import GlobalHeader from '@/components/layout/global-header';
+import GlobalFooter from '@/components/layout/global-footer';
 
 export default function RealEstateLeadForm() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold mb-2">Real Estate Lead Generation</h1>
-          <p className="text-muted-foreground">
-            Connect with our real estate solutions
-          </p>
+    <>
+      <GlobalHeader />
+      <div className="bg-black min-h-screen px-4 py-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-bold mb-3 text-white">Real Estate Solutions</h1>
+            <p className="text-lg text-gray-400">
+              Connect with our real estate investment and financing solutions
+            </p>
+          </div>
+
+          <RealEstateForm />
         </div>
-        
-        <GHLFormEmbed
-          formId="M2jNYXh8wl8FYhxOap9N"
-          formName="Real Estate Agent Lead Generation"
-          height="1118px"
-          title="Real Estate Agent Lead Generation"
-          className="w-full"
-        />
       </div>
-    </div>
+      <GlobalFooter />
+    </>
   );
 }
