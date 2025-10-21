@@ -253,7 +253,7 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
             {/* Step 2: Business Details */}
             {currentStep === 2 && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Business Details</h3>
+                <h3 className="font-semibold text-yellow-300">Business Details</h3>
 
                 <FormField
                   control={form.control}
@@ -357,7 +357,7 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
             {/* Step 3: Loan Information */}
             {currentStep === 3 && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Loan Information</h3>
+                <h3 className="font-semibold text-yellow-300">Loan Information</h3>
 
                 <FormField
                   control={form.control}
@@ -392,7 +392,7 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
             {/* Step 4: Credit & Collateral */}
             {currentStep === 4 && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Credit & Collateral</h3>
+                <h3 className="font-semibold text-yellow-300">Credit & Collateral</h3>
 
                 <FormField
                   control={form.control}
@@ -484,28 +484,28 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
 
               {currentStep === steps.length ? (
                 <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    'Submit Application'
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  onClick={() => setCurrentStep(currentStep + 1)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Next
-                </Button>
-              )}
+                type="submit"
+                disabled={isLoading}
+                className="bg-yellow-400 text-black hover:bg-yellow-300"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit Application'
+                )}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={() => setCurrentStep(currentStep + 1)}
+                className="bg-yellow-400 text-black hover:bg-yellow-300"
+              >
+                Next
+              </Button>
+            )}
             </div>
           </form>
         </Form>
