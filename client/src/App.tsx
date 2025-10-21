@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { SaintBrokerProvider } from "@/context/SaintBrokerContext";
 import SaintBrokerGlobal from "@/components/ai/saintbroker-global";
+import { useSaintBroker } from "@/context/SaintBrokerContext";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Login from "@/pages/login";
