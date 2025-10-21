@@ -323,9 +323,6 @@ export default function RealEstate() {
       </section>
 
       <GlobalFooter />
-      
-      {/* AI Concierge */}
-      <SaintBrokerEnhanced />
     </div>
   );
 }
