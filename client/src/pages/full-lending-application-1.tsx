@@ -62,21 +62,29 @@ export default function FullLendingApplicationPage() {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('/api/ghl/lead-capture', {
+      const response = await fetch('/api/ghl/form-submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          businessName: data.businessName,
-          loanAmount: data.loanAmount,
-          type: data.loanPurpose,
-          source: 'full-lending-application',
-          notes: `Structure: ${data.businessStructure} | Years: ${data.yearsInBusiness} | Revenue: ${data.annualRevenue} | Timeframe: ${data.fundingTimeframe} | Credit: ${data.creditScore || 'Not provided'} | Business: ${data.businessDescription || 'Not provided'} | Additional: ${data.additionalInfo || 'None'}`
+          formId: '0zcz0ZlG2eEddg94wcbq', // Full Lending Application form from GHL
+          formData: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            businessName: data.businessName,
+            businessStructure: data.businessStructure,
+            yearsInBusiness: data.yearsInBusiness,
+            annualRevenue: data.annualRevenue,
+            loanAmount: data.loanAmount,
+            loanPurpose: data.loanPurpose,
+            fundingTimeframe: data.fundingTimeframe,
+            creditScore: data.creditScore,
+            businessDescription: data.businessDescription,
+            additionalInfo: data.additionalInfo
+          }
         })
       });
 
