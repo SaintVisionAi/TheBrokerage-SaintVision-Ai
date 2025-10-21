@@ -295,6 +295,50 @@ export default function ClientHub() {
             {/* Dashboard Tab */}
             {activeTab === 'dashboard' && (
               <div className="space-y-6">
+                {/* Quick Links Section - Prominent Top Links */}
+                <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-8 text-center text-white">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-1">⚡ Client Hub Quick Links ⚡</h2>
+                  <p className="text-gray-300 mb-6">We Listen. Simple. Fast & Easy. Access. Click. Upload. Connect</p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
+                    <a href="/apply" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        📋 APPLY NOW & GET PRE-APPROVED! 🔥
+                      </Button>
+                    </a>
+                    <a href="/apply" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        💎 GET PREPPED: SOFT CREDIT PULL HERE 🔑
+                      </Button>
+                    </a>
+                    <a href="/full-lending-application-1" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        🏗 FULL LENDING APPLICATION 👊
+                      </Button>
+                    </a>
+                    <a href="/real-estate-investing" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        📈 SVG FIXED RETURN 9-12% APP 📊
+                      </Button>
+                    </a>
+                    <a href="/set-appointment" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        🍎 SCHEDULE & APPOINTMENTS 🍎
+                      </Button>
+                    </a>
+                    <a href="/contact" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        💼 SAINT VISION MERCHANT SERVICES APPLICATION 🚀
+                      </Button>
+                    </a>
+                    <a href="/file-hub" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        📁 SAINT VISION GROUP | SECURE FILE HUB 🔒
+                      </Button>
+                    </a>
+                  </div>
+                </div>
+
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Saint Vision Group</h2>
                   <p className="text-gray-600">Your complete hub for lending, investments, and real estate financing</p>
