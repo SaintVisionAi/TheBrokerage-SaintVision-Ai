@@ -31,6 +31,7 @@ import SaintBrokerButton from '@/components/ai/saintbroker-button';
 
 export default function Landing() {
   const [scrollY, setScrollY] = useState(0);
+  const { openChat } = useSaintBroker();
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -274,7 +275,7 @@ export default function Landing() {
                   <Brain className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-blue-300 to-blue-400 bg-clip-text text-transparent">
-                  Meet SaintBroker AI���
+                  Meet SaintBroker AI™
                 </h3>
               </div>
               <p className="text-xl text-white/80 mb-4 leading-relaxed">
