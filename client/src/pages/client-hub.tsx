@@ -58,6 +58,7 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useChat } from '@/hooks/use-chat';
 import { useGHLApplications, useGHLPortfolio, getPendingApplicationsCount, getTotalPortfolioValue, getTotalMonthlyReturns } from '@/hooks/useGHLData';
+import DocumentVisionPreview from '@/components/ai/document-vision-preview';
 
 interface WorkspaceFile {
   id: string;
