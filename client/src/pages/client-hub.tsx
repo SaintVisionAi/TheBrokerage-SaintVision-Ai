@@ -8,12 +8,12 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  Upload, 
-  FileText, 
-  Download, 
-  Clock, 
-  CheckCircle, 
+import {
+  Upload,
+  FileText,
+  Download,
+  Clock,
+  CheckCircle,
   AlertCircle,
   Calendar,
   DollarSign,
@@ -51,11 +51,13 @@ import {
   ChevronDown,
   ChevronUp,
   MessageSquare,
-  X
+  X,
+  Loader2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useChat } from '@/hooks/use-chat';
+import { useGHLApplications, useGHLPortfolio, getPendingApplicationsCount, getTotalPortfolioValue, getTotalMonthlyReturns } from '@/hooks/useGHLData';
 
 interface WorkspaceFile {
   id: string;
