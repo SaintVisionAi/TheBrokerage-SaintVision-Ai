@@ -13,7 +13,6 @@ import { Separator } from '@/components/ui/separator';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
 import LoanCalculator from '@/components/calculators/loan-calculator';
-import SaintBrokerEnhanced from '@/components/ai/saint-broker-enhanced';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -431,9 +430,6 @@ export default function Lending() {
       </section>
 
       <GlobalFooter />
-      
-      {/* AI Concierge */}
-      <SaintBrokerEnhanced />
     </div>
   );
 }

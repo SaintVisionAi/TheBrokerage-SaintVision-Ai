@@ -4,7 +4,6 @@ import GlobalHeader from "@/components/layout/global-header";
 import GlobalFooter from "@/components/layout/global-footer";
 import InvestmentCalculator from "@/components/calculators/investment-calculator";
 import { Link } from "wouter";
-import SaintBrokerEnhanced from "@/components/ai/saint-broker-enhanced";
 
 export default function Investments() {
   const offerings = [
