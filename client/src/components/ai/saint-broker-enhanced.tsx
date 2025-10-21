@@ -591,9 +591,9 @@ export default function SaintBrokerEnhanced() {
         <TabsContent value="chat" className="flex-1 flex flex-col mt-0 h-full overflow-hidden">
           {/* Quick Actions at top */}
           {messages.length <= 1 && (
-            <div className="border-b border-white/10 p-2 md:p-3 bg-white/5 backdrop-blur-sm">
+            <div className="border-b border-white/10 p-2 md:p-3 bg-white/5 backdrop-blur-sm overflow-y-auto max-h-[180px] md:max-h-[220px]">
               <p className="text-xs text-neutral-400 mb-2 font-medium">Quick Actions:</p>
-              <div className="grid grid-cols-2 gap-1 md:gap-2">
+              <div className="grid grid-cols-2 gap-1 md:gap-2 auto-rows-max">
                 <Button
                   variant="outline"
                   className="h-auto py-3 px-3 text-left flex flex-col items-start gap-1 bg-white/5 backdrop-blur-sm border-yellow-400/30 hover:border-yellow-400 hover:bg-yellow-400/10 transition-all"
