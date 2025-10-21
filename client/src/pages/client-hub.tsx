@@ -877,6 +877,21 @@ export default function ClientHub() {
           )}
         </div>
       </div>
+
+      {/* Document Vision Preview Modal */}
+      {selectedFileForVision && (
+        <DocumentVisionPreview
+          file={selectedFileForVision as unknown as File}
+          documentName={(selectedFileForVision as any).name}
+          onClose={() => setSelectedFileForVision(null)}
+          onAnalysisComplete={(analysis) => {
+            toast({
+              title: '✅ Document Analyzed',
+              description: `Document classified as ${analysis.documentType}`,
+            });
+          }}
+        />
+      )}
     </div>
   );
 }
