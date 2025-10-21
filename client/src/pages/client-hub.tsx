@@ -638,12 +638,12 @@ export default function ClientHub() {
                           <p className="font-semibold text-yellow-300">Up to 80% LTV</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Use Funds For</p>
-                          <p className="font-semibold text-gray-900">Any purpose</p>
+                          <p className="text-sm text-white/60">Use Funds For</p>
+                          <p className="font-semibold text-yellow-300">Any purpose</p>
                         </div>
                       </div>
                       <a href="/real-estate-investing">
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700">Learn More</Button>
+                        <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">Learn More</Button>
                       </a>
                     </CardContent>
                   </Card>
@@ -655,23 +655,23 @@ export default function ClientHub() {
             {activeTab === 'tools' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Tools & Resources</h2>
-                  <p className="text-gray-600">Everything you need to make informed decisions</p>
+                  <h2 className="text-3xl font-bold text-yellow-300 mb-2">Tools & Resources</h2>
+                  <p className="text-white/70">Everything you need to make informed decisions</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {tools.map((tool, idx) => (
-                    <Card key={idx}>
+                    <Card key={idx} className="bg-neutral-900/80 border border-yellow-400/20">
                       <CardHeader>
-                        <CardTitle>{tool.title}</CardTitle>
-                        <CardDescription>{tool.description}</CardDescription>
+                        <CardTitle className="text-yellow-300">{tool.title}</CardTitle>
+                        <CardDescription className="text-white/60">{tool.description}</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mb-4">
-                          <tool.icon className="w-6 h-6 text-gray-600" />
+                        <div className="w-12 h-12 rounded-lg bg-yellow-400/20 flex items-center justify-center mb-4">
+                          <tool.icon className="w-6 h-6 text-yellow-300" />
                         </div>
                         <a href={tool.link}>
-                          <Button className="bg-blue-600 hover:bg-blue-700">
+                          <Button className="bg-yellow-400 text-black hover:bg-yellow-300">
                             {tool.action} <ExternalLink className="w-3 h-3 ml-1" />
                           </Button>
                         </a>
@@ -681,23 +681,23 @@ export default function ClientHub() {
                 </div>
 
                 {/* Educational Resources */}
-                <Card>
+                <Card className="bg-neutral-900/80 border border-yellow-400/20">
                   <CardHeader>
-                    <CardTitle>Educational Resources</CardTitle>
-                    <CardDescription>Learn about financing, investing & real estate strategies</CardDescription>
+                    <CardTitle className="text-yellow-300">Educational Resources</CardTitle>
+                    <CardDescription className="text-white/60">Learn about financing, investing & real estate strategies</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <div className="font-medium text-gray-900">Live Market Intelligence</div>
-                      <div className="text-sm text-gray-600">JP Morgan insights & real-time market data</div>
+                    <a href="/" className="block p-3 border border-yellow-400/20 rounded-lg hover:bg-yellow-400/10">
+                      <div className="font-medium text-yellow-300">Live Market Intelligence</div>
+                      <div className="text-sm text-white/60">JP Morgan insights & real-time market data</div>
                     </a>
-                    <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <div className="font-medium text-gray-900">Lending Guide</div>
-                      <div className="text-sm text-gray-600">Everything you need to know about business loans</div>
+                    <a href="/" className="block p-3 border border-yellow-400/20 rounded-lg hover:bg-yellow-400/10">
+                      <div className="font-medium text-yellow-300">Lending Guide</div>
+                      <div className="text-sm text-white/60">Everything you need to know about business loans</div>
                     </a>
-                    <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <div className="font-medium text-gray-900">Investment Strategies</div>
-                      <div className="text-sm text-gray-600">Tax-advantaged approaches & portfolio optimization</div>
+                    <a href="/" className="block p-3 border border-yellow-400/20 rounded-lg hover:bg-yellow-400/10">
+                      <div className="font-medium text-yellow-300">Investment Strategies</div>
+                      <div className="text-sm text-white/60">Tax-advantaged approaches & portfolio optimization</div>
                     </a>
                   </CardContent>
                 </Card>
@@ -707,55 +707,55 @@ export default function ClientHub() {
             {/* Account Tab */}
             {activeTab === 'account' && (
               <div className="space-y-6">
-                <h2 className="text-3xl font-bold text-gray-900">Account Settings</h2>
+                <h2 className="text-3xl font-bold text-yellow-300">Account Settings</h2>
 
-                <Card>
+                <Card className="bg-neutral-900/80 border border-yellow-400/20">
                   <CardHeader>
-                    <CardTitle>Profile Information</CardTitle>
+                    <CardTitle className="text-yellow-300">Profile Information</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Full Name</label>
-                      <p className="text-gray-900 mt-1">Ryan Capatosto</p>
+                      <label className="text-sm font-medium text-yellow-400/70">Full Name</label>
+                      <p className="text-yellow-300 mt-1">Ryan Capatosto</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Email</label>
-                      <p className="text-gray-900 mt-1">ryan@example.com</p>
+                      <label className="text-sm font-medium text-yellow-400/70">Email</label>
+                      <p className="text-yellow-300 mt-1">ryan@example.com</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Pre-Approved Amount</label>
-                      <p className="text-gray-900 mt-1">$5,000,000</p>
+                      <label className="text-sm font-medium text-yellow-400/70">Pre-Approved Amount</label>
+                      <p className="text-yellow-300 mt-1">$5,000,000</p>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-neutral-900/80 border border-yellow-400/20">
                   <CardHeader>
-                    <CardTitle>Documents</CardTitle>
+                    <CardTitle className="text-yellow-300">Documents</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <a href="/file-hub" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <p className="font-medium text-gray-900">Secure File Hub</p>
-                      <p className="text-sm text-gray-600">Upload & store documents safely</p>
+                    <a href="/file-hub" className="block p-3 border border-yellow-400/20 rounded-lg hover:bg-yellow-400/10">
+                      <p className="font-medium text-yellow-300">Secure File Hub</p>
+                      <p className="text-sm text-white/60">Upload & store documents safely</p>
                     </a>
-                    <a href="/upload-documents" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <p className="font-medium text-gray-900">Submit Loan Documents</p>
-                      <p className="text-sm text-gray-600">Upload required documents for your application</p>
+                    <a href="/upload-documents" className="block p-3 border border-yellow-400/20 rounded-lg hover:bg-yellow-400/10">
+                      <p className="font-medium text-yellow-300">Submit Loan Documents</p>
+                      <p className="text-sm text-white/60">Upload required documents for your application</p>
                     </a>
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-neutral-900/80 border border-yellow-400/20">
                   <CardHeader>
-                    <CardTitle>Support</CardTitle>
+                    <CardTitle className="text-yellow-300">Support</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-yellow-400/30 text-yellow-300 hover:bg-yellow-400/10">
                       <HelpCircle className="w-4 h-4 mr-2" />
                       SaintSal Help Desk
                     </Button>
                     <a href="/set-appointment">
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button variant="outline" className="w-full justify-start border-yellow-400/30 text-yellow-300 hover:bg-yellow-400/10">
                         <Calendar className="w-4 h-4 mr-2" />
                         Schedule Consultation
                       </Button>
@@ -763,7 +763,7 @@ export default function ClientHub() {
                   </CardContent>
                 </Card>
 
-                <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+                <Button variant="outline" className="border-yellow-400/30 text-yellow-300 hover:bg-yellow-400/10">
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </Button>
@@ -773,21 +773,21 @@ export default function ClientHub() {
         </div>
 
         {/* Chat Panel */}
-        <div className="hidden lg:flex w-96 border-l border-gray-200 flex-col bg-white">
-          <div className="border-b border-gray-200 p-4">
+        <div className="hidden lg:flex w-96 border-l border-yellow-400/20 flex-col bg-gradient-to-br from-neutral-900/50 via-black/50 to-neutral-950/50">
+          <div className="border-b border-yellow-400/20 p-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">🤖</span>
-              <p className="font-semibold text-gray-900">SaintBroker AI</p>
+              <p className="font-semibold text-yellow-300">SaintBroker AI</p>
             </div>
-            <p className="text-xs text-green-600">Online & ready to help</p>
+            <p className="text-xs text-yellow-400/70">Online & ready to help</p>
           </div>
 
           <ScrollArea className="flex-1 p-4" ref={chatScrollRef}>
             <div className="space-y-4">
               {messages.length === 0 ? (
                 <div className="text-center py-8">
-                  <div className="text-sm text-gray-600 mb-3">Hi! I'm SaintBroker AI 👋</div>
-                  <div className="text-xs text-gray-500 space-y-2">
+                  <div className="text-sm text-white/60 mb-3">Hi! I'm SaintBroker AI 👋</div>
+                  <div className="text-xs text-white/50 space-y-2">
                     <div>I can help you with:</div>
                     <div className="mt-2">
                       • Loan questions & qualification<br />
