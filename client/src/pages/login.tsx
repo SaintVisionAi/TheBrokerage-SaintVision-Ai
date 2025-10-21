@@ -61,10 +61,10 @@ export default function Login() {
           description: `Welcome back, ${data.user.username || data.user.email}`,
         });
 
-        // Redirect to admin dashboard for all logged in users
-        // Admin dashboard shows all applications and metrics
-        const targetUrl = "/admin";
-        
+        // Redirect to dashboard for logged in users
+        // Dashboard shows all applications and metrics
+        const targetUrl = "/dashboard";
+
         // Direct navigation without delay
         setLocation(targetUrl);
       } else {
