@@ -361,68 +361,67 @@ export default function SaintBrokerEnhanced() {
           </TabsList>
 
           {/* CHAT TAB */}
-          <TabsContent value="chat" className="flex-1 flex flex-col mt-0 overflow-hidden w-full">
-            <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-              <div className="space-y-4">
-                {messages.map((msg, idx) => (
+          <TabsContent value="chat" className="flex-1 flex flex-col mt-0 overflow-hidden w-full min-h-0">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
+              {messages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    "flex gap-3",
+                    msg.role === 'user' ? 'justify-end' : 'justify-start'
+                  )}
+                >
+                  {msg.role === 'assistant' && (
+                    <Avatar className="h-8 w-8 bg-gradient-to-r from-yellow-400 to-yellow-600 flex-shrink-0">
+                      <AvatarFallback className="text-black text-xs font-bold">
+                        SB
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                   <div
-                    key={idx}
                     className={cn(
-                      "flex gap-3",
-                      msg.role === 'user' ? 'justify-end' : 'justify-start'
+                      "rounded-lg p-3 max-w-[80%]",
+                      msg.role === 'user'
+                        ? 'bg-yellow-400 text-black'
+                        : 'bg-white/5 text-white backdrop-blur-sm'
                     )}
                   >
-                    {msg.role === 'assistant' && (
-                      <Avatar className="h-8 w-8 bg-gradient-to-r from-yellow-400 to-yellow-600">
-                        <AvatarFallback className="text-black text-xs font-bold">
-                          SB
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
-                    <div
-                      className={cn(
-                        "rounded-lg p-3 max-w-[80%]",
-                        msg.role === 'user'
-                          ? 'bg-yellow-400 text-black'
-                          : 'bg-white/5 text-white backdrop-blur-sm'
-                      )}
-                    >
-                      <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start gap-3">
+                  <Avatar className="h-8 w-8 bg-gradient-to-r from-yellow-400 to-yellow-600 flex-shrink-0">
+                    <AvatarFallback className="text-black text-xs font-bold">SB</AvatarFallback>
+                  </Avatar>
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                     </div>
                   </div>
-                ))}
-                {isLoading && (
-                  <div className="flex justify-start gap-3">
-                    <Avatar className="h-8 w-8 bg-gradient-to-r from-yellow-400 to-yellow-600">
-                      <AvatarFallback className="text-black text-xs font-bold">SB</AvatarFallback>
-                    </Avatar>
-                    <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-            
-            <div className="p-4 border-t border-white/10 bg-black/20">
+                </div>
+              )}
+            </div>
+
+            <div className="p-3 border-t border-white/10 bg-black/20 flex-shrink-0">
               <div className="flex gap-2">
                 <Input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask SaintBroker..."
-                  className="flex-1 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50"
+                  className="flex-1 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50 h-9"
                   data-testid="input-chat"
                 />
                 <Button
                   onClick={handleSend}
                   disabled={isLoading || !input.trim()}
-                  className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black flex-shrink-0"
                   data-testid="button-send-message"
+                  size="sm"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
