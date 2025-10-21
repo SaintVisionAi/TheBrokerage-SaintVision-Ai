@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Shield, 
-  Zap, 
-  Crown, 
-  ArrowRight, 
+import {
+  Shield,
+  Zap,
+  Crown,
+  ArrowRight,
   CheckCircle,
   Lock,
   Award,
@@ -19,9 +19,12 @@ import {
   FileText,
   TrendingUp,
   Star,
-  Play
+  Play,
+  Sparkles,
+  MessageCircle
 } from 'lucide-react';
 import { Link } from 'wouter';
+import { useSaintBroker } from '@/context/SaintBrokerContext';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
 import SaintBrokerButton from '@/components/ai/saintbroker-button';
@@ -271,7 +274,7 @@ export default function Landing() {
                   <Brain className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-blue-300 to-blue-400 bg-clip-text text-transparent">
-                  Meet SaintBroker AI™
+                  Meet SaintBroker AI���
                 </h3>
               </div>
               <p className="text-xl text-white/80 mb-4 leading-relaxed">
