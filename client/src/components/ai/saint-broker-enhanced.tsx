@@ -137,30 +137,54 @@ export default function SaintBrokerEnhanced() {
   const loadUserData = async () => {
     try {
       // Load documents (with credentials for auth)
-      const docsRes = await fetch('/api/saint-broker/documents', {
-        credentials: 'include'
-      });
-      if (docsRes.ok) {
-        const docsData = await docsRes.json();
-        setDocuments(docsData);
+      try {
+        const docsRes = await fetch('/api/saint-broker/documents', {
+          credentials: 'include',
+          signal: AbortSignal.timeout(5000)
+        });
+        if (docsRes.ok) {
+          const docsData = await docsRes.json();
+          setDocuments(Array.isArray(docsData) ? docsData : []);
+        } else {
+          setDocuments([]);
+        }
+      } catch (err) {
+        console.warn('Failed to load documents:', err);
+        setDocuments([]);
       }
 
       // Load notes (with credentials for auth)
-      const notesRes = await fetch('/api/saint-broker/notes', {
-        credentials: 'include'
-      });
-      if (notesRes.ok) {
-        const notesData = await notesRes.json();
-        setNotes(notesData);
+      try {
+        const notesRes = await fetch('/api/saint-broker/notes', {
+          credentials: 'include',
+          signal: AbortSignal.timeout(5000)
+        });
+        if (notesRes.ok) {
+          const notesData = await notesRes.json();
+          setNotes(Array.isArray(notesData) ? notesData : []);
+        } else {
+          setNotes([]);
+        }
+      } catch (err) {
+        console.warn('Failed to load notes:', err);
+        setNotes([]);
       }
 
       // Load signatures (with credentials for auth)
-      const sigRes = await fetch('/api/saint-broker/signatures', {
-        credentials: 'include'
-      });
-      if (sigRes.ok) {
-        const sigData = await sigRes.json();
-        setSignatures(sigData);
+      try {
+        const sigRes = await fetch('/api/saint-broker/signatures', {
+          credentials: 'include',
+          signal: AbortSignal.timeout(5000)
+        });
+        if (sigRes.ok) {
+          const sigData = await sigRes.json();
+          setSignatures(Array.isArray(sigData) ? sigData : []);
+        } else {
+          setSignatures([]);
+        }
+      } catch (err) {
+        console.warn('Failed to load signatures:', err);
+        setSignatures([]);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
