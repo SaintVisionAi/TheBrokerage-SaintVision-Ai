@@ -27,20 +27,13 @@ import GlobalFooter from '@/components/layout/global-footer';
 
 export default function Landing() {
   const [scrollY, setScrollY] = useState(0);
-  const [showSaintBroker, setShowSaintBroker] = useState(true); // Show immediately on load
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
-    
-    // Auto-show SaintBroker with lending message after 2 seconds
-    const timer = setTimeout(() => {
-      setShowSaintBroker(true);
-    }, 2000);
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      clearTimeout(timer);
     };
   }, []);
 
@@ -246,19 +239,16 @@ export default function Landing() {
                 <ArrowRight className="w-6 h-6 ml-2" />
               </Button>
             </Link>
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-6 text-xl font-semibold border-0 shadow-lg shadow-blue-500/30"
-              data-testid="button-chat-saintbroker"
-              onClick={() => {
-                setShowSaintBroker(true);
-                // Send a lending-focused message to SaintBroker
-                window.postMessage({ type: 'SAINTBROKER_MESSAGE', message: 'I need funding for my business' }, '*');
-              }}
-            >
-              💬 Chat with SaintBroker AI
-              <ArrowRight className="w-6 h-6 ml-2" />
-            </Button>
+            <Link href="/client-hub">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-8 py-6 text-xl font-semibold border-0 shadow-lg shadow-blue-500/30"
+                data-testid="button-chat-saintbroker"
+              >
+                💬 Chat with SaintBroker AI
+                <ArrowRight className="w-6 h-6 ml-2" />
+              </Button>
+            </Link>
           </div>
 
           {/* Patent Badge - Moved Below Buttons */}
