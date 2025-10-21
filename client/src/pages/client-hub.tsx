@@ -95,6 +95,9 @@ export default function ClientHub() {
   // GHL Data Hooks
   const { applications, isLoading: appsLoading } = useGHLApplications('user-123');
   const { portfolio, isLoading: portfolioLoading } = useGHLPortfolio('user-123');
+
+  // Document Vision State
+  const [selectedFileForVision, setSelectedFileForVision] = useState<File | null>(null);
   const [workspaceFiles, setWorkspaceFiles] = useState<WorkspaceFile[]>([
     { 
       id: '1', 
