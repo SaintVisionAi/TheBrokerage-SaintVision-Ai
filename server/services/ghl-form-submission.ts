@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const GHL_API_BASE = 'https://rest.gohighlevel.com/v1';
 const GHL_PRIVATE_TOKEN = process.env.GHL_PRIVATE_ACCESS_TOKEN || 'pit-867ef626-39f8-4e19-b610-6736c9c35eac';
+const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'NgUphdsMGXpRO3h98XyG';
 
 interface FormSubmissionPayload {
   formId: string;
