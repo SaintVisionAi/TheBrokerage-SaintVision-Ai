@@ -99,19 +99,19 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
 
   if (isSubmitted && !isLoading) {
     return (
-      <Card className="border-green-200 bg-green-50">
+      <Card className="border-yellow-400/30 bg-gradient-to-r from-yellow-900/30 to-black/30">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-green-600" />
+            <CheckCircle className="w-6 h-6 text-yellow-300" />
             <div>
-              <CardTitle className="text-green-900">Application Submitted!</CardTitle>
-              <CardDescription>Your real estate financing request received</CardDescription>
+              <CardTitle className="text-yellow-300">Application Submitted!</CardTitle>
+              <CardDescription className="text-white/60">Your real estate financing request received</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="p-4 bg-white rounded-lg border border-green-200">
-            <p className="text-sm text-gray-700">
+          <div className="p-4 bg-neutral-900/50 rounded-lg border border-yellow-400/20">
+            <p className="text-sm text-white/70">
               ✓ Your application has been reviewed by our team<br />
               ✓ Expect to hear from us within 24 hours<br />
               ✓ We'll discuss your project and next steps
@@ -122,7 +122,7 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
               setIsSubmitted(false);
               form.reset();
             }}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-yellow-400 text-black hover:bg-yellow-300"
           >
             Submit Another Application
           </Button>
@@ -132,10 +132,10 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
   }
 
   return (
-    <Card>
+    <Card className="bg-neutral-900/80 border border-yellow-400/20">
       <CardHeader>
-        <CardTitle>Real Estate Financing Application</CardTitle>
-        <CardDescription>Let's discuss your real estate project and financing needs</CardDescription>
+        <CardTitle className="text-yellow-300">Real Estate Financing Application</CardTitle>
+        <CardDescription className="text-white/60">Let's discuss your real estate project and financing needs</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -143,7 +143,7 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Personal Info */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Personal Information</h3>
+              <h3 className="font-semibold text-yellow-300 mb-4">Personal Information</h3>
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <FormField
@@ -208,7 +208,7 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
 
             {/* Property Details */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Property Details</h3>
+              <h3 className="font-semibold text-yellow-300 mb-4">Property Details</h3>
 
               <FormField
                 control={form.control}
@@ -267,7 +267,7 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
 
             {/* Financing Details */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Financing Details</h3>
+              <h3 className="font-semibold text-yellow-300 mb-4">Financing Details</h3>
 
               <FormField
                 control={form.control}
@@ -335,7 +335,7 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
 
             {/* Additional Info */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Additional Information</h3>
+              <h3 className="font-semibold text-yellow-300 mb-4">Additional Information</h3>
 
               <FormField
                 control={form.control}
@@ -383,19 +383,19 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
             {isLoading && submitProgress > 0 && (
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-600">Submitting application...</span>
-                  <span className="font-medium">{submitProgress}%</span>
+                  <span className="text-white/60">Submitting application...</span>
+                  <span className="font-medium text-yellow-300">{submitProgress}%</span>
                 </div>
-                <Progress value={submitProgress} className="h-2" />
+                <Progress value={submitProgress} className="h-2 bg-neutral-800" />
               </div>
             )}
 
             {error && !isLoading && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <div className="p-3 bg-red-950/50 border border-red-400/30 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-red-900">Submission Failed</p>
-                  <p className="text-sm text-red-800 mt-1">{error.message}</p>
+                  <p className="text-sm font-semibold text-red-300">Submission Failed</p>
+                  <p className="text-sm text-red-400/80 mt-1">{error.message}</p>
                 </div>
               </div>
             )}
@@ -404,7 +404,7 @@ export default function RealEstateForm({ onSuccess, onError }: RealEstateFormPro
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-yellow-400 text-black hover:bg-yellow-300"
             >
               {isLoading ? (
                 <>
