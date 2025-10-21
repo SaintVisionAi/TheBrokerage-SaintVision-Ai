@@ -31,13 +31,13 @@ export interface GHLFormConfig {
 // Form IDs - These should match your GHL setup
 // If you don't have specific form IDs yet, we'll use placeholder structure
 const GHL_FORM_IDS = {
-  [GHLFormType.PRE_QUAL]: process.env.REACT_APP_GHL_PREQUAL_FORM_ID || 'prequal_form_id',
-  [GHLFormType.FULL_APPLICATION]: process.env.REACT_APP_GHL_APPLICATION_FORM_ID || 'application_form_id',
-  [GHLFormType.DOCUMENT_UPLOAD]: process.env.REACT_APP_GHL_DOCUMENT_FORM_ID || 'document_form_id',
-  [GHLFormType.INVESTMENT]: process.env.REACT_APP_GHL_INVESTMENT_FORM_ID || 'investment_form_id',
-  [GHLFormType.REAL_ESTATE]: process.env.REACT_APP_GHL_REALESTATE_FORM_ID || 'realestate_form_id',
-  [GHLFormType.SVT_REGISTRATION]: process.env.REACT_APP_GHL_SVT_FORM_ID || 'svt_form_id',
-  [GHLFormType.MORTGAGE]: process.env.REACT_APP_GHL_MORTGAGE_FORM_ID || 'mortgage_form_id',
+  [GHLFormType.PRE_QUAL]: import.meta.env.VITE_GHL_PREQUAL_FORM_ID || 'gPGc1pTZGRvxybqPpDRL',
+  [GHLFormType.FULL_APPLICATION]: import.meta.env.VITE_GHL_APPLICATION_FORM_ID || '0zcz0ZlG2eEddg94wcbq',
+  [GHLFormType.DOCUMENT_UPLOAD]: import.meta.env.VITE_GHL_DOCUMENT_FORM_ID || 'yLjMJMuW3mM08ju9GkWY',
+  [GHLFormType.INVESTMENT]: import.meta.env.VITE_GHL_INVESTMENT_FORM_ID || '1pivHofKUp5uTa9ws1TG',
+  [GHLFormType.REAL_ESTATE]: import.meta.env.VITE_GHL_REALESTATE_FORM_ID || 'M2jNYXh8wl8FYhxOap9N',
+  [GHLFormType.SVT_REGISTRATION]: import.meta.env.VITE_GHL_SVT_FORM_ID || 'svt_form_id',
+  [GHLFormType.MORTGAGE]: import.meta.env.VITE_GHL_MORTGAGE_FORM_ID || 'mortgage_form_id',
 };
 
 export const GHL_FORM_CONFIGS: Record<GHLFormType, GHLFormConfig> = {
