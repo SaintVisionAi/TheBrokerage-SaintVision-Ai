@@ -45,39 +45,39 @@ export default function RealEstateInvestingPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-neutral-950 via-neutral-900 to-black">
       <GlobalHeader />
 
       <div className="flex-1 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Real Estate Investing Solutions</h1>
-            <p className="text-lg text-gray-600">Fix & flips, DSCR loans, bridge financing, and investment properties</p>
+            <h1 className="text-4xl font-bold text-yellow-300 mb-2">Real Estate Investing Solutions</h1>
+            <p className="text-lg text-white/70">Fix & flips, DSCR loans, bridge financing, and investment properties</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {products.map((product, idx) => (
-              <Card key={idx} className="hover:shadow-lg transition-shadow">
+              <Card key={idx} className="hover:shadow-lg transition-shadow bg-neutral-900/80 border border-yellow-400/20">
                 <CardHeader>
-                  <CardTitle>{product.title}</CardTitle>
-                  <CardDescription>{product.description}</CardDescription>
+                  <CardTitle className="text-yellow-300">{product.title}</CardTitle>
+                  <CardDescription className="text-white/60">{product.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${product.color}`}>
-                    <product.icon className="w-6 h-6 text-gray-800" />
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-yellow-400/20">
+                    <product.icon className="w-6 h-6 text-yellow-300" />
                   </div>
                   <div className="space-y-3 mb-4">
                     <div>
-                      <p className="text-sm text-gray-600">Loan Amount</p>
-                      <p className="font-semibold text-gray-900">{product.amount}</p>
+                      <p className="text-sm text-white/60">Loan Amount</p>
+                      <p className="font-semibold text-yellow-300">{product.amount}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-600">Terms</p>
-                      <p className="font-semibold text-gray-900">{product.terms}</p>
+                      <p className="text-sm text-white/60">Terms</p>
+                      <p className="font-semibold text-yellow-300">{product.terms}</p>
                     </div>
                   </div>
-                  <Button 
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  <Button
+                    className="w-full bg-yellow-400 text-black hover:bg-yellow-300"
                     onClick={() => setLocation('/apply')}
                   >
                     Learn More
@@ -88,44 +88,44 @@ export default function RealEstateInvestingPage() {
             ))}
           </div>
 
-          <Card className="mb-8 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+          <Card className="mb-8 bg-gradient-to-r from-yellow-900/30 to-black/30 border border-yellow-400/30">
             <CardHeader>
-              <CardTitle className="text-blue-900">Why Choose Saint Vision Group?</CardTitle>
+              <CardTitle className="text-yellow-300">Why Choose Saint Vision Group?</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="flex gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                  <CheckCircle className="w-6 h-6 text-yellow-300 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-blue-900">Fast Funding</p>
-                    <p className="text-sm text-blue-800">24-72 hour closing available</p>
+                    <p className="font-semibold text-yellow-300">Fast Funding</p>
+                    <p className="text-sm text-white/60">24-72 hour closing available</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                  <CheckCircle className="w-6 h-6 text-yellow-300 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-blue-900">Flexible Terms</p>
-                    <p className="text-sm text-blue-800">Customized to your project</p>
+                    <p className="font-semibold text-yellow-300">Flexible Terms</p>
+                    <p className="text-sm text-white/60">Customized to your project</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                  <CheckCircle className="w-6 h-6 text-yellow-300 flex-shrink-0" />
                   <div>
-                    <p className="font-semibold text-blue-900">Expert Support</p>
-                    <p className="text-sm text-blue-800">Dedicated account managers</p>
+                    <p className="font-semibold text-yellow-300">Expert Support</p>
+                    <p className="text-sm text-white/60">Dedicated account managers</p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-blue-600 text-white border-0">
+          <Card className="bg-gradient-to-r from-yellow-900/30 to-black/30 border border-yellow-400/30 text-white">
             <CardContent className="pt-8">
-              <h3 className="text-2xl font-bold mb-2">Ready to Get Started?</h3>
-              <p className="mb-4 text-blue-100">Complete your pre-qualification in just 5 minutes. Fast decision in 24-48 hours.</p>
-              <Button 
+              <h3 className="text-2xl font-bold mb-2 text-yellow-300">Ready to Get Started?</h3>
+              <p className="mb-4 text-yellow-400/70">Complete your pre-qualification in just 5 minutes. Fast decision in 24-48 hours.</p>
+              <Button
                 onClick={() => setLocation('/apply')}
-                className="bg-white text-blue-600 hover:bg-gray-100"
+                className="bg-yellow-400 text-black hover:bg-yellow-300"
               >
                 Start Pre-Qualification
               </Button>
