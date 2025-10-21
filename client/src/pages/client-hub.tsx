@@ -686,16 +686,16 @@ export default function ClientHub() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <p className="font-medium text-gray-900">Live Market Intelligence</p>
-                      <p className="text-sm text-gray-600">JP Morgan insights & real-time market data</p>
+                      <div className="font-medium text-gray-900">Live Market Intelligence</div>
+                      <div className="text-sm text-gray-600">JP Morgan insights & real-time market data</div>
                     </a>
                     <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <p className="font-medium text-gray-900">Lending Guide</p>
-                      <p className="text-sm text-gray-600">Everything you need to know about business loans</p>
+                      <div className="font-medium text-gray-900">Lending Guide</div>
+                      <div className="text-sm text-gray-600">Everything you need to know about business loans</div>
                     </a>
                     <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <p className="font-medium text-gray-900">Investment Strategies</p>
-                      <p className="text-sm text-gray-600">Tax-advantaged approaches & portfolio optimization</p>
+                      <div className="font-medium text-gray-900">Investment Strategies</div>
+                      <div className="text-sm text-gray-600">Tax-advantaged approaches & portfolio optimization</div>
                     </a>
                   </CardContent>
                 </Card>
