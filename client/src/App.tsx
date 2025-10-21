@@ -153,6 +153,15 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route path="/cookies" component={Cookies} />
+      <Route path="/set-appointment" component={SetAppointmentPage} />
+      <Route path="/prequal-success" component={PrequalSuccessPage} />
+      <Route path="/loans-docs-4-funding" component={LoansDocs4FundingPage} />
+      <Route path="/real-estate-investing" component={RealEstateInvestingPage} />
+      <Route path="/investment-offering-1" component={InvestmentOffering1Page} />
+      <Route path="/comprehensive-solutions" component={ComprehensiveSolutionsPage} />
+      <Route path="/file-hub" component={FileHubPage} />
+      <Route path="/upload-documents" component={UploadDocumentsPage} />
+      <Route path="/m/account" component={ProtectedClientPortal} />
       <Route component={NotFound} />
     </Switch>
   );
