@@ -487,23 +487,23 @@ export default function ClientHub() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {investmentProducts.map((product, idx) => (
                     <a key={idx} href={product.link} className="block">
-                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full bg-neutral-900/80 border border-yellow-400/20">
                         <CardHeader>
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <CardTitle className="text-lg">{product.title}</CardTitle>
-                              <CardDescription>{product.description}</CardDescription>
+                              <CardTitle className="text-lg text-yellow-300">{product.title}</CardTitle>
+                              <CardDescription className="text-white/60">{product.description}</CardDescription>
                             </div>
                             {product.badge && (
-                              <Badge className="bg-yellow-100 text-yellow-800 text-xs">{product.badge}</Badge>
+                              <Badge className="bg-yellow-400/30 text-yellow-300 text-xs">{product.badge}</Badge>
                             )}
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center mb-4">
-                            <product.icon className="w-6 h-6 text-green-600" />
+                          <div className="w-12 h-12 rounded-lg bg-yellow-400/20 flex items-center justify-center mb-4">
+                            <product.icon className="w-6 h-6 text-yellow-300" />
                           </div>
-                          <Button variant="outline" className="mt-4">
+                          <Button variant="outline" className="mt-4 border-yellow-400/30 text-yellow-300 hover:bg-yellow-400/10">
                             Explore <ExternalLink className="w-3 h-3 ml-1" />
                           </Button>
                         </CardContent>
@@ -513,37 +513,37 @@ export default function ClientHub() {
                 </div>
 
                 {/* Why Invest */}
-                <Card>
+                <Card className="bg-neutral-900/80 border border-yellow-400/20">
                   <CardHeader>
-                    <CardTitle>Why Invest with Saint Vision Group?</CardTitle>
+                    <CardTitle className="text-yellow-300">Why Invest with Saint Vision Group?</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-yellow-300 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-gray-900">Fixed Returns</p>
-                        <p className="text-sm text-gray-600">Predictable 9-12% annual returns</p>
+                        <p className="font-medium text-yellow-300">Fixed Returns</p>
+                        <p className="text-sm text-white/60">Predictable 9-12% annual returns</p>
                       </div>
                     </div>
                     <div className="flex gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-yellow-300 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-gray-900">Diversification</p>
-                        <p className="text-sm text-gray-600">Real estate & lending portfolio mix</p>
+                        <p className="font-medium text-yellow-300">Diversification</p>
+                        <p className="text-sm text-white/60">Real estate & lending portfolio mix</p>
                       </div>
                     </div>
                     <div className="flex gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-yellow-300 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-gray-900">Tax-Advantaged</p>
-                        <p className="text-sm text-gray-600">UPREIT, 1031 exchanges & strategies</p>
+                        <p className="font-medium text-yellow-300">Tax-Advantaged</p>
+                        <p className="text-sm text-white/60">UPREIT, 1031 exchanges & strategies</p>
                       </div>
                     </div>
                     <div className="flex gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 text-yellow-300 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-gray-900">Private Access</p>
-                        <p className="text-sm text-gray-600">Exclusive opportunities for clients</p>
+                        <p className="font-medium text-yellow-300">Private Access</p>
+                        <p className="text-sm text-white/60">Exclusive opportunities for clients</p>
                       </div>
                     </div>
                   </CardContent>
@@ -555,87 +555,87 @@ export default function ClientHub() {
             {activeTab === 'real-estate' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Real Estate Solutions</h2>
-                  <p className="text-gray-600">Fix & flips, DSCR loans, bridge financing, and investment properties</p>
+                  <h2 className="text-3xl font-bold text-yellow-300 mb-2">Real Estate Solutions</h2>
+                  <p className="text-white/70">Fix & flips, DSCR loans, bridge financing, and investment properties</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
+                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
                     <CardHeader>
-                      <CardTitle>Fix & Flip Loans</CardTitle>
-                      <CardDescription>Quick capital for real estate projects</CardDescription>
+                      <CardTitle className="text-yellow-300">Fix & Flip Loans</CardTitle>
+                      <CardDescription className="text-white/60">Quick capital for real estate projects</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3 mb-4">
                         <div>
-                          <p className="text-sm text-gray-600">Loan Amount</p>
-                          <p className="font-semibold text-gray-900">$100K - $10M+</p>
+                          <p className="text-sm text-white/60">Loan Amount</p>
+                          <p className="font-semibold text-yellow-300">$100K - $10M+</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Terms</p>
-                          <p className="font-semibold text-gray-900">6 months - 24 months</p>
+                          <p className="text-sm text-white/60">Terms</p>
+                          <p className="font-semibold text-yellow-300">6 months - 24 months</p>
                         </div>
                       </div>
                       <a href="/real-estate-investing">
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700">Learn More</Button>
+                        <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">Learn More</Button>
                       </a>
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
                     <CardHeader>
-                      <CardTitle>DSCR Loans</CardTitle>
-                      <CardDescription>No income verification required</CardDescription>
+                      <CardTitle className="text-yellow-300">DSCR Loans</CardTitle>
+                      <CardDescription className="text-white/60">No income verification required</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3 mb-4">
                         <div>
-                          <p className="text-sm text-gray-600">Loan Amount</p>
-                          <p className="font-semibold text-gray-900">$100K - $5M+</p>
+                          <p className="text-sm text-white/60">Loan Amount</p>
+                          <p className="font-semibold text-yellow-300">$100K - $5M+</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Perfect For</p>
-                          <p className="font-semibold text-gray-900">Investment properties</p>
+                          <p className="text-sm text-white/60">Perfect For</p>
+                          <p className="font-semibold text-yellow-300">Investment properties</p>
                         </div>
                       </div>
                       <a href="/real-estate-investing">
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700">Learn More</Button>
+                        <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">Learn More</Button>
                       </a>
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
                     <CardHeader>
-                      <CardTitle>Bridge Loans</CardTitle>
-                      <CardDescription>Short-term transition financing</CardDescription>
+                      <CardTitle className="text-yellow-300">Bridge Loans</CardTitle>
+                      <CardDescription className="text-white/60">Short-term transition financing</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3 mb-4">
                         <div>
-                          <p className="text-sm text-gray-600">Speed</p>
-                          <p className="font-semibold text-gray-900">48-72 hour closing</p>
+                          <p className="text-sm text-white/60">Speed</p>
+                          <p className="font-semibold text-yellow-300">48-72 hour closing</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Use Case</p>
-                          <p className="font-semibold text-gray-900">Buy before you sell</p>
+                          <p className="text-sm text-white/60">Use Case</p>
+                          <p className="font-semibold text-yellow-300">Buy before you sell</p>
                         </div>
                       </div>
                       <a href="/real-estate-investing">
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700">Learn More</Button>
+                        <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">Learn More</Button>
                       </a>
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
                     <CardHeader>
-                      <CardTitle>Cash-Out Refi</CardTitle>
-                      <CardDescription>Leverage existing equity</CardDescription>
+                      <CardTitle className="text-yellow-300">Cash-Out Refi</CardTitle>
+                      <CardDescription className="text-white/60">Leverage existing equity</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3 mb-4">
                         <div>
-                          <p className="text-sm text-gray-600">Access Equity</p>
-                          <p className="font-semibold text-gray-900">Up to 80% LTV</p>
+                          <p className="text-sm text-white/60">Access Equity</p>
+                          <p className="font-semibold text-yellow-300">Up to 80% LTV</p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-600">Use Funds For</p>
