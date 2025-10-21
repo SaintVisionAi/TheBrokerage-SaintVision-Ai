@@ -107,6 +107,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup GHL data routes
   app.use('/api/ghl', ghlDataRouter);
 
+  // Setup vision analysis routes
+  app.use('/api/vision', visionRouter);
+
   // Authentication Routes
   app.post("/api/auth/signup", async (req, res) => {
     try {
