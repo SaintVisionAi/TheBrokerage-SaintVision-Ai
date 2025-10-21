@@ -266,30 +266,40 @@ export default function Landing() {
       </section>
 
       {/* SaintBroker AI Engagement Section */}
-      <section className="relative z-10 py-16 border-y border-white/10 bg-gradient-to-r from-blue-900/20 via-neutral-900/40 to-blue-900/20">
+      <section className="relative z-10 py-16 border-y border-white/10 bg-gradient-to-r from-yellow-900/10 via-neutral-900/40 to-yellow-900/10">
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex-1 text-center md:text-left">
               <div className="inline-flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                  <Brain className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-charcoal-900" />
                 </div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-blue-300 to-blue-400 bg-clip-text text-transparent">
-                  Meet SaintBroker AI™
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                  Speak with SaintBroker AI™
                 </h3>
               </div>
               <p className="text-xl text-white/80 mb-4 leading-relaxed">
-                Your 24/7 AI brokerage assistant powered by Azure Cognitive Services and SaintSal™ HACP™ technology. 
-                <span className="text-blue-400 font-medium"> Ask anything. Get instant answers. No red tape.</span>
+                Your 24/7 AI brokerage assistant powered by Azure Cognitive Services and SaintSal™ HACP™ technology.
+                <span className="text-yellow-400 font-medium"> Ask anything. Get instant answers. Full document upload, signatures, and loan management - all in one place.</span>
               </p>
               <p className="text-lg text-white/60">
-                Explore our services, get real-time quotes, or start your pre-qualification - all through intelligent conversation.
+                Explore our services, get real-time quotes, upload documents, request signatures, or start your pre-qualification - all through intelligent conversation. Available on every page via the floating icon.
               </p>
             </div>
             <div className="flex flex-col gap-4">
+              <Button
+                onClick={openChat}
+                size="lg"
+                className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-charcoal-900 hover:from-yellow-500 hover:to-yellow-700 px-10 py-6 text-xl font-bold shadow-lg shadow-yellow-500/30"
+                data-testid="button-chat-saintbroker-hero"
+              >
+                <MessageCircle className="w-6 h-6 mr-3" />
+                Start Chatting Now
+                <ArrowRight className="w-6 h-6 ml-3" />
+              </Button>
               <Link href="/apply">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 px-10 py-6 text-xl font-bold shadow-lg shadow-emerald-500/30"
                   data-testid="button-prequal-hero"
                 >
