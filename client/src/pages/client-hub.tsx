@@ -208,52 +208,52 @@ export default function ClientHub() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-black text-white">
       <GlobalHeader />
       {/* Top Navigation - Search Bar */}
-      <div className="border-b border-gray-200 bg-white sticky top-20 z-40">
+      <div className="border-b border-yellow-400/20 bg-gradient-to-r from-neutral-950/40 via-black/40 to-neutral-900/40 backdrop-blur-sm sticky top-20 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+                className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
               >
-                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {sidebarOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Saint Vision Group</h1>
-                <p className="text-xs text-gray-500">Client Hub & Resource Center</p>
+                <h1 className="text-xl font-bold text-yellow-400">Saint Vision Group</h1>
+                <p className="text-xs text-yellow-400/70 uppercase tracking-wider">Client Hub & Resource Center</p>
               </div>
             </div>
 
             <div className="flex-1 max-w-xs mx-8">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yellow-400/50" />
                 <Input
                   placeholder="Search products, tools..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 border-gray-300"
+                  className="pl-10 border-yellow-400/20 bg-white/10 text-white placeholder:text-white/40"
                 />
               </div>
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">Ryan Capatosto</span>
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
-                <LogOut className="w-5 h-5 text-gray-600" />
+              <span className="text-sm text-yellow-400/80">Ryan Capatosto</span>
+              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+                <LogOut className="w-5 h-5 text-yellow-400" />
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex h-[calc(100vh-64px)]">
+      <div className="flex h-[calc(100vh-80px)]">
         {/* Sidebar */}
         <div
           className={cn(
-            'w-64 border-r border-gray-200 bg-gray-50 flex flex-col transition-all duration-300',
+            'w-64 border-r border-yellow-400/20 bg-gradient-to-br from-neutral-900/50 via-black/50 to-neutral-950/50 flex flex-col transition-all duration-300',
             !sidebarOpen && 'hidden lg:flex'
           )}
         >
@@ -269,8 +269,8 @@ export default function ClientHub() {
                   className={cn(
                     'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
                     activeTab === item.id
-                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-yellow-400/20 text-yellow-300 border border-yellow-400/40'
+                      : 'text-white/70 hover:bg-yellow-400/10 hover:text-yellow-300'
                   )}
                 >
                   <item.icon className="w-5 h-5" />
@@ -280,12 +280,12 @@ export default function ClientHub() {
             </nav>
           </div>
 
-          <div className="border-t border-gray-200 p-4 bg-white">
+          <div className="border-t border-yellow-400/20 p-4 bg-gradient-to-r from-neutral-900/40 via-black/40 to-neutral-950/40">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-2xl">🤖</span>
-              <span className="text-sm font-semibold text-gray-900">SaintBroker AI</span>
+              <span className="text-sm font-semibold text-yellow-300">SaintBroker AI</span>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-white/60">
               Need help navigating your options? I can answer questions, help with applications, or guide you through any process.
             </p>
           </div>
