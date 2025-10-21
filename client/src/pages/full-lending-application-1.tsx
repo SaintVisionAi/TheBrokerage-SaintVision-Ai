@@ -1,0 +1,686 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import GlobalHeader from '@/components/layout/global-header';
+import GlobalFooter from '@/components/layout/global-footer';
+import { Loader2, FileText, User, Building2, DollarSign, CheckCircle } from 'lucide-react';
+import { useLocation } from 'wouter';
+
+const applicationSchema = z.object({
+  firstName: z.string().min(2, 'First name is required'),
+  lastName: z.string().min(2, 'Last name is required'),
+  email: z.string().email('Valid email is required'),
+  phone: z.string().min(10, 'Valid phone number is required'),
+  businessName: z.string().min(2, 'Business name is required'),
+  businessStructure: z.string().min(1, 'Please select business structure'),
+  yearsInBusiness: z.string().min(1, 'Please select years in business'),
+  industry: z.string().min(2, 'Industry is required'),
+  annualRevenue: z.string().min(1, 'Please select annual revenue range'),
+  monthlyRevenue: z.string().optional(),
+  loanAmount: z.string().min(1, 'Please select loan amount'),
+  loanPurpose: z.string().min(1, 'Please select loan purpose'),
+  creditScore: z.string().optional(),
+  fundingTimeframe: z.string().min(1, 'Please select funding timeframe'),
+  businessDescription: z.string().optional(),
+  taxReturns: z.string().optional(),
+  bankStatements: z.string().optional(),
+  businessLicense: z.string().optional(),
+  collateral: z.string().optional(),
+  additionalInfo: z.string().optional()
+});
+
+type ApplicationFormValues = z.infer<typeof applicationSchema>;
+
+export default function FullLendingApplicationPage() {
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const form = useForm<ApplicationFormValues>({
+    resolver: zodResolver(applicationSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      businessName: '',
+      businessStructure: '',
+      yearsInBusiness: '',
+      industry: '',
+      annualRevenue: '',
+      monthlyRevenue: '',
+      loanAmount: '',
+      loanPurpose: '',
+      creditScore: '',
+      fundingTimeframe: '',
+      businessDescription: '',
+      taxReturns: '',
+      bankStatements: '',
+      businessLicense: '',
+      collateral: '',
+      additionalInfo: ''
+    }
+  });
+
+  const onSubmit = async (data: ApplicationFormValues) => {
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/ghl/form-submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          formId: '0zcz0ZlG2eEddg94wcbq',
+          formData: data
+        })
+      });
+
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error('Invalid response from server');
+      }
+
+      if (response.ok && result.success) {
+        setIsSuccess(true);
+        toast({
+          title: "Application Submitted! 🎉",
+          description: "You'll receive a text message within minutes with next steps.",
+          duration: 5000
+        });
+
+        setTimeout(() => {
+          setLocation('/prequal-success');
+        }, 2000);
+      } else {
+        throw new Error(result.error || result.message || 'Submission failed');
+      }
+    } catch (error: any) {
+      console.error('Form submission error:', error);
+      toast({
+        title: "Submission Error",
+        description: error.message || "Something went wrong. Please call us at (949) 546-1123",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isSuccess) {
+    return (
+      <>
+        <GlobalHeader />
+        <div className="min-h-screen bg-black flex items-center justify-center px-4 py-12">
+          <div className="w-full max-w-2xl text-center">
+            <div className="mx-auto w-20 h-20 bg-yellow-400/10 rounded-full flex items-center justify-center mb-8">
+              <CheckCircle className="w-12 h-12 text-yellow-400" />
+            </div>
+            <h1 className="text-[clamp(2rem,5vw,3.5rem)] font-semibold text-white mb-6 leading-tight">
+              Application Submitted Successfully
+            </h1>
+            <p className="text-[clamp(1rem,2vw,1.25rem)] text-gray-300 mb-8 max-w-xl mx-auto">
+              Your full lending application is being processed. You'll receive a text message within minutes and an email with next steps.
+            </p>
+            <Button 
+              onClick={() => setLocation('/client-portal')}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-6 text-lg rounded-xl"
+            >
+              Access Your Dashboard
+            </Button>
+          </div>
+        </div>
+        <GlobalFooter />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <GlobalHeader />
+      
+      {/* Hero Section */}
+      <div className="bg-black text-white pt-32 pb-20 px-4">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 rounded-full px-6 py-2 mb-8">
+            <span className="text-yellow-400 text-sm font-medium">📋 Complete Your Application</span>
+          </div>
+          
+          <h1 className="text-[clamp(2.5rem,8vw,5rem)] font-semibold mb-6 leading-[1.1] tracking-tight">
+            Full Lending<br />
+            <span className="text-yellow-400">Application</span>
+          </h1>
+          
+          <p className="text-[clamp(1rem,2vw,1.25rem)] text-gray-300 mb-4 max-w-3xl mx-auto">
+            Complete this comprehensive application for funding consideration. Takes 15-20 minutes.
+          </p>
+          <p className="text-[clamp(0.875rem,1.5vw,1.125rem)] text-yellow-400 font-medium">
+            Fast approval • No credit impact • Flexible terms
+          </p>
+        </div>
+
+        {/* Benefits Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mt-16">
+          {[
+            { icon: '⚡', title: '24-48 Hour Decision', desc: 'AI-powered approval process' },
+            { icon: '💰', title: '$50K - $5M Available', desc: 'Flexible loan amounts' },
+            { icon: '🔓', title: 'No Collateral Required', desc: 'Unsecured options available' },
+            { icon: '📈', title: 'Rates from 9%', desc: 'Competitive rates with transparent terms' }
+          ].map((benefit, i) => (
+            <div key={i} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all">
+              <div className="text-4xl mb-4">{benefit.icon}</div>
+              <h3 className="text-lg font-semibold mb-2">{benefit.title}</h3>
+              <p className="text-sm text-gray-400">{benefit.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Form Section */}
+      <div className="bg-black min-h-screen px-4 py-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-gradient-to-b from-white/[0.07] to-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl">
+            
+            {/* Form Header */}
+            <div className="text-center mb-12">
+              <div className="mx-auto w-16 h-16 bg-yellow-400/10 rounded-2xl flex items-center justify-center mb-6">
+                <FileText className="w-8 h-8 text-yellow-400" />
+              </div>
+              <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-semibold text-white mb-3">
+                Lending Application
+              </h2>
+              <p className="text-[clamp(0.875rem,1.5vw,1rem)] text-gray-400">
+                Get pre-approved in 24 hours • 100% secure • No credit score impact
+              </p>
+            </div>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+                
+                {/* Personal Information */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <User className="w-5 h-5 text-yellow-400" />
+                    <h3 className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-semibold text-yellow-400">
+                      Personal Information
+                    </h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">First Name *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="John"
+                              className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Last Name *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="Smith"
+                              className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Email Address *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              type="email"
+                              placeholder="john@company.com"
+                              className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Phone Number *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              type="tel"
+                              placeholder="(555) 123-4567"
+                              className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Business Information */}
+                <div className="space-y-6 pt-6 border-t border-white/10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Building2 className="w-5 h-5 text-yellow-400" />
+                    <h3 className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-semibold text-yellow-400">
+                      Business Information
+                    </h3>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="businessName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white text-sm font-medium">Business Name *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="ABC Company LLC"
+                            className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="businessStructure"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Business Structure *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select structure" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-black border-white/20">
+                              <SelectItem value="llc">LLC</SelectItem>
+                              <SelectItem value="corporation">Corporation</SelectItem>
+                              <SelectItem value="s-corp">S-Corporation</SelectItem>
+                              <SelectItem value="partnership">Partnership</SelectItem>
+                              <SelectItem value="sole-proprietor">Sole Proprietor</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="yearsInBusiness"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Years in Business *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select years" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-black border-white/20">
+                              <SelectItem value="less-than-1">Less than 1 year</SelectItem>
+                              <SelectItem value="1-2">1-2 years</SelectItem>
+                              <SelectItem value="2-5">2-5 years</SelectItem>
+                              <SelectItem value="5-10">5-10 years</SelectItem>
+                              <SelectItem value="10+">10+ years</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="industry"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Industry *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="e.g., Healthcare, Technology, Retail"
+                              className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="annualRevenue"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Annual Revenue *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select range" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-black border-white/20">
+                              <SelectItem value="0-100k">$0 - $100K</SelectItem>
+                              <SelectItem value="100k-250k">$100K - $250K</SelectItem>
+                              <SelectItem value="250k-500k">$250K - $500K</SelectItem>
+                              <SelectItem value="500k-1m">$500K - $1M</SelectItem>
+                              <SelectItem value="1m-5m">$1M - $5M</SelectItem>
+                              <SelectItem value="5m+">$5M+</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="businessDescription"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white text-sm font-medium">Business Description</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            {...field} 
+                            placeholder="Briefly describe your business operations..."
+                            className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20 min-h-[100px]"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Loan Details */}
+                <div className="space-y-6 pt-6 border-t border-white/10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <DollarSign className="w-5 h-5 text-yellow-400" />
+                    <h3 className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-semibold text-yellow-400">
+                      Loan Requirements
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="loanAmount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Loan Amount Needed *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select amount" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-black border-white/20">
+                              <SelectItem value="$50,000">$50,000</SelectItem>
+                              <SelectItem value="$100,000">$100,000</SelectItem>
+                              <SelectItem value="$250,000">$250,000</SelectItem>
+                              <SelectItem value="$500,000">$500,000</SelectItem>
+                              <SelectItem value="$1,000,000">$1,000,000</SelectItem>
+                              <SelectItem value="$2,500,000">$2,500,000</SelectItem>
+                              <SelectItem value="$5,000,000">$5,000,000+</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="loanPurpose"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Loan Purpose *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select purpose" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-black border-white/20">
+                              <SelectItem value="working-capital">Working Capital</SelectItem>
+                              <SelectItem value="equipment">Equipment Purchase</SelectItem>
+                              <SelectItem value="expansion">Business Expansion</SelectItem>
+                              <SelectItem value="inventory">Inventory</SelectItem>
+                              <SelectItem value="debt-consolidation">Debt Consolidation</SelectItem>
+                              <SelectItem value="real-estate">Real Estate</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="fundingTimeframe"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Funding Timeframe *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select timeframe" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-black border-white/20">
+                              <SelectItem value="asap">ASAP (Within 7 days)</SelectItem>
+                              <SelectItem value="2-weeks">2 weeks</SelectItem>
+                              <SelectItem value="30-days">30 days</SelectItem>
+                              <SelectItem value="60-days">60 days</SelectItem>
+                              <SelectItem value="90-days">90 days</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="creditScore"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Credit Score (Optional)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              type="number"
+                              placeholder="e.g., 750"
+                              className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Documentation */}
+                <div className="space-y-6 pt-6 border-t border-white/10">
+                  <h3 className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-semibold text-yellow-400">
+                    Documentation
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="taxReturns"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Tax Returns</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select option" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-black border-white/20">
+                              <SelectItem value="2-years">2 Years Available</SelectItem>
+                              <SelectItem value="1-year">1 Year Available</SelectItem>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="not-available">Not Available</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="bankStatements"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Bank Statements</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select option" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-black border-white/20">
+                              <SelectItem value="3-months">3 Months</SelectItem>
+                              <SelectItem value="6-months">6 Months</SelectItem>
+                              <SelectItem value="12-months">12 Months</SelectItem>
+                              <SelectItem value="not-available">Not Available</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="collateral"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white text-sm font-medium">Do you have collateral available? (Optional)</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20">
+                              <SelectValue placeholder="Select option" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-black border-white/20">
+                            <SelectItem value="yes">Yes</SelectItem>
+                            <SelectItem value="maybe">Maybe</SelectItem>
+                            <SelectItem value="no">No</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Additional Info */}
+                <div className="space-y-6 pt-6 border-t border-white/10">
+                  <FormField
+                    control={form.control}
+                    name="additionalInfo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white text-sm font-medium">Additional Information (Optional)</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            {...field} 
+                            placeholder="Anything else we should know about your business or application?"
+                            className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20 min-h-[120px]"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-400" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <div className="pt-6 border-t border-white/10">
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold h-12 text-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center">
+                        <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                        Submitting Application...
+                      </span>
+                    ) : (
+                      'Submit Full Application'
+                    )}
+                  </Button>
+                  <p className="text-center text-sm text-gray-400 mt-4">
+                    * Required fields. We'll never share your information.
+                  </p>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
+      </div>
+
+      <GlobalFooter />
+    </>
+  );
+}

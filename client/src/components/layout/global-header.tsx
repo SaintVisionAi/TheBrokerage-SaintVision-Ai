@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Building2, TrendingUp, DollarSign, Menu, X, ChevronDown, Sparkles, Briefcase, Phone, Home } from "lucide-react";
+import { Building2, TrendingUp, DollarSign, Menu, X, ChevronDown, Sparkles, Briefcase, Phone, Home, MessageCircle } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useSaintBroker } from "@/context/SaintBrokerContext";
 import svgLogo from "../../assets/logo.png";
 
 export default function GlobalHeader() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const { openChat } = useSaintBroker();
 
   const services = [
     { 
@@ -120,6 +122,15 @@ export default function GlobalHeader() {
             <Link href="/contact" className={`px-4 py-2 font-medium transition-colors ${isActive("/contact") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
               Contact
             </Link>
+
+            <Button
+              onClick={openChat}
+              variant="ghost"
+              className="text-white hover:text-yellow-400 hover:bg-yellow-400/10 font-medium flex items-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Help/Chat
+            </Button>
           </div>
 
           {/* Right Side Actions */}
@@ -223,6 +234,17 @@ export default function GlobalHeader() {
                   Contact
                 </div>
               </Link>
+
+              <button
+                onClick={() => {
+                  openChat();
+                  setMobileMenuOpen(false);
+                }}
+                className="px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer text-white flex items-center gap-2 w-full"
+              >
+                <MessageCircle className="w-4 h-4" />
+                SaintBroker Chat
+              </button>
 
               {/* Phone */}
               <div className="px-4 py-3 flex items-center gap-2 text-gray-400 text-sm">

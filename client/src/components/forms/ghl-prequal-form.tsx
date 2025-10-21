@@ -24,7 +24,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useGHLSubmit, createCommonValidation, GHLFormType } from '@/hooks/useGHLSubmit';
+import { useGHLSubmit, createCommonValidation } from '@/hooks/useGHLSubmit';
+import { GHLFormType } from '@/config/ghl-forms';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

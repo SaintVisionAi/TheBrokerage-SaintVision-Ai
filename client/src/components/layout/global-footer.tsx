@@ -1,6 +1,9 @@
 import { Link } from "wouter";
+import { useSaintBroker } from "@/context/SaintBrokerContext";
 
 export default function GlobalFooter() {
+  const { openChat } = useSaintBroker();
+
   const footerLinks = {
     Product: [
       { name: "AI Dashboard", href: "/dashboard" },
@@ -18,6 +21,7 @@ export default function GlobalFooter() {
       { name: "cookin.io Platform", href: "https://cookin.io", external: true }
     ],
     Resources: [
+      { name: "Speak with SaintBroker", onClick: true },
       { name: "Documentation", href: "/docs" },
       { name: "Help Center", href: "/help" },
       { name: "Community", href: "/community" },
@@ -120,13 +124,23 @@ export default function GlobalFooter() {
             <ul className="space-y-3">
               {footerLinks.Resources.map((link, index) => (
                 <li key={index}>
-                  <Link
-                    href={link.href}
-                    className="text-white/60 hover:text-white text-sm transition-colors"
-                    data-testid={`link-footer-resources-${index}`}
-                  >
-                    {link.name}
-                  </Link>
+                  {(link as any).onClick ? (
+                    <button
+                      onClick={openChat}
+                      className="text-white/60 hover:text-yellow-400 text-sm transition-colors cursor-pointer"
+                      data-testid={`link-footer-resources-${index}`}
+                    >
+                      {link.name}
+                    </button>
+                  ) : (
+                    <Link
+                      href={(link as any).href}
+                      className="text-white/60 hover:text-white text-sm transition-colors"
+                      data-testid={`link-footer-resources-${index}`}
+                    >
+                      {link.name}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

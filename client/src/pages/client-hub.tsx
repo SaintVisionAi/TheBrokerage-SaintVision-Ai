@@ -295,6 +295,50 @@ export default function ClientHub() {
             {/* Dashboard Tab */}
             {activeTab === 'dashboard' && (
               <div className="space-y-6">
+                {/* Quick Links Section - Prominent Top Links */}
+                <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-8 text-center text-white">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-1">⚡ Client Hub Quick Links ⚡</h2>
+                  <p className="text-gray-300 mb-6">We Listen. Simple. Fast & Easy. Access. Click. Upload. Connect</p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
+                    <a href="/apply" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        📋 APPLY NOW & GET PRE-APPROVED! 🔥
+                      </Button>
+                    </a>
+                    <a href="/soft-credit-pull" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        💎 GET PREPPED: SOFT CREDIT PULL HERE 🔑
+                      </Button>
+                    </a>
+                    <a href="/full-lending-application-1" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        🏗 FULL LENDING APPLICATION 👊
+                      </Button>
+                    </a>
+                    <a href="/real-estate-investing" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        📈 SVG FIXED RETURN 9-12% APP 📊
+                      </Button>
+                    </a>
+                    <a href="/set-appointment" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        🍎 SCHEDULE & APPOINTMENTS 🍎
+                      </Button>
+                    </a>
+                    <a href="/contact" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        💼 SAINT VISION MERCHANT SERVICES APPLICATION 🚀
+                      </Button>
+                    </a>
+                    <a href="/file-hub" className="block">
+                      <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
+                        📁 SAINT VISION GROUP | SECURE FILE HUB 🔒
+                      </Button>
+                    </a>
+                  </div>
+                </div>
+
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Saint Vision Group</h2>
                   <p className="text-gray-600">Your complete hub for lending, investments, and real estate financing</p>
@@ -642,16 +686,16 @@ export default function ClientHub() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <p className="font-medium text-gray-900">Live Market Intelligence</p>
-                      <p className="text-sm text-gray-600">JP Morgan insights & real-time market data</p>
+                      <div className="font-medium text-gray-900">Live Market Intelligence</div>
+                      <div className="text-sm text-gray-600">JP Morgan insights & real-time market data</div>
                     </a>
                     <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <p className="font-medium text-gray-900">Lending Guide</p>
-                      <p className="text-sm text-gray-600">Everything you need to know about business loans</p>
+                      <div className="font-medium text-gray-900">Lending Guide</div>
+                      <div className="text-sm text-gray-600">Everything you need to know about business loans</div>
                     </a>
                     <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
-                      <p className="font-medium text-gray-900">Investment Strategies</p>
-                      <p className="text-sm text-gray-600">Tax-advantaged approaches & portfolio optimization</p>
+                      <div className="font-medium text-gray-900">Investment Strategies</div>
+                      <div className="text-sm text-gray-600">Tax-advantaged approaches & portfolio optimization</div>
                     </a>
                   </CardContent>
                 </Card>
@@ -740,8 +784,8 @@ export default function ClientHub() {
             <div className="space-y-4">
               {messages.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-gray-600 mb-3">Hi! I'm SaintBroker AI 👋</p>
-                  <p className="text-xs text-gray-500 space-y-2">
+                  <div className="text-sm text-gray-600 mb-3">Hi! I'm SaintBroker AI 👋</div>
+                  <div className="text-xs text-gray-500 space-y-2">
                     <div>I can help you with:</div>
                     <div className="mt-2">
                       • Loan questions & qualification<br />
@@ -750,7 +794,7 @@ export default function ClientHub() {
                       • Document requirements<br />
                       • Scheduling appointments
                     </div>
-                  </p>
+                  </div>
                 </div>
               ) : (
                 messages.map((msg, idx) => (

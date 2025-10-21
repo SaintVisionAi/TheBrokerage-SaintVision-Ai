@@ -2875,6 +2875,51 @@ IMPORTANT: You are SaintBroker AI, the master orchestrator. Respond based on the
     }
   });
 
+  // GHL Form Submission Endpoint
+  app.post("/api/ghl/form-submit", async (req: any, res) => {
+    try {
+      const { formId, formData } = req.body;
+
+      if (!formId || !formData) {
+        return res.status(400).json({
+          success: false,
+          message: "formId and formData are required"
+        });
+      }
+
+      console.log(`[GHL-SUBMIT] Received form submission for form ID: ${formId}`);
+
+      // Import the GHL form submission service
+      const { submitFormToGHL } = await import('./services/ghl-form-submission');
+
+      // Submit to GHL
+      let result;
+      try {
+        result = await submitFormToGHL(formId, formData);
+      } catch (submitError: any) {
+        console.error('[GHL-SUBMIT] GHL API error:', submitError.message);
+        return res.status(500).json({
+          success: false,
+          error: submitError.message || "Failed to submit form to GHL"
+        });
+      }
+
+      console.log(`[GHL-SUBMIT] Form ${formId} submitted successfully`);
+
+      return res.status(200).json({
+        success: true,
+        message: "Form submitted to GHL successfully",
+        result
+      });
+    } catch (error: any) {
+      console.error('[GHL-SUBMIT] Endpoint error:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message || "Failed to submit form to GHL"
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

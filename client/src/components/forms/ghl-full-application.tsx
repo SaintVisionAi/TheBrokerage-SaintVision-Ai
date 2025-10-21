@@ -23,7 +23,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useGHLSubmit, GHLFormType } from '@/hooks/useGHLSubmit';
+import { useGHLSubmit } from '@/hooks/useGHLSubmit';
+import { GHLFormType } from '@/config/ghl-forms';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 const fullAppSchema = z.object({
