@@ -93,15 +93,18 @@ function requireApiKey(req: any, res: any, next: any) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+
   app.use(cookieParser());
   app.use(webhooksRouter);
-  
+
   // Setup voice routes for speech-to-text and text-to-speech
   setupVoiceRoutes(app);
-  
+
   // Setup email verification and password reset routes
   registerEmailVerificationRoutes(app, storage);
+
+  // Setup GHL data routes
+  app.use('/api/ghl', ghlDataRouter);
 
   // Authentication Routes
   app.post("/api/auth/signup", async (req, res) => {
