@@ -94,7 +94,7 @@ export default function Apply() {
         });
 
         setTimeout(() => {
-          setLocation('/client-portal');
+          setLocation('/prequal-success');
         }, 2000);
       } else {
         throw new Error(result.error || result.message || 'Submission failed');
