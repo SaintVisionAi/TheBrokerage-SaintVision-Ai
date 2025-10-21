@@ -391,26 +391,26 @@ export default function ClientHub() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
                     <CardContent className="pt-6">
-                      <div className="text-sm text-gray-600 mb-2">Fastest Funding</div>
-                      <div className="text-3xl font-bold text-blue-600">24-48h</div>
-                      <p className="text-xs text-gray-500 mt-2">Decision timeline</p>
+                      <div className="text-sm text-yellow-400/70 mb-2">Fastest Funding</div>
+                      <div className="text-3xl font-bold text-yellow-300">24-48h</div>
+                      <p className="text-xs text-white/50 mt-2">Decision timeline</p>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* Featured */}
-                <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+                <Card className="bg-gradient-to-r from-yellow-900/30 to-black/30 border border-yellow-400/30">
                   <CardHeader>
-                    <CardTitle className="text-blue-900">Featured: SaintVision Technologies™</CardTitle>
-                    <CardDescription className="text-blue-800">AI-powered lending and investment solutions</CardDescription>
+                    <CardTitle className="text-yellow-300">Featured: SaintVision Technologies™</CardTitle>
+                    <CardDescription className="text-yellow-400/70">AI-powered lending and investment solutions</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-blue-900 mb-4">
+                    <p className="text-sm text-white/70 mb-4">
                       Experience next-generation financing with our patent-protected HACP™ technology. Faster decisions, better terms, technology-enabled excellence.
                     </p>
-                    <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Button className="bg-yellow-400 text-black hover:bg-yellow-300">
                       Learn About Our Technology
                     </Button>
                   </CardContent>
@@ -422,30 +422,30 @@ export default function ClientHub() {
             {activeTab === 'lending' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Lending Solutions</h2>
-                  <p className="text-gray-600">From $50K to $5M+ with competitive rates starting at 9%</p>
+                  <h2 className="text-3xl font-bold text-yellow-300 mb-2">Lending Solutions</h2>
+                  <p className="text-white/70">From $50K to $5M+ with competitive rates starting at 9%</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {lendingProducts.map((product, idx) => (
                     <a key={idx} href={product.link} className="block">
-                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full bg-neutral-900/80 border border-yellow-400/20">
                         <CardHeader>
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <CardTitle className="text-lg">{product.title}</CardTitle>
-                              <CardDescription>{product.description}</CardDescription>
+                              <CardTitle className="text-lg text-yellow-300">{product.title}</CardTitle>
+                              <CardDescription className="text-white/60">{product.description}</CardDescription>
                             </div>
                             {product.badge && (
-                              <Badge className="bg-green-100 text-green-800 text-xs">{product.badge}</Badge>
+                              <Badge className="bg-yellow-400/30 text-yellow-300 text-xs">{product.badge}</Badge>
                             )}
                           </div>
                         </CardHeader>
                         <CardContent>
-                          <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4">
-                            <product.icon className="w-6 h-6 text-blue-600" />
+                          <div className="w-12 h-12 rounded-lg bg-yellow-400/20 flex items-center justify-center mb-4">
+                            <product.icon className="w-6 h-6 text-yellow-300" />
                           </div>
-                          <Button variant="outline" className="mt-4">
+                          <Button variant="outline" className="mt-4 border-yellow-400/30 text-yellow-300 hover:bg-yellow-400/10">
                             Learn More <ExternalLink className="w-3 h-3 ml-1" />
                           </Button>
                         </CardContent>
@@ -455,18 +455,18 @@ export default function ClientHub() {
                 </div>
 
                 {/* CTA Section */}
-                <Card className="bg-blue-600 text-white border-0">
+                <Card className="bg-gradient-to-r from-yellow-900/30 to-black/30 border border-yellow-400/30 text-white">
                   <CardContent className="pt-8">
-                    <h3 className="text-2xl font-bold mb-2">Ready to Get Funded?</h3>
-                    <p className="mb-4 text-blue-100">Complete application takes 15-20 minutes. Decision in 24-48 hours.</p>
+                    <h3 className="text-2xl font-bold mb-2 text-yellow-300">Ready to Get Funded?</h3>
+                    <p className="mb-4 text-yellow-400/70">Complete application takes 15-20 minutes. Decision in 24-48 hours.</p>
                     <div className="flex gap-3">
                       <a href="/full-lending-application-1" className="block">
-                        <Button className="bg-white text-blue-600 hover:bg-gray-100">
+                        <Button className="bg-yellow-400 text-black hover:bg-yellow-300">
                           Start Application
                         </Button>
                       </a>
                       <a href="/set-appointment" className="block">
-                        <Button variant="outline" className="border-white text-white hover:bg-blue-700">
+                        <Button variant="outline" className="border-yellow-400/30 text-yellow-300 hover:bg-yellow-400/10">
                           Schedule Call
                         </Button>
                       </a>
@@ -480,8 +480,8 @@ export default function ClientHub() {
             {activeTab === 'investments' && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Investment Opportunities</h2>
-                  <p className="text-gray-600">Fixed returns from 9-12% annually. Tax-advantaged strategies available.</p>
+                  <h2 className="text-3xl font-bold text-yellow-300 mb-2">Investment Opportunities</h2>
+                  <p className="text-white/70">Fixed returns from 9-12% annually. Tax-advantaged strategies available.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
