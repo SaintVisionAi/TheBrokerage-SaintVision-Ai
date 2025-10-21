@@ -490,12 +490,12 @@ export default function ClientHub() {
         <div className="p-4 border-t border-yellow-400/20">
           <div className="grid grid-cols-2 gap-2">
             <div className="p-2 bg-emerald-400/10 rounded-lg">
-              <p className="text-xs text-emerald-400">Active Loans</p>
-              <p className="text-lg font-bold text-white">3</p>
+              <p className="text-xs text-emerald-400">Active Applications</p>
+              <p className="text-lg font-bold text-white">{appsLoading ? '...' : getPendingApplicationsCount(applications)}</p>
             </div>
             <div className="p-2 bg-blue-400/10 rounded-lg">
-              <p className="text-xs text-blue-400">Total Funded</p>
-              <p className="text-lg font-bold text-white">$2.5M</p>
+              <p className="text-xs text-blue-400">Portfolio Value</p>
+              <p className="text-lg font-bold text-white">{portfolioLoading ? '...' : `$${(getTotalPortfolioValue(portfolio) / 1000).toFixed(0)}K`}</p>
             </div>
           </div>
         </div>
