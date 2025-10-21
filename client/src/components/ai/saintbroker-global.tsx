@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 export default function SaintBrokerGlobal() {
   const { isOpen, closeChat } = useSaintBroker();
   const { messages, sendMessage, isLoading } = useChat('global-user', 'global-chat');
-  const [chatInput, setChatInput] = React.useState('');
+  const [chatInput, setChatInput] = useState('');
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
