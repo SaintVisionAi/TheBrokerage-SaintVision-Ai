@@ -151,40 +151,74 @@ export default function FullLendingApplicationPage() {
     <>
       <GlobalHeader />
       
-      {/* Hero Section */}
-      <div className="bg-black text-white pt-32 pb-20 px-4">
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-yellow-400/10 border border-yellow-400/20 rounded-full px-6 py-2 mb-8">
-            <span className="text-yellow-400 text-sm font-medium">📋 Complete Your Application</span>
-          </div>
-          
-          <h1 className="text-[clamp(2.5rem,8vw,5rem)] font-semibold mb-6 leading-[1.1] tracking-tight">
-            Full Lending<br />
-            <span className="text-yellow-400">Application</span>
-          </h1>
-          
-          <p className="text-[clamp(1rem,2vw,1.25rem)] text-gray-300 mb-4 max-w-3xl mx-auto">
-            Complete this comprehensive application for funding consideration. Takes 15-20 minutes.
-          </p>
-          <p className="text-[clamp(0.875rem,1.5vw,1.125rem)] text-yellow-400 font-medium">
-            Fast approval • No credit impact • Flexible terms
-          </p>
+      {/* Premium Background */}
+      <div className="relative bg-black overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-yellow-400/15 rounded-full blur-[100px] animate-pulse" />
+          <div className="absolute -bottom-1/4 right-1/4 w-[700px] h-[700px] bg-blue-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIEwgMCA2MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40" />
         </div>
 
-        {/* Benefits Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mt-16">
-          {[
-            { icon: '⚡', title: '24-48 Hour Decision', desc: 'AI-powered approval process' },
-            { icon: '💰', title: '$50K - $5M Available', desc: 'Flexible loan amounts' },
-            { icon: '🔓', title: 'No Collateral Required', desc: 'Unsecured options available' },
-            { icon: '📈', title: 'Rates from 9%', desc: 'Competitive rates with transparent terms' }
-          ].map((benefit, i) => (
-            <div key={i} className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all">
-              <div className="text-4xl mb-4">{benefit.icon}</div>
-              <h3 className="text-lg font-semibold mb-2">{benefit.title}</h3>
-              <p className="text-sm text-gray-400">{benefit.desc}</p>
+        {/* Hero Section */}
+        <div className="relative z-10 min-h-screen flex items-center justify-center pt-20 pb-20 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-5xl text-center space-y-12">
+            {/* Badge */}
+            <div className="inline-flex items-center justify-center">
+              <Badge className="bg-yellow-400/25 text-yellow-300 border border-yellow-400/60 hover:bg-yellow-400/35 text-sm md:text-base px-4 py-2 font-semibold">
+                📋 Full Lending Application
+              </Badge>
             </div>
-          ))}
+
+            {/* Title */}
+            <div className="space-y-4">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter">
+                <span className="bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-500 bg-clip-text text-transparent">
+                  Complete Your
+                </span>
+                <br className="hidden sm:block" />
+                <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                  Funding Application
+                </span>
+              </h1>
+            </div>
+
+            {/* Subtitle */}
+            <div className="space-y-4 max-w-3xl mx-auto">
+              <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/85 leading-relaxed font-light">
+                Comprehensive application for <span className="font-semibold text-yellow-400">full funding consideration</span>
+              </p>
+              <p className="text-base sm:text-lg md:text-xl text-white/70">
+                Takes 15-20 minutes • No credit impact • Fast approval
+              </p>
+            </div>
+
+            {/* Benefits Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 py-8">
+              <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+                <span className="text-2xl md:text-3xl mb-3 block">⚡</span>
+                <h3 className="text-xs md:text-sm font-bold text-white mb-2">24-48 Hour Decision</h3>
+                <p className="text-xs text-white/60 leading-snug">AI-powered approval</p>
+              </div>
+
+              <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+                <span className="text-2xl md:text-3xl mb-3 block">💰</span>
+                <h3 className="text-xs md:text-sm font-bold text-white mb-2">$50K - $5M</h3>
+                <p className="text-xs text-white/60 leading-snug">Flexible amounts</p>
+              </div>
+
+              <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+                <span className="text-2xl md:text-3xl mb-3 block">🔓</span>
+                <h3 className="text-xs md:text-sm font-bold text-white mb-2">No Collateral</h3>
+                <p className="text-xs text-white/60 leading-snug">Unsecured options</p>
+              </div>
+
+              <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+                <span className="text-2xl md:text-3xl mb-3 block">📈</span>
+                <h3 className="text-xs md:text-sm font-bold text-white mb-2">Rates from 9%</h3>
+                <p className="text-xs text-white/60 leading-snug">Transparent terms</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
