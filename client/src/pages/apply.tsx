@@ -86,7 +86,7 @@ export default function Apply() {
 
       if (response.ok && result.success) {
         setIsSuccess(true);
-        
+
         toast({
           title: "Application Submitted! 🎉",
           description: "You'll receive a text message within minutes. Check your email for next steps!",
@@ -97,7 +97,7 @@ export default function Apply() {
           setLocation('/prequal-success');
         }, 2000);
       } else {
-        throw new Error(result.error || result.message || 'Submission failed');
+        throw new Error(result.error || result.message || 'Submission failed - please try again');
       }
     } catch (error: any) {
       console.error('Form submission error:', error);
