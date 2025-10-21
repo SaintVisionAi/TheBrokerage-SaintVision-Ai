@@ -65,6 +65,7 @@ export default function Lending() {
     notes: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   // Fetch loan products from API
   const { data: loanProducts = [], isLoading: isLoadingProducts } = useQuery<LoanProduct[]>({
