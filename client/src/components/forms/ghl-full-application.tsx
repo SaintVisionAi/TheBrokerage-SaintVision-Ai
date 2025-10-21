@@ -113,26 +113,26 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
 
   if (isSubmitted && !isLoading) {
     return (
-      <Card className="border-green-200 bg-green-50">
+      <Card className="border-yellow-400/30 bg-gradient-to-r from-yellow-900/30 to-black/30">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-green-600" />
+            <CheckCircle className="w-6 h-6 text-yellow-300" />
             <div>
-              <CardTitle className="text-green-900">Application Submitted!</CardTitle>
-              <CardDescription>Your full application has been received</CardDescription>
+              <CardTitle className="text-yellow-300">Application Submitted!</CardTitle>
+              <CardDescription className="text-white/60">Your full application has been received</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="p-4 bg-white rounded-lg border border-green-200">
-            <p className="text-sm text-gray-700">
+          <div className="p-4 bg-neutral-900/50 rounded-lg border border-yellow-400/20">
+            <p className="text-sm text-white/70">
               ✓ Your application has been submitted and is being reviewed<br />
               ✓ You'll receive updates via email<br />
               ✓ Expected decision: 24-48 hours
             </p>
           </div>
-          <div className="p-4 bg-white rounded-lg border border-gray-200">
-            <p className="text-xs text-gray-600">Application ID: APP-{Date.now().toString().slice(-8)}</p>
+          <div className="p-4 bg-neutral-900/50 rounded-lg border border-yellow-400/20">
+            <p className="text-xs text-white/50">Application ID: APP-{Date.now().toString().slice(-8)}</p>
           </div>
           <Button
             onClick={() => {
@@ -140,7 +140,7 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
               form.reset();
               setCurrentStep(1);
             }}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-yellow-400 text-black hover:bg-yellow-300"
           >
             Submit Another Application
           </Button>
@@ -150,10 +150,10 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
   }
 
   return (
-    <Card>
+    <Card className="bg-neutral-900/80 border border-yellow-400/20">
       <CardHeader>
-        <CardTitle>Full Lending Application</CardTitle>
-        <CardDescription>Complete information for loan approval</CardDescription>
+        <CardTitle className="text-yellow-300">Full Lending Application</CardTitle>
+        <CardDescription className="text-white/60">Complete information for loan approval</CardDescription>
 
         {/* Progress Steps */}
         <div className="mt-6 flex gap-4 items-center">
@@ -163,17 +163,17 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
                 onClick={() => setCurrentStep(step.number)}
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${
                   currentStep >= step.number
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-600'
+                    ? 'bg-yellow-400 text-black'
+                    : 'bg-neutral-800 text-white/50'
                 }`}
               >
                 {step.number}
               </button>
-              <span className={`text-sm font-medium ${currentStep >= step.number ? 'text-gray-900' : 'text-gray-500'}`}>
+              <span className={`text-sm font-medium ${currentStep >= step.number ? 'text-yellow-300' : 'text-white/40'}`}>
                 {step.title}
               </span>
               {idx < steps.length - 1 && (
-                <div className={`h-1 w-8 mx-2 ${currentStep > step.number ? 'bg-blue-600' : 'bg-gray-200'}`} />
+                <div className={`h-1 w-8 mx-2 ${currentStep > step.number ? 'bg-yellow-400' : 'bg-neutral-800'}`} />
               )}
             </div>
           ))}
@@ -186,7 +186,7 @@ export default function FullApplicationForm({ onSuccess, onError }: FullApplicat
             {/* Step 1: Personal Info */}
             {currentStep === 1 && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Personal Information</h3>
+                <h3 className="font-semibold text-yellow-300">Personal Information</h3>
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
