@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { FileText, Zap, Shield, Clock, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import GHLPreQualForm from '@/components/forms/ghl-prequal-form';
@@ -5,6 +6,12 @@ import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
 
 export default function PreQualForm() {
+  const formRef = useRef<HTMLDivElement>(null);
+
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <>
       <GlobalHeader />
