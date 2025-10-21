@@ -28,91 +28,91 @@ export default function PreQualForm() {
         </div>
 
         <div className="relative z-10">
-          {/* Hero Section - Full Viewport Height */}
-          <section className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-20">
-            <div className="w-full max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Hero Section - Centered Vertical Layout */}
+          <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+            <div className="w-full max-w-4xl text-center space-y-12">
+              {/* Premium Badge */}
+              <div className="inline-flex items-center justify-center">
+                <Badge className="bg-yellow-400/25 text-yellow-300 border border-yellow-400/60 hover:bg-yellow-400/35 text-sm md:text-base px-4 py-2 font-semibold">
+                  ⚡ Get Pre-Qualified in Minutes
+                </Badge>
+              </div>
 
-                {/* Left Column - Hero Content */}
-                <div className="text-center lg:text-left space-y-8">
-                  {/* Premium Badge */}
-                  <div className="inline-flex items-center justify-center lg:justify-start">
-                    <Badge className="bg-yellow-400/25 text-yellow-300 border border-yellow-400/60 hover:bg-yellow-400/35 text-sm md:text-base px-4 py-2 font-semibold">
-                      ⚡ Get Pre-Qualified in Minutes
-                    </Badge>
-                  </div>
+              {/* Hero Title - Massive & Viewport Optimized */}
+              <div className="space-y-4">
+                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter">
+                  <span className="bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-500 bg-clip-text text-transparent">
+                    Business
+                  </span>
+                  <br className="hidden sm:block" />
+                  <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                    Lending
+                  </span>
+                </h1>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white/90">
+                  Pre-Qualification
+                </h2>
+              </div>
 
-                  {/* Hero Title - Extra Large */}
-                  <div className="space-y-4">
-                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tight">
-                      <span className="bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-500 bg-clip-text text-transparent">
-                        Business
-                      </span>
-                      <br />
-                      <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                        Lending
-                      </span>
-                    </h1>
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white/90">
-                      Pre-Qualification
-                    </h2>
-                  </div>
+              {/* Subtitle & Benefits */}
+              <div className="space-y-4 max-w-2xl mx-auto">
+                <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/85 leading-relaxed font-light">
+                  Complete our quick application and receive a <span className="font-semibold text-yellow-400">pre-qualification decision within 24 hours</span>
+                </p>
+                <p className="text-base sm:text-lg md:text-xl text-white/70 font-light">
+                  No impact to your credit score
+                </p>
+              </div>
 
-                  {/* Subtitle */}
-                  <div className="space-y-3">
-                    <p className="text-lg md:text-xl lg:text-2xl text-white/80 leading-relaxed font-light">
-                      Get approved in <span className="font-semibold text-yellow-400">24-48 hours</span> with our AI-powered pre-qualification
-                    </p>
-                    <p className="text-base md:text-lg text-white/60">
-                      No credit impact • $50K - $5M available • Completely free assessment
-                    </p>
-                  </div>
-
-                  {/* CTA Button */}
-                  <div className="pt-4">
-                    <button className="group relative inline-flex items-center gap-3 px-8 md:px-10 py-4 md:py-5 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold text-lg md:text-xl rounded-xl hover:from-yellow-300 hover:to-yellow-400 transition-all duration-300 shadow-2xl shadow-yellow-400/30 hover:shadow-yellow-400/50">
-                      <span>Start Application</span>
-                      <ArrowRight className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
+              {/* Feature Cards Grid - 4 Column */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 py-8">
+                <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+                  <Clock className="w-8 h-8 md:w-10 md:h-10 text-yellow-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                  <h3 className="text-xs md:text-sm font-bold text-white mb-2">24-48 Hour Decision</h3>
+                  <p className="text-xs text-white/60 leading-snug">AI-powered with fast approval</p>
                 </div>
 
-                {/* Right Column - Feature Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                  <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 md:p-8 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
-                    <Clock className="w-10 h-10 md:w-12 md:h-12 text-yellow-400 mb-4 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-base md:text-lg font-bold text-white mb-3">24-48 Hour Decision</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">AI-powered assessment with fast approval</p>
-                  </div>
-
-                  <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 md:p-8 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
-                    <Zap className="w-10 h-10 md:w-12 md:h-12 text-yellow-400 mb-4 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-base md:text-lg font-bold text-white mb-3">$50K - $5M Available</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">Flexible amounts for any business need</p>
-                  </div>
-
-                  <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 md:p-8 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
-                    <Shield className="w-10 h-10 md:w-12 md:h-12 text-yellow-400 mb-4 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-base md:text-lg font-bold text-white mb-3">No Collateral Required</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">Unsecured loans for qualified borrowers</p>
-                  </div>
-
-                  <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 md:p-8 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
-                    <FileText className="w-10 h-10 md:w-12 md:h-12 text-yellow-400 mb-4 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-base md:text-lg font-bold text-white mb-3">Rates from 9%</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">Competitive rates with transparent terms</p>
-                  </div>
+                <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+                  <Zap className="w-8 h-8 md:w-10 md:h-10 text-yellow-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                  <h3 className="text-xs md:text-sm font-bold text-white mb-2">$50K - $5M</h3>
+                  <p className="text-xs text-white/60 leading-snug">Flexible loan amounts</p>
                 </div>
+
+                <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+                  <Shield className="w-8 h-8 md:w-10 md:h-10 text-yellow-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                  <h3 className="text-xs md:text-sm font-bold text-white mb-2">No Collateral</h3>
+                  <p className="text-xs text-white/60 leading-snug">Unsecured options</p>
+                </div>
+
+                <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+                  <FileText className="w-8 h-8 md:w-10 md:h-10 text-yellow-400 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                  <h3 className="text-xs md:text-sm font-bold text-white mb-2">Rates from 9%</h3>
+                  <p className="text-xs text-white/60 leading-snug">Competitive & transparent</p>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div className="pt-4">
+                <button
+                  onClick={scrollToForm}
+                  className="group relative inline-flex items-center gap-3 px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold text-lg md:text-2xl rounded-xl hover:from-yellow-300 hover:to-yellow-400 transition-all duration-300 shadow-2xl shadow-yellow-400/30 hover:shadow-yellow-400/50 hover:scale-105"
+                >
+                  <span>Start Application</span>
+                  <ArrowRight className="w-6 h-6 md:w-7 md:h-7 group-hover:translate-x-1 transition-transform" />
+                </button>
               </div>
             </div>
           </section>
 
           {/* Form Section */}
-          <section className="py-12 md:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-black/50 to-black">
+          <section
+            ref={formRef}
+            className="py-16 md:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-black/50 to-black"
+          >
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Quick Pre-Qualification Form</h2>
-                <p className="text-white/60 text-lg">Complete in 5 minutes • No documents required</p>
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Pre-Qualification Form</h2>
+                <p className="text-white/60 text-base md:text-lg">Complete in 5 minutes • No documents required</p>
               </div>
               <GHLPreQualForm />
             </div>
