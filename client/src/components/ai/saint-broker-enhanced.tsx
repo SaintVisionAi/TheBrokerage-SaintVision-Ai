@@ -528,44 +528,43 @@ export default function SaintBrokerEnhanced() {
           </TabsContent>
 
           {/* SIGNATURES TAB */}
-          <TabsContent value="signatures" className="flex-1 flex flex-col mt-0 p-4">
-            <ScrollArea className="flex-1">
-              <div className="space-y-2">
-                {signatures.length === 0 ? (
-                  <div className="text-center text-white/60 py-8">
-                    <FileSignature className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>No signature requests</p>
-                  </div>
-                ) : (
-                  signatures.map((sig) => (
-                    <Card key={sig.id} className="bg-white/5 backdrop-blur-sm border-white/20">
-                      <CardContent className="p-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="font-semibold text-white text-sm">{sig.documentTitle}</p>
-                            <p className="text-xs text-white/60">
-                              {new Date(sig.requestedAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <Badge
-                            className={cn(
-                              sig.status === 'pending' && 'bg-orange-400 text-black',
-                              sig.status === 'signed' && 'bg-green-400 text-black',
-                              sig.status === 'declined' && 'bg-red-400 text-black'
-                            )}
-                          >
-                            {sig.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
-                            {sig.status === 'signed' && <Check className="h-3 w-3 mr-1" />}
-                            {sig.status === 'declined' && <XCircle className="h-3 w-3 mr-1" />}
-                            {sig.status}
-                          </Badge>
+          <TabsContent value="signatures" className="flex-1 flex flex-col mt-0 overflow-hidden w-full min-h-0">
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              {signatures.length === 0 ? (
+                <div className="text-center text-white/60 py-8">
+                  <FileSignature className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No signature requests</p>
+                </div>
+              ) : (
+                signatures.map((sig) => (
+                  <Card key={sig.id} className="bg-white/5 backdrop-blur-sm border-white/20">
+                    <CardContent className="p-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-white text-sm truncate">{sig.documentTitle}</p>
+                          <p className="text-xs text-white/60">
+                            {new Date(sig.requestedAt).toLocaleDateString()}
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
+                        <Badge
+                          className={cn(
+                            "flex-shrink-0 text-xs",
+                            sig.status === 'pending' && 'bg-orange-400 text-black',
+                            sig.status === 'signed' && 'bg-green-400 text-black',
+                            sig.status === 'declined' && 'bg-red-400 text-black'
+                          )}
+                        >
+                          {sig.status === 'pending' && <Clock className="h-3 w-3 mr-0.5" />}
+                          {sig.status === 'signed' && <Check className="h-3 w-3 mr-0.5" />}
+                          {sig.status === 'declined' && <XCircle className="h-3 w-3 mr-0.5" />}
+                          {sig.status}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </Card>
