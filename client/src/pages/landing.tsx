@@ -24,6 +24,7 @@ import {
 import { Link } from 'wouter';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
+import SaintBrokerButton from '@/components/ai/saintbroker-button';
 
 export default function Landing() {
   const [scrollY, setScrollY] = useState(0);
