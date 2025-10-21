@@ -484,48 +484,47 @@ export default function SaintBrokerEnhanced() {
           </TabsContent>
 
           {/* NOTES TAB */}
-          <TabsContent value="notes" className="flex-1 flex flex-col mt-0 p-4 space-y-4">
-            <div className="space-y-2 bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+          <TabsContent value="notes" className="flex-1 flex flex-col mt-0 overflow-hidden w-full min-h-0">
+            <div className="flex-shrink-0 space-y-2 bg-white/5 backdrop-blur-sm p-3 border-b border-white/10">
               <Input
                 value={noteTitle}
                 onChange={(e) => setNoteTitle(e.target.value)}
                 placeholder="Title..."
-                className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50"
+                className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50 h-8 text-sm"
               />
               <Textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 placeholder="Content..."
-                className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50 min-h-[60px]"
+                className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder:text-white/50 min-h-[50px] text-sm"
               />
               <Button
                 onClick={handleSaveNote}
-                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black"
+                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black h-8 text-sm"
+                size="sm"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-3 w-3 mr-1" />
                 Save
               </Button>
             </div>
 
-            <ScrollArea className="flex-1">
-              <div className="space-y-2">
-                {notes.length === 0 ? (
-                  <div className="text-center text-white/60 py-8">
-                    <StickyNote className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>No notes</p>
-                  </div>
-                ) : (
-                  notes.map((note) => (
-                    <Card key={note.id} className="bg-white/5 backdrop-blur-sm border-white/20">
-                      <CardContent className="p-3">
-                        <h4 className="font-semibold text-white">{note.title}</h4>
-                        <p className="text-sm text-white/80 mt-2">{note.content}</p>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              {notes.length === 0 ? (
+                <div className="text-center text-white/60 py-8">
+                  <StickyNote className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">No notes</p>
+                </div>
+              ) : (
+                notes.map((note) => (
+                  <Card key={note.id} className="bg-white/5 backdrop-blur-sm border-white/20">
+                    <CardContent className="p-3">
+                      <h4 className="font-semibold text-white text-sm">{note.title}</h4>
+                      <p className="text-xs text-white/80 mt-1">{note.content}</p>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
           </TabsContent>
 
           {/* SIGNATURES TAB */}
