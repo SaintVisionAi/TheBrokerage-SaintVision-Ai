@@ -3,7 +3,6 @@ import { Building2, Home, DollarSign, TrendingUp, CheckCircle, ArrowRight, MapPi
 import GlobalHeader from "@/components/layout/global-header";
 import GlobalFooter from "@/components/layout/global-footer";
 import { Link } from "wouter";
-import SaintBrokerEnhanced from "@/components/ai/saint-broker-enhanced";
 
 export default function RealEstate() {
   const services = [
@@ -324,9 +323,6 @@ export default function RealEstate() {
       </section>
 
       <GlobalFooter />
-      
-      {/* AI Concierge */}
-      <SaintBrokerEnhanced />
     </div>
   );
 }

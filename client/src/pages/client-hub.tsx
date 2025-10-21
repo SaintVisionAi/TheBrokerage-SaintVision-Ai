@@ -1,737 +1,816 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { 
-  Upload, 
-  FileText, 
-  Download, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle,
-  Calendar,
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
   DollarSign,
-  Briefcase,
   Home,
-  TrendingUp,
-  Shield,
-  FileSignature,
-  Send,
-  Eye,
-  Trash2,
-  Plus,
-  Calculator,
-  Search,
   Building2,
-  MessageCircle,
-  Sparkles,
-  Brain,
-  Zap,
-  FolderOpen,
-  File,
+  TrendingUp,
+  FileText,
+  Calendar,
   Users,
   Settings,
   LogOut,
-  Bot,
-  ChevronRight,
-  Activity,
+  Menu,
+  X,
+  Send,
+  Loader2,
+  ExternalLink,
+  Search,
+  CheckCircle,
+  AlertCircle,
   CreditCard,
-  Target,
-  Rocket,
-  Database,
-  Layers,
-  Terminal,
-  Code2,
-  ChevronDown,
-  ChevronUp,
-  MessageSquare,
-  X
+  Briefcase,
+  PieChart,
+  Wrench,
+  HelpCircle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useChat } from '@/hooks/use-chat';
 
-interface WorkspaceFile {
-  id: string;
-  name: string;
-  type: 'document' | 'application' | 'image' | 'contract';
-  size: string;
-  modified: string;
-  status: 'pending' | 'verified' | 'processing' | 'complete' | 'awaiting_signature' | 'signed';
-  progress?: number;
-  signatureRequired?: boolean;
-  signedBy?: string;
-  signedAt?: string;
-}
-
-interface QuickAction {
-  id: string;
-  title: string;
-  description: string;
-  icon: any;
-  color: string;
-  time?: string;
-}
-
 export default function ClientHub() {
   const { toast } = useToast();
-  const [activeSection, setActiveSection] = useState('dashboard');
-  const [saintBrokerInput, setSaintBrokerInput] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isChatExpanded, setIsChatExpanded] = useState(false);
-  const { messages, sendMessage, isLoading } = useChat('user-123', 'hub-chat');
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'lending' | 'investments' | 'real-estate' | 'tools' | 'account'>('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { messages, sendMessage, isLoading: chatLoading } = useChat('user-123', 'hub-chat');
   const [chatInput, setChatInput] = useState('');
-  const [workspaceFiles, setWorkspaceFiles] = useState<WorkspaceFile[]>([
-    { 
-      id: '1', 
-      name: 'Equipment_Loan_Agreement.pdf', 
-      type: 'contract', 
-      size: '2.4 MB', 
-      modified: '2 hours ago', 
-      status: 'awaiting_signature',
-      signatureRequired: true 
-    },
-    { 
-      id: '2', 
-      name: 'Personal_Guarantee_Form.pdf', 
-      type: 'contract', 
-      size: '1.2 MB', 
-      modified: '2 hours ago', 
-      status: 'awaiting_signature',
-      signatureRequired: true 
-    },
-    { 
-      id: '3', 
-      name: 'Tax_Returns_2024.pdf', 
-      type: 'document', 
-      size: '1.8 MB', 
-      modified: '1 day ago', 
-      status: 'signed',
-      signatureRequired: true,
-      signedBy: 'Ryan Capatosto',
-      signedAt: 'Yesterday at 3:45 PM'
-    },
-    { 
-      id: '4', 
-      name: 'Bank_Statements_Q4.pdf', 
-      type: 'document', 
-      size: '456 KB', 
-      modified: '3 days ago', 
-      status: 'verified' 
-    },
-    { 
-      id: '5', 
-      name: 'Business_Plan_2025.pdf', 
-      type: 'document', 
-      size: '892 KB', 
-      modified: '5 days ago', 
-      status: 'complete' 
-    },
-    { 
-      id: '6', 
-      name: 'Equipment_Invoice.pdf', 
-      type: 'document', 
-      size: '1.1 MB', 
-      modified: '1 week ago', 
-      status: 'signed',
-      signatureRequired: true,
-      signedBy: 'Ryan Capatosto',
-      signedAt: '3 days ago'
-    },
-  ]);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
 
-  const [recentActions] = useState([
-    { id: '1', title: 'Equipment Loan Pre-Approved', description: '$500K approved for restaurant equipment', time: '2 hours ago', status: 'success' },
-    { id: '2', title: 'Documents Verified', description: 'Tax returns and bank statements verified', time: '1 day ago', status: 'success' },
-    { id: '3', title: 'Credit Check Complete', description: 'Soft pull completed - Score: 750', time: '2 days ago', status: 'info' },
-    { id: '4', title: 'Application Started', description: 'Commercial lending application initiated', time: '3 days ago', status: 'progress' },
-  ]);
-
-  const navigationItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Activity, badge: null },
-    { id: 'applications', label: 'Applications', icon: FileText, badge: '3' },
-    { id: 'documents', label: 'Documents', icon: FolderOpen, badge: '12' },
-    { id: 'funding', label: 'Funding Status', icon: DollarSign, badge: null },
-    { id: 'messages', label: 'Messages', icon: MessageCircle, badge: '5' },
-    { id: 'account', label: 'Account', icon: Users, badge: null },
-    { id: 'settings', label: 'Settings', icon: Settings, badge: null },
-  ];
-
-  const quickActions: QuickAction[] = [
-    { id: 'apply', title: 'Start New Application', description: 'Get funded in 24-48 hours', icon: Rocket, color: 'from-emerald-500 to-emerald-600' },
-    { id: 'upload', title: 'Upload Documents', description: 'Secure document portal', icon: Upload, color: 'from-blue-500 to-blue-600' },
-    { id: 'schedule', title: 'Schedule Call', description: 'Speak with an expert', icon: Calendar, color: 'from-purple-500 to-purple-600' },
-    { id: 'calculator', title: 'ROI Calculator', description: 'Calculate your returns', icon: Calculator, color: 'from-yellow-400 to-yellow-500' },
-  ];
-
-  const handleSaintBrokerSubmit = async () => {
-    if (!saintBrokerInput.trim()) return;
-    
-    setIsProcessing(true);
-    
-    // Simulate AI processing
-    setTimeout(() => {
-      toast({
-        title: "🤖 SaintBroker AI Processing",
-        description: "I'm working on your request. Documents will be ready in 2 minutes!",
-      });
-      setSaintBrokerInput('');
-      setIsProcessing(false);
-      
-      // Simulate document creation
-      setTimeout(() => {
-        const newFile: WorkspaceFile = {
-          id: Date.now().toString(),
-          name: 'AI_Generated_Application.pdf',
-          type: 'application',
-          size: '1.2 MB',
-          modified: 'Just now',
-          status: 'processing',
-          progress: 0
-        };
-        setWorkspaceFiles(prev => [newFile, ...prev]);
-        
-        // Simulate progress
-        let progress = 0;
-        const interval = setInterval(() => {
-          progress += 20;
-          setWorkspaceFiles(prev => prev.map(f => 
-            f.id === newFile.id ? { ...f, progress, status: progress >= 100 ? 'complete' : 'processing' } : f
-          ));
-          if (progress >= 100) {
-            clearInterval(interval);
-            toast({
-              title: "✅ Documents Ready!",
-              description: "Your application is complete. Funding approval in 24 hours!",
-            });
-          }
-        }, 400);
-      }, 2000);
-    }, 1000);
-  };
-
-  const getFileIcon = (type: string) => {
-    switch (type) {
-      case 'document': return <FileText className="w-4 h-4 text-blue-400" />;
-      case 'application': return <FileSignature className="w-4 h-4 text-emerald-400" />;
-      case 'image': return <File className="w-4 h-4 text-purple-400" />;
-      case 'contract': return <Shield className="w-4 h-4 text-yellow-400" />;
-      default: return <File className="w-4 h-4 text-gray-400" />;
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
-  };
+  }, [messages]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'complete': return 'text-emerald-400';
-      case 'signed': return 'text-emerald-400';
-      case 'verified': return 'text-blue-400';
-      case 'processing': return 'text-yellow-400';
-      case 'awaiting_signature': return 'text-orange-400';
-      case 'pending': return 'text-gray-400';
-      default: return 'text-gray-400';
-    }
-  };
-
-  const handleSignDocument = (fileId: string, fileName: string) => {
-    toast({
-      title: "📝 Opening GHL Signature Portal",
-      description: `Redirecting to sign ${fileName}...`,
-    });
-    
-    // Simulate signing process
-    setTimeout(() => {
-      setWorkspaceFiles(prev => prev.map(f => 
-        f.id === fileId ? { 
-          ...f, 
-          status: 'signed', 
-          signedBy: 'Ryan Capatosto',
-          signedAt: new Date().toLocaleString()
-        } : f
-      ));
-      
-      toast({
-        title: "✅ Document Signed!",
-        description: "Your signature has been captured successfully.",
-      });
-    }, 3000);
-  };
-
-  const handleSendChatMessage = async () => {
-    if (!chatInput.trim() || isLoading) return;
-    
+  const handleSendMessage = async () => {
+    if (!chatInput.trim()) return;
     const message = chatInput;
     setChatInput('');
-    
     await sendMessage(message);
   };
 
-  // Auto-scroll chat to bottom
-  useEffect(() => {
-    if (scrollAreaRef.current && isChatExpanded) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }
-    }
-  }, [messages, isChatExpanded]);
+  // Platform Resources
+  const lendingProducts = [
+    {
+      title: 'Business Loans',
+      description: '$50K - $5M at rates starting at 9%',
+      icon: Briefcase,
+      link: '/loans-docs-4-funding',
+      badge: 'Popular',
+    },
+    {
+      title: 'Real Estate Financing',
+      description: '$100K - $10M+ commercial & residential',
+      icon: Building2,
+      link: '/real-estate-investing',
+    },
+    {
+      title: 'Equipment Financing',
+      description: 'Purchase equipment with flexible terms',
+      icon: Wrench,
+      link: '/loans-docs-4-funding',
+    },
+    {
+      title: 'Lines of Credit',
+      description: 'Access flexible credit when you need it',
+      icon: CreditCard,
+      link: '/loans-docs-4-funding',
+    },
+    {
+      title: 'Bridge Loans',
+      description: 'Short-term financing for transitions',
+      icon: DollarSign,
+      link: '/loans-docs-4-funding',
+    },
+    {
+      title: 'Personal Loans',
+      description: 'Debt consolidation & major purchases',
+      icon: Users,
+      link: '/loans-docs-4-funding',
+    },
+  ];
+
+  const investmentProducts = [
+    {
+      title: '9-12% Fixed Returns',
+      description: 'Diversified real estate & lending portfolio',
+      icon: TrendingUp,
+      link: '/investment-offering-1',
+      badge: 'High Yield',
+    },
+    {
+      title: 'Comprehensive Fund',
+      description: 'Saint Vision Comprehensive Fund access',
+      icon: PieChart,
+      link: '/comprehensive-solutions',
+    },
+    {
+      title: 'Lending Syndicate Fund',
+      description: 'Private lending opportunities & returns',
+      icon: DollarSign,
+      link: '/investment-offering-1',
+    },
+    {
+      title: 'UPREIT Strategies',
+      description: '1031 exchanges & tax-advantaged investing',
+      icon: Building2,
+      link: '/investment-offering-1',
+    },
+    {
+      title: 'Private Client Suite',
+      description: 'Exclusive wealth strategies & access',
+      icon: Users,
+      link: '/comprehensive-solutions',
+    },
+    {
+      title: 'Portfolio Advisory',
+      description: 'Custom investment strategies for you',
+      icon: TrendingUp,
+      link: '/investment-offering-1',
+    },
+  ];
+
+  const tools = [
+    {
+      title: 'Deal Analyzer',
+      description: 'Analyze real estate deals & ROI',
+      icon: Wrench,
+      link: '/',
+      action: 'Download',
+    },
+    {
+      title: 'Market Intelligence',
+      description: 'Live JP Morgan & market insights',
+      icon: TrendingUp,
+      link: '/',
+      action: 'View',
+    },
+    {
+      title: 'Secure File Hub',
+      description: 'Upload & store documents securely',
+      icon: FileText,
+      link: '/file-hub',
+      action: 'Access',
+    },
+    {
+      title: 'Document Submission',
+      description: 'Submit required loan documents',
+      icon: FileText,
+      link: '/upload-documents',
+      action: 'Submit',
+    },
+  ];
+
+  const quickActions = [
+    {
+      icon: FileText,
+      title: 'Full Application',
+      description: 'Complete lending application',
+      link: '/full-lending-application-1',
+      color: 'bg-blue-100',
+    },
+    {
+      icon: Calendar,
+      title: 'Schedule Call',
+      description: 'Book discovery appointment',
+      link: '/set-appointment',
+      color: 'bg-green-100',
+    },
+    {
+      icon: HelpCircle,
+      title: 'SaintSal Help',
+      description: 'AI assistance & support',
+      link: '/',
+      color: 'bg-yellow-100',
+    },
+    {
+      icon: Home,
+      title: 'Client Portal',
+      description: 'Access your account & documents',
+      link: '/m/account',
+      color: 'bg-purple-100',
+    },
+  ];
+
+  const tabItems = [
+    { id: 'dashboard' as const, label: 'Dashboard', icon: Home },
+    { id: 'lending' as const, label: 'Lending Products', icon: CreditCard },
+    { id: 'investments' as const, label: 'Investments', icon: TrendingUp },
+    { id: 'real-estate' as const, label: 'Real Estate', icon: Building2 },
+    { id: 'tools' as const, label: 'Tools & Resources', icon: Wrench },
+    { id: 'account' as const, label: 'Account', icon: Settings },
+  ];
 
   return (
-    <div className="min-h-screen bg-black flex">
-      {/* Left Panel - Navigation & SaintBroker Command Center */}
-      <div className="w-80 bg-gradient-to-b from-neutral-950 to-black border-r border-yellow-400/20 flex flex-col">
-        {/* Brand Header */}
-        <div className="p-6 border-b border-yellow-400/20">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-              <Brain className="w-7 h-7 text-black" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-yellow-400">SaintBroker AI™</h1>
-              <p className="text-xs text-gray-400">Command Center</p>
-            </div>
-          </div>
-          
-          {/* User Profile Quick Info */}
-          <div className="flex items-center justify-between mt-4 p-3 bg-yellow-400/10 rounded-lg">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
-                <span className="text-xs font-bold text-black">RC</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-white">Ryan Capatosto</p>
-                <p className="text-xs text-emerald-400">Pre-Approved: $5M</p>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-yellow-400" />
-          </div>
-        </div>
-
-        {/* SaintBroker AI Chat Section */}
-        <div className="border-b border-yellow-400/20">
-          {!isChatExpanded ? (
-            // Collapsed state - clever messaging
-            <button
-              onClick={() => setIsChatExpanded(true)}
-              className="w-full p-4 text-left hover:bg-yellow-400/5 transition-colors group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-yellow-400 group-hover:animate-pulse" />
-                  <div>
-                    <p className="text-sm font-medium text-yellow-400">Talk to SaintBroker™</p>
-                    <p className="text-xs text-gray-400">When you need your guy who just knocks this sh*t out...</p>
-                  </div>
-                </div>
-                <ChevronDown className="w-4 h-4 text-yellow-400 group-hover:text-yellow-300" />
-              </div>
-            </button>
-          ) : (
-            // Expanded state - full chat
-            <div className="flex flex-col h-[500px]">
-              {/* Chat Header */}
-              <div className="px-4 py-3 bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                    <Brain className="w-5 h-5 text-black" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-yellow-400">SaintBroker™ AI</p>
-                    <p className="text-xs text-emerald-400 flex items-center gap-1">
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                      Online • Ready to crush it
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsChatExpanded(false)}
-                  className="p-1 hover:bg-white/10 rounded transition-colors"
-                >
-                  <ChevronUp className="w-4 h-4 text-yellow-400" />
-                </button>
-              </div>
-
-              {/* Chat Messages */}
-              <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-                <div className="space-y-4">
-                  {messages.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Bot className="w-12 h-12 text-yellow-400/40 mx-auto mb-3" />
-                      <p className="text-sm text-gray-400">Start a conversation with SaintBroker AI</p>
-                      <p className="text-xs text-gray-500 mt-2">I'll handle everything from funding to documents</p>
-                    </div>
-                  ) : (
-                    messages.map((msg, idx) => (
-                      <div
-                        key={idx}
-                        className={cn(
-                          "flex gap-3",
-                          msg.role === 'user' ? 'justify-end' : 'justify-start'
-                        )}
-                      >
-                        {msg.role === 'assistant' && (
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center flex-shrink-0">
-                            <Brain className="w-5 h-5 text-black" />
-                          </div>
-                        )}
-                        <div
-                          className={cn(
-                            "max-w-[70%] px-4 py-2 rounded-lg",
-                            msg.role === 'user'
-                              ? 'bg-yellow-400/20 text-white'
-                              : 'bg-black/50 text-white border border-yellow-400/20'
-                          )}
-                        >
-                          <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {new Date(msg.timestamp || '').toLocaleTimeString()}
-                          </p>
-                        </div>
-                        {msg.role === 'user' && (
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs font-bold text-black">RC</span>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                  {isLoading && (
-                    <div className="flex gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                        <Brain className="w-5 h-5 text-black animate-pulse" />
-                      </div>
-                      <div className="bg-black/50 px-4 py-2 rounded-lg border border-yellow-400/20">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" />
-                          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-
-              {/* Chat Input */}
-              <div className="p-3 border-t border-yellow-400/20">
-                <div className="flex gap-2">
-                  <Input
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendChatMessage();
-                      }
-                    }}
-                    placeholder="Ask me anything... funding, documents, applications"
-                    className="flex-1 bg-black/50 border-yellow-400/30 text-white placeholder:text-gray-500 focus:border-yellow-400"
-                    disabled={isLoading}
-                  />
-                  <Button
-                    onClick={handleSendChatMessage}
-                    disabled={!chatInput.trim() || isLoading}
-                    className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700"
-                  >
-                    {isLoading ? (
-                      <Activity className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Send className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Enter to send • Shift+Enter for new line</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation Menu */}
-        <ScrollArea className="flex-1 px-3 py-4">
-          <nav className="space-y-1">
-            {navigationItems.map((item) => (
+    <div className="min-h-screen bg-white">
+      {/* Top Navigation */}
+      <div className="border-b border-gray-200 bg-white sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-3">
               <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                className={cn(
-                  "w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all",
-                  activeSection === item.id
-                    ? "bg-yellow-400/20 text-yellow-400 border border-yellow-400/30"
-                    : "text-gray-400 hover:bg-white/5 hover:text-white"
-                )}
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
               >
-                <div className="flex items-center gap-3">
-                  <item.icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{item.label}</span>
-                </div>
-                {item.badge && (
-                  <Badge className="bg-yellow-400/20 text-yellow-400 border-0 text-xs px-1.5">
-                    {item.badge}
-                  </Badge>
-                )}
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
-            ))}
-          </nav>
-        </ScrollArea>
-
-        {/* Quick Stats */}
-        <div className="p-4 border-t border-yellow-400/20">
-          <div className="grid grid-cols-2 gap-2">
-            <div className="p-2 bg-emerald-400/10 rounded-lg">
-              <p className="text-xs text-emerald-400">Active Loans</p>
-              <p className="text-lg font-bold text-white">3</p>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Saint Vision Group</h1>
+                <p className="text-xs text-gray-500">Client Hub & Resource Center</p>
+              </div>
             </div>
-            <div className="p-2 bg-blue-400/10 rounded-lg">
-              <p className="text-xs text-blue-400">Total Funded</p>
-              <p className="text-lg font-bold text-white">$2.5M</p>
+
+            <div className="flex-1 max-w-xs mx-8">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search products, tools..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 border-gray-300"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">Ryan Capatosto</span>
+              <button className="p-2 hover:bg-gray-100 rounded-lg">
+                <LogOut className="w-5 h-5 text-gray-600" />
+              </button>
             </div>
           </div>
-        </div>
-
-        {/* Logout */}
-        <div className="p-4 border-t border-yellow-400/20">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-gray-400 hover:text-white hover:bg-white/5"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
         </div>
       </div>
 
-      {/* Right Panel - Main Workspace */}
-      <div className="flex-1 flex flex-col bg-gradient-to-br from-neutral-950 via-black to-neutral-900">
-        {/* Top Bar */}
-        <div className="bg-black/40 backdrop-blur-xl border-b border-yellow-400/20 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-white">Client Workspace</h2>
-              <p className="text-sm text-gray-400 mt-1">Everything you need in one place</p>
+      <div className="flex h-[calc(100vh-64px)]">
+        {/* Sidebar */}
+        <div
+          className={cn(
+            'w-64 border-r border-gray-200 bg-gray-50 flex flex-col transition-all duration-300',
+            !sidebarOpen && 'hidden lg:flex'
+          )}
+        >
+          <div className="flex-1 overflow-y-auto p-4">
+            <nav className="space-y-2">
+              {tabItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setSidebarOpen(false);
+                  }}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+                    activeTab === item.id
+                      ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  )}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <div className="border-t border-gray-200 p-4 bg-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-2xl">🤖</span>
+              <span className="text-sm font-semibold text-gray-900">SaintBroker AI</span>
             </div>
-            <div className="flex items-center gap-3">
-              {/* Live Status */}
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-400/10 border border-emerald-400/30 rounded-lg">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <span className="text-xs text-emerald-400 font-medium">All Systems Operational</span>
-              </div>
-              
-              {/* Quick Actions */}
-              <Button className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700">
-                <Plus className="w-4 h-4 mr-2" />
-                New Application
-              </Button>
-            </div>
+            <p className="text-xs text-gray-500">
+              Need help navigating your options? I can answer questions, help with applications, or guide you through any process.
+            </p>
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 p-6 overflow-auto">
-          {activeSection === 'dashboard' && (
-            <div className="space-y-6">
-              {/* Quick Actions Grid */}
-              <div className="grid grid-cols-4 gap-4">
-                {quickActions.map((action) => (
-                  <Card 
-                    key={action.id}
-                    className="bg-black/40 border-yellow-400/20 hover:border-yellow-400/40 transition-all cursor-pointer group"
-                  >
-                    <CardContent className="p-6">
-                      <div className={cn(
-                        "w-12 h-12 rounded-lg bg-gradient-to-br flex items-center justify-center mb-4",
-                        action.color
-                      )}>
-                        <action.icon className="w-6 h-6 text-black" />
-                      </div>
-                      <h3 className="font-semibold text-white mb-1">{action.title}</h3>
-                      <p className="text-xs text-gray-400">{action.description}</p>
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto bg-gray-50">
+          <div className="max-w-6xl mx-auto p-6">
+            {/* Dashboard Tab */}
+            {activeTab === 'dashboard' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome to Saint Vision Group</h2>
+                  <p className="text-gray-600">Your complete hub for lending, investments, and real estate financing</p>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {quickActions.map((action, idx) => (
+                    <a
+                      key={idx}
+                      href={action.link}
+                      className="block"
+                    >
+                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                        <CardContent className="pt-6">
+                          <div className={cn('w-12 h-12 rounded-lg flex items-center justify-center mb-4', action.color)}>
+                            <action.icon className="w-6 h-6 text-gray-800" />
+                          </div>
+                          <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
+                          <p className="text-xs text-gray-600">{action.description}</p>
+                          <Button
+                            variant="link"
+                            className="mt-4 p-0 text-blue-600 hover:text-blue-700"
+                          >
+                            Get Started <ExternalLink className="w-3 h-3 ml-1" />
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </a>
+                  ))}
+                </div>
+
+                {/* Status Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-sm text-gray-600 mb-2">Pre-Approved Amount</div>
+                      <div className="text-3xl font-bold text-gray-900">$5M</div>
+                      <p className="text-xs text-gray-500 mt-2">Ready to access</p>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
 
-              {/* Signature Status Tracker */}
-              {workspaceFiles.filter(f => f.status === 'awaiting_signature').length > 0 && (
-                <Card className="bg-gradient-to-r from-orange-500/10 to-orange-600/10 border-orange-400/30">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-sm text-gray-600 mb-2">Investment Opportunities</div>
+                      <div className="text-3xl font-bold text-green-600">9-12%</div>
+                      <p className="text-xs text-gray-500 mt-2">Fixed annual returns</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-sm text-gray-600 mb-2">Fastest Funding</div>
+                      <div className="text-3xl font-bold text-blue-600">24-48h</div>
+                      <p className="text-xs text-gray-500 mt-2">Decision timeline</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Featured */}
+                <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
                   <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-orange-400/20 flex items-center justify-center">
-                          <FileSignature className="w-5 h-5 text-orange-400" />
+                    <CardTitle className="text-blue-900">Featured: SaintVision Technologies™</CardTitle>
+                    <CardDescription className="text-blue-800">AI-powered lending and investment solutions</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-blue-900 mb-4">
+                      Experience next-generation financing with our patent-protected HACP™ technology. Faster decisions, better terms, technology-enabled excellence.
+                    </p>
+                    <Button className="bg-blue-600 hover:bg-blue-700">
+                      Learn About Our Technology
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Lending Tab */}
+            {activeTab === 'lending' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Lending Solutions</h2>
+                  <p className="text-gray-600">From $50K to $5M+ with competitive rates starting at 9%</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {lendingProducts.map((product, idx) => (
+                    <a key={idx} href={product.link} className="block">
+                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                        <CardHeader>
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <CardTitle className="text-lg">{product.title}</CardTitle>
+                              <CardDescription>{product.description}</CardDescription>
+                            </div>
+                            {product.badge && (
+                              <Badge className="bg-green-100 text-green-800 text-xs">{product.badge}</Badge>
+                            )}
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4">
+                            <product.icon className="w-6 h-6 text-blue-600" />
+                          </div>
+                          <Button variant="outline" className="mt-4">
+                            Learn More <ExternalLink className="w-3 h-3 ml-1" />
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </a>
+                  ))}
+                </div>
+
+                {/* CTA Section */}
+                <Card className="bg-blue-600 text-white border-0">
+                  <CardContent className="pt-8">
+                    <h3 className="text-2xl font-bold mb-2">Ready to Get Funded?</h3>
+                    <p className="mb-4 text-blue-100">Complete application takes 15-20 minutes. Decision in 24-48 hours.</p>
+                    <div className="flex gap-3">
+                      <a href="/full-lending-application-1" className="block">
+                        <Button className="bg-white text-blue-600 hover:bg-gray-100">
+                          Start Application
+                        </Button>
+                      </a>
+                      <a href="/set-appointment" className="block">
+                        <Button variant="outline" className="border-white text-white hover:bg-blue-700">
+                          Schedule Call
+                        </Button>
+                      </a>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Investments Tab */}
+            {activeTab === 'investments' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Investment Opportunities</h2>
+                  <p className="text-gray-600">Fixed returns from 9-12% annually. Tax-advantaged strategies available.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {investmentProducts.map((product, idx) => (
+                    <a key={idx} href={product.link} className="block">
+                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                        <CardHeader>
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <CardTitle className="text-lg">{product.title}</CardTitle>
+                              <CardDescription>{product.description}</CardDescription>
+                            </div>
+                            {product.badge && (
+                              <Badge className="bg-yellow-100 text-yellow-800 text-xs">{product.badge}</Badge>
+                            )}
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center mb-4">
+                            <product.icon className="w-6 h-6 text-green-600" />
+                          </div>
+                          <Button variant="outline" className="mt-4">
+                            Explore <ExternalLink className="w-3 h-3 ml-1" />
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </a>
+                  ))}
+                </div>
+
+                {/* Why Invest */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Why Invest with Saint Vision Group?</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-900">Fixed Returns</p>
+                        <p className="text-sm text-gray-600">Predictable 9-12% annual returns</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-900">Diversification</p>
+                        <p className="text-sm text-gray-600">Real estate & lending portfolio mix</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-900">Tax-Advantaged</p>
+                        <p className="text-sm text-gray-600">UPREIT, 1031 exchanges & strategies</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-900">Private Access</p>
+                        <p className="text-sm text-gray-600">Exclusive opportunities for clients</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Real Estate Tab */}
+            {activeTab === 'real-estate' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Real Estate Solutions</h2>
+                  <p className="text-gray-600">Fix & flips, DSCR loans, bridge financing, and investment properties</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Fix & Flip Loans</CardTitle>
+                      <CardDescription>Quick capital for real estate projects</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Loan Amount</p>
+                          <p className="font-semibold text-gray-900">$100K - $10M+</p>
                         </div>
                         <div>
-                          <CardTitle className="text-orange-400">Documents Awaiting Signature</CardTitle>
-                          <CardDescription>Sign these documents to move forward with funding</CardDescription>
+                          <p className="text-sm text-gray-600">Terms</p>
+                          <p className="font-semibold text-gray-900">6 months - 24 months</p>
                         </div>
                       </div>
-                      <Badge className="bg-orange-400/20 text-orange-400 border-orange-400/30">
-                        {workspaceFiles.filter(f => f.status === 'awaiting_signature').length} Pending
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      {workspaceFiles.filter(f => f.status === 'awaiting_signature').map((file) => (
-                        <div key={file.id} className="flex items-center justify-between p-4 bg-black/40 rounded-lg border border-orange-400/20">
-                          <div className="flex items-center gap-3">
-                            <FileSignature className="w-5 h-5 text-orange-400" />
-                            <div>
-                              <p className="text-sm font-medium text-white">{file.name}</p>
-                              <p className="text-xs text-gray-400">Uploaded {file.modified}</p>
-                            </div>
-                          </div>
-                          <Button 
-                            onClick={() => handleSignDocument(file.id, file.name)}
-                            className="bg-orange-400 hover:bg-orange-500 text-black font-semibold px-3 py-1 text-xs"
-                          >
-                            Sign Now
-                          </Button>
+                      <a href="/real-estate-investing">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700">Learn More</Button>
+                      </a>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>DSCR Loans</CardTitle>
+                      <CardDescription>No income verification required</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Loan Amount</p>
+                          <p className="font-semibold text-gray-900">$100K - $5M+</p>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Split View - Activity Feed & Files */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* Recent Activity */}
-                <Card className="bg-black/40 border-yellow-400/20">
-                  <CardHeader>
-                    <CardTitle className="text-yellow-400">Recent Activity</CardTitle>
-                    <CardDescription>Your latest updates and actions</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[400px] pr-4">
-                      <div className="space-y-4">
-                        {recentActions.map((action) => (
-                          <div key={action.id} className="flex items-start gap-3 p-3 bg-white/5 rounded-lg">
-                            <div className={cn(
-                              "w-8 h-8 rounded-full flex items-center justify-center",
-                              action.status === 'success' ? 'bg-emerald-400/20' :
-                              action.status === 'info' ? 'bg-blue-400/20' :
-                              'bg-yellow-400/20'
-                            )}>
-                              {action.status === 'success' ? <CheckCircle className="w-4 h-4 text-emerald-400" /> :
-                               action.status === 'info' ? <AlertCircle className="w-4 h-4 text-blue-400" /> :
-                               <Clock className="w-4 h-4 text-yellow-400" />}
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-white">{action.title}</p>
-                              <p className="text-xs text-gray-400 mt-1">{action.description}</p>
-                              <p className="text-xs text-gray-500 mt-2">{action.time}</p>
-                            </div>
-                          </div>
-                        ))}
+                        <div>
+                          <p className="text-sm text-gray-600">Perfect For</p>
+                          <p className="font-semibold text-gray-900">Investment properties</p>
+                        </div>
                       </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
+                      <a href="/real-estate-investing">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700">Learn More</Button>
+                      </a>
+                    </CardContent>
+                  </Card>
 
-                {/* Workspace Files */}
-                <Card className="bg-black/40 border-yellow-400/20">
-                  <CardHeader>
-                    <CardTitle className="text-yellow-400">Workspace Files</CardTitle>
-                    <CardDescription>Your documents and applications</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-[400px] pr-4">
-                      <div className="space-y-2">
-                        {workspaceFiles.map((file) => (
-                          <div key={file.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors" data-testid={`file-${file.id}`}>
-                            <div className="flex items-center gap-3 flex-1">
-                              {getFileIcon(file.type)}
-                              <div className="flex-1">
-                                <p className="text-sm font-medium text-white" data-testid={`filename-${file.id}`}>{file.name}</p>
-                                <p className="text-xs text-gray-400">{file.size} • {file.modified}</p>
-                                {file.status === 'signed' && file.signedBy && (
-                                  <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
-                                    <CheckCircle className="w-3 h-3" />
-                                    Signed by {file.signedBy} • {file.signedAt}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {file.status === 'awaiting_signature' ? (
-                                <Button 
-                                  onClick={() => handleSignDocument(file.id, file.name)}
-                                  size="sm"
-                                  className="bg-orange-400 hover:bg-orange-500 text-black font-semibold text-xs"
-                                  data-testid={`sign-button-${file.id}`}
-                                >
-                                  <FileSignature className="w-3 h-3 mr-1" />
-                                  Sign
-                                </Button>
-                              ) : file.progress !== undefined && file.progress < 100 ? (
-                                <div className="flex items-center gap-2">
-                                  <Progress value={file.progress} className="w-20 h-1" />
-                                  <span className="text-xs text-yellow-400">{file.progress}%</span>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                                  <span className={cn("text-xs font-medium px-2 py-1 rounded", 
-                                    file.status === 'signed' ? 'bg-emerald-400/20 text-emerald-400' :
-                                    file.status === 'verified' ? 'bg-blue-400/20 text-blue-400' :
-                                    file.status === 'complete' ? 'bg-emerald-400/20 text-emerald-400' :
-                                    'bg-gray-400/20 text-gray-400'
-                                  )} data-testid={`file-status-${file.id}`}>
-                                    {file.status === 'signed' && <CheckCircle className="w-3 h-3 inline mr-1" />}
-                                    {file.status}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Bridge Loans</CardTitle>
+                      <CardDescription>Short-term transition financing</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Speed</p>
+                          <p className="font-semibold text-gray-900">48-72 hour closing</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Use Case</p>
+                          <p className="font-semibold text-gray-900">Buy before you sell</p>
+                        </div>
                       </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
-              </div>
+                      <a href="/real-estate-investing">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700">Learn More</Button>
+                      </a>
+                    </CardContent>
+                  </Card>
 
-              {/* AI Insights Panel */}
-              <Card className="bg-gradient-to-r from-yellow-400/10 to-yellow-600/10 border-yellow-400/30">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
-                        <Bot className="w-7 h-7 text-black" />
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Cash-Out Refi</CardTitle>
+                      <CardDescription>Leverage existing equity</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 mb-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Access Equity</p>
+                          <p className="font-semibold text-gray-900">Up to 80% LTV</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Use Funds For</p>
+                          <p className="font-semibold text-gray-900">Any purpose</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-yellow-400">SaintBroker AI Insight</h3>
-                        <p className="text-sm text-gray-300 mt-1">
-                          Based on your profile, you're pre-approved for $5M in funding. Your next equipment loan can be funded in 24 hours.
-                        </p>
-                      </div>
-                    </div>
-                    <Button className="bg-black/50 border border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/20">
-                      View Full Analysis
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Other sections would go here based on activeSection */}
-          {activeSection !== 'dashboard' && (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full bg-yellow-400/20 flex items-center justify-center mx-auto mb-4">
-                  <Terminal className="w-10 h-10 text-yellow-400" />
+                      <a href="/real-estate-investing">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700">Learn More</Button>
+                      </a>
+                    </CardContent>
+                  </Card>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Section: {activeSection}</h3>
-                <p className="text-gray-400">This workspace section is being built by SaintBroker AI</p>
               </div>
+            )}
+
+            {/* Tools Tab */}
+            {activeTab === 'tools' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Tools & Resources</h2>
+                  <p className="text-gray-600">Everything you need to make informed decisions</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {tools.map((tool, idx) => (
+                    <Card key={idx}>
+                      <CardHeader>
+                        <CardTitle>{tool.title}</CardTitle>
+                        <CardDescription>{tool.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mb-4">
+                          <tool.icon className="w-6 h-6 text-gray-600" />
+                        </div>
+                        <a href={tool.link}>
+                          <Button className="bg-blue-600 hover:bg-blue-700">
+                            {tool.action} <ExternalLink className="w-3 h-3 ml-1" />
+                          </Button>
+                        </a>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Educational Resources */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Educational Resources</CardTitle>
+                    <CardDescription>Learn about financing, investing & real estate strategies</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
+                      <p className="font-medium text-gray-900">Live Market Intelligence</p>
+                      <p className="text-sm text-gray-600">JP Morgan insights & real-time market data</p>
+                    </a>
+                    <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
+                      <p className="font-medium text-gray-900">Lending Guide</p>
+                      <p className="text-sm text-gray-600">Everything you need to know about business loans</p>
+                    </a>
+                    <a href="/" className="block p-3 border rounded-lg hover:bg-gray-50">
+                      <p className="font-medium text-gray-900">Investment Strategies</p>
+                      <p className="text-sm text-gray-600">Tax-advantaged approaches & portfolio optimization</p>
+                    </a>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Account Tab */}
+            {activeTab === 'account' && (
+              <div className="space-y-6">
+                <h2 className="text-3xl font-bold text-gray-900">Account Settings</h2>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Profile Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">Full Name</label>
+                      <p className="text-gray-900 mt-1">Ryan Capatosto</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">Email</label>
+                      <p className="text-gray-900 mt-1">ryan@example.com</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">Pre-Approved Amount</label>
+                      <p className="text-gray-900 mt-1">$5,000,000</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Documents</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <a href="/file-hub" className="block p-3 border rounded-lg hover:bg-gray-50">
+                      <p className="font-medium text-gray-900">Secure File Hub</p>
+                      <p className="text-sm text-gray-600">Upload & store documents safely</p>
+                    </a>
+                    <a href="/upload-documents" className="block p-3 border rounded-lg hover:bg-gray-50">
+                      <p className="font-medium text-gray-900">Submit Loan Documents</p>
+                      <p className="text-sm text-gray-600">Upload required documents for your application</p>
+                    </a>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Support</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button variant="outline" className="w-full justify-start">
+                      <HelpCircle className="w-4 h-4 mr-2" />
+                      SaintSal Help Desk
+                    </Button>
+                    <a href="/set-appointment">
+                      <Button variant="outline" className="w-full justify-start">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Schedule Consultation
+                      </Button>
+                    </a>
+                  </CardContent>
+                </Card>
+
+                <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Chat Panel */}
+        <div className="hidden lg:flex w-96 border-l border-gray-200 flex-col bg-white">
+          <div className="border-b border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-2xl">🤖</span>
+              <p className="font-semibold text-gray-900">SaintBroker AI</p>
             </div>
-          )}
+            <p className="text-xs text-green-600">Online & ready to help</p>
+          </div>
+
+          <ScrollArea className="flex-1 p-4" ref={chatScrollRef}>
+            <div className="space-y-4">
+              {messages.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-600 mb-3">Hi! I'm SaintBroker AI 👋</p>
+                  <p className="text-xs text-gray-500 space-y-2">
+                    <div>I can help you with:</div>
+                    <div className="mt-2">
+                      • Loan questions & qualification<br />
+                      • Investment opportunities<br />
+                      • Application guidance<br />
+                      • Document requirements<br />
+                      • Scheduling appointments
+                    </div>
+                  </p>
+                </div>
+              ) : (
+                messages.map((msg, idx) => (
+                  <div key={idx} className={cn('flex gap-2', msg.role === 'user' ? 'justify-end' : '')}>
+                    {msg.role === 'assistant' && (
+                      <span className="text-xl flex-shrink-0">🤖</span>
+                    )}
+                    <div
+                      className={cn(
+                        'max-w-xs px-3 py-2 rounded-lg text-sm',
+                        msg.role === 'user'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-100 text-gray-900'
+                      )}
+                    >
+                      {msg.content}
+                    </div>
+                  </div>
+                ))
+              )}
+              {chatLoading && (
+                <div className="flex gap-2">
+                  <span className="text-xl">🤖</span>
+                  <div className="bg-gray-100 px-3 py-2 rounded-lg">
+                    <div className="flex gap-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+
+          <div className="border-t border-gray-200 p-4">
+            <div className="flex gap-2">
+              <Input
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+                placeholder="Ask anything..."
+                className="text-sm border-gray-300"
+                disabled={chatLoading}
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!chatInput.trim() || chatLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                size="sm"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

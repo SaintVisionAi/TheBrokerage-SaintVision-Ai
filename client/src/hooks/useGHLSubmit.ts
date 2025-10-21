@@ -1,77 +1,217 @@
-/**
- * useGHLSubmit Hook
- * Add this to your existing beautiful Saint Vision forms
- * Just drop it in and call it on form submit
- */
+import { useState, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { GHLFormType, getFormConfig, mapFormDataToGHL } from '@/config/ghl-forms';
 
-import { useState } from 'react';
-
-export interface GHLFormData {
-  [key: string]: string | number | boolean | File | null;
+export interface GHLSubmitOptions {
+  onSuccess?: (response: any) => void;
+  onError?: (error: Error) => void;
+  showToast?: boolean;
 }
 
-export const GHL_FORMS = {
-  PRE_QUAL: 'gPGc1pTZGRvxybqPpDRL',
-  FULL_APPLICATION: '0zcz0ZlG2eEddg94wcbq',
-  DOC_UPLOAD: 'yLjMJMuW3mM08ju9GkWY',
-  INVESTMENT: '1pivHofKUp5uTa9ws1TG',
-  REAL_ESTATE: 'M2jNYXh8wl8FYhxOap9N',
-  SVT_REGISTRATION: 'BmPNIXxZcCjsVhFTVddI',
-  MORTGAGE: 'nYhOnZmZP1mH1MWGLNBd'
-} as const;
+export interface GHLSubmitResult {
+  success: boolean;
+  data?: any;
+  error?: Error;
+}
 
 /**
- * Hook to submit form data to GoHighLevel
- * Use this in your existing form components
+ * Hook for submitting forms to GoHighLevel
+ * Handles form data mapping, validation, and API submission
  */
 export function useGHLSubmit() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const { toast } = useToast();
 
-  const submitToGHL = async (
-    formId: string,
-    formData: GHLFormData
-  ): Promise<{ success: boolean; error?: string }> => {
-    setIsSubmitting(true);
-    setError(null);
+  const submit = useCallback(
+    async (
+      formType: GHLFormType,
+      formData: Record<string, any>,
+      options: GHLSubmitOptions = {}
+    ): Promise<GHLSubmitResult> => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      // GHL form submission endpoint
-      const endpoint = `https://api.leadconnectorhq.com/widget/form/${formId}`;
+      try {
+        const config = getFormConfig(formType);
+        
+        // Validate required fields
+        const missingFields = Object.entries(config.fieldMappings)
+          .filter(([key, mapping]) => mapping.required && !formData[key])
+          .map(([key]) => key);
 
-      // Convert to FormData
-      const submitData = new FormData();
-      
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          if (value instanceof File) {
-            submitData.append(key, value);
-          } else {
-            submitData.append(key, String(value));
+        if (missingFields.length > 0) {
+          const error = new Error(`Missing required fields: ${missingFields.join(', ')}`);
+          setError(error);
+          if (options.showToast !== false) {
+            toast({
+              title: '❌ Validation Error',
+              description: `Please fill in all required fields: ${missingFields.join(', ')}`,
+              variant: 'destructive',
+            });
           }
+          if (options.onError) {
+            options.onError(error);
+          }
+          return { success: false, error };
         }
-      });
 
-      // Submit to GHL
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        body: submitData,
-      });
+        // Map form data to GHL field names
+        const mappedData = mapFormDataToGHL(formData, formType);
 
-      if (!response.ok) {
-        throw new Error(`Submission failed: ${response.status}`);
+        // Add service type if not already present
+        if (!mappedData.service_type && formData.serviceType) {
+          mappedData.service_type = formData.serviceType;
+        }
+
+        // Add source identifier
+        if (!mappedData.source) {
+          mappedData.source = 'SaintBroker AI - Client Hub';
+        }
+
+        // Get the endpoint from config
+        const endpoint = config.endpoint;
+
+        if (!endpoint) {
+          throw new Error(`Form ID not configured for ${formType}. Please check your environment variables.`);
+        }
+
+        // Submit to GHL
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(mappedData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(`GHL submission failed: ${response.statusText}. ${errorData}`);
+        }
+
+        const result = await response.json();
+
+        if (options.showToast !== false) {
+          toast({
+            title: '✅ Form Submitted',
+            description: `Your ${config.formName} has been successfully submitted to our system.`,
+          });
+        }
+
+        if (options.onSuccess) {
+          options.onSuccess(result);
+        }
+
+        setIsLoading(false);
+        return { success: true, data: result };
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setError(error);
+
+        if (options.showToast !== false) {
+          toast({
+            title: '❌ Submission Failed',
+            description: error.message,
+            variant: 'destructive',
+          });
+        }
+
+        if (options.onError) {
+          options.onError(error);
+        }
+
+        setIsLoading(false);
+        return { success: false, error };
+      }
+    },
+    [toast]
+  );
+
+  const submitWithValidation = useCallback(
+    async (
+      formType: GHLFormType,
+      formData: Record<string, any>,
+      customValidation?: (data: Record<string, any>) => string | null,
+      options: GHLSubmitOptions = {}
+    ): Promise<GHLSubmitResult> => {
+      // Run custom validation if provided
+      if (customValidation) {
+        const validationError = customValidation(formData);
+        if (validationError) {
+          setError(new Error(validationError));
+          if (options.showToast !== false) {
+            toast({
+              title: '❌ Validation Error',
+              description: validationError,
+              variant: 'destructive',
+            });
+          }
+          return { success: false, error: new Error(validationError) };
+        }
       }
 
-      return { success: true };
+      return submit(formType, formData, options);
+    },
+    [submit, toast]
+  );
 
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Submission failed';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setIsSubmitting(false);
-    }
+  return {
+    submit,
+    submitWithValidation,
+    isLoading,
+    error,
   };
+}
 
-  return { submitToGHL, isSubmitting, error };
+/**
+ * Helper function to validate email format
+ */
+export function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * Helper function to validate phone format (basic US format)
+ */
+export function validatePhone(phone: string): boolean {
+  const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/;
+  return phoneRegex.test(phone.replace(/\D/g, ''));
+}
+
+/**
+ * Helper function to validate loan amount
+ */
+export function validateLoanAmount(amount: string): boolean {
+  const numAmount = parseInt(amount.replace(/\D/g, ''));
+  return numAmount > 0 && numAmount <= 10000000; // Max $10M
+}
+
+/**
+ * Combined validation for common form patterns
+ */
+export function createCommonValidation() {
+  return (formData: Record<string, any>) => {
+    if (formData.email && !validateEmail(formData.email)) {
+      return 'Please enter a valid email address';
+    }
+
+    if (formData.phone && !validatePhone(formData.phone)) {
+      return 'Please enter a valid phone number (at least 10 digits)';
+    }
+
+    if (formData.loanAmount && !validateLoanAmount(formData.loanAmount)) {
+      return 'Please enter a loan amount between $1 and $10,000,000';
+    }
+
+    if (
+      formData.yearsInBusiness &&
+      (parseInt(formData.yearsInBusiness) < 0 || parseInt(formData.yearsInBusiness) > 100)
+    ) {
+      return 'Please enter a valid number of years in business';
+    }
+
+    return null;
+  };
 }

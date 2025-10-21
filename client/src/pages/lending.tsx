@@ -13,7 +13,6 @@ import { Separator } from '@/components/ui/separator';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
 import LoanCalculator from '@/components/calculators/loan-calculator';
-import SaintBrokerEnhanced from '@/components/ai/saint-broker-enhanced';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -76,7 +75,13 @@ export default function Lending() {
   useEffect(() => {
     if (!isLoadingProducts && loanProducts.length === 0) {
       fetch('/api/loan-products/seed', { method: 'POST' })
-        .then(res => res.json())
+        .then(async (res) => {
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({ error: 'Unknown error' }));
+            throw new Error(errorData.error || `HTTP ${res.status}`);
+          }
+          return res.json();
+        })
         .then(data => {
           if (data.success) {
             console.log('✅ Loan products seeded:', data.message);
@@ -425,9 +430,6 @@ export default function Lending() {
       </section>
 
       <GlobalFooter />
-      
-      {/* AI Concierge */}
-      <SaintBrokerEnhanced />
     </div>
   );
 }
