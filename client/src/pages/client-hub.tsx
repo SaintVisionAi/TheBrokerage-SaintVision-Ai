@@ -25,7 +25,7 @@ import {
   CreditCard,
   Briefcase,
   PieChart,
-  Tool,
+  Wrench,
   HelpCircle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -72,7 +72,7 @@ export default function ClientHub() {
     {
       title: 'Equipment Financing',
       description: 'Purchase equipment with flexible terms',
-      icon: Tool,
+      icon: Wrench,
       link: '/loans-docs-4-funding',
     },
     {
@@ -139,7 +139,7 @@ export default function ClientHub() {
     {
       title: 'Deal Analyzer',
       description: 'Analyze real estate deals & ROI',
-      icon: Tool,
+      icon: Wrench,
       link: '/',
       action: 'Download',
     },
@@ -202,7 +202,7 @@ export default function ClientHub() {
     { id: 'lending' as const, label: 'Lending Products', icon: CreditCard },
     { id: 'investments' as const, label: 'Investments', icon: TrendingUp },
     { id: 'real-estate' as const, label: 'Real Estate', icon: Building2 },
-    { id: 'tools' as const, label: 'Tools & Resources', icon: Tool },
+    { id: 'tools' as const, label: 'Tools & Resources', icon: Wrench },
     { id: 'account' as const, label: 'Account', icon: Settings },
   ];
 
