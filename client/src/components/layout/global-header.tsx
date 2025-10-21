@@ -228,12 +228,6 @@ export default function GlobalHeader() {
                     Sign In
                   </Button>
                 </Link>
-                
-                <Link href="/apply">
-                  <Button className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold">
-                    Get Started →
-                  </Button>
-                </Link>
               </div>
             </div>
           </div>
