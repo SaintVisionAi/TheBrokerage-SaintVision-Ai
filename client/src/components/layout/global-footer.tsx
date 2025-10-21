@@ -1,6 +1,9 @@
 import { Link } from "wouter";
+import { useSaintBroker } from "@/context/SaintBrokerContext";
 
 export default function GlobalFooter() {
+  const { openChat } = useSaintBroker();
+
   const footerLinks = {
     Product: [
       { name: "AI Dashboard", href: "/dashboard" },
@@ -18,6 +21,7 @@ export default function GlobalFooter() {
       { name: "cookin.io Platform", href: "https://cookin.io", external: true }
     ],
     Resources: [
+      { name: "Speak with SaintBroker", onClick: true },
       { name: "Documentation", href: "/docs" },
       { name: "Help Center", href: "/help" },
       { name: "Community", href: "/community" },
