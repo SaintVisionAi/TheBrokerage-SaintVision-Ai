@@ -235,6 +235,17 @@ export default function GlobalHeader() {
                 </div>
               </Link>
 
+              <button
+                onClick={() => {
+                  openChat();
+                  setMobileMenuOpen(false);
+                }}
+                className="px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer text-white flex items-center gap-2 w-full"
+              >
+                <MessageCircle className="w-4 h-4" />
+                SaintBroker Chat
+              </button>
+
               {/* Phone */}
               <div className="px-4 py-3 flex items-center gap-2 text-gray-400 text-sm">
                 <Phone className="w-4 h-4" />
