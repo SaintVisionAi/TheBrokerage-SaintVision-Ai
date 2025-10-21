@@ -122,6 +122,15 @@ export default function GlobalHeader() {
             <Link href="/contact" className={`px-4 py-2 font-medium transition-colors ${isActive("/contact") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
               Contact
             </Link>
+
+            <Button
+              onClick={openChat}
+              variant="ghost"
+              className="text-white hover:text-yellow-400 hover:bg-yellow-400/10 font-medium flex items-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Help/Chat
+            </Button>
           </div>
 
           {/* Right Side Actions */}
