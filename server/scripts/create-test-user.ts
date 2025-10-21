@@ -41,7 +41,7 @@ async function createTestUser() {
     console.log('   Email:', email);
     console.log('   Username:', username);
     console.log('   Role: admin');
-    console.log('✅ You can now log in at: https://57ffd1b0bf8c4a4c8c44568cb9d5ff66-818c12fb898e43ae8154931a0.fly.dev/login');
+    console.log('✅ You can now log in!');
     
     process.exit(0);
   } catch (error: any) {
