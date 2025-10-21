@@ -172,7 +172,7 @@ export async function initializeDatabase() {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS conversations (
         id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id VARCHAR REFERENCES users(id) NOT NULL,
+        user_id VARCHAR NOT NULL,
         title TEXT,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
@@ -183,7 +183,7 @@ export async function initializeDatabase() {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS messages (
         id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-        conversation_id VARCHAR REFERENCES conversations(id) NOT NULL,
+        conversation_id VARCHAR NOT NULL,
         role TEXT NOT NULL,
         content TEXT NOT NULL,
         metadata JSONB,
@@ -195,7 +195,7 @@ export async function initializeDatabase() {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS knowledge_base (
         id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id VARCHAR REFERENCES users(id) NOT NULL,
+        user_id VARCHAR NOT NULL,
         filename TEXT NOT NULL,
         content TEXT NOT NULL,
         embeddings JSONB,
@@ -207,7 +207,7 @@ export async function initializeDatabase() {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS system_logs (
         id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id VARCHAR REFERENCES users(id),
+        user_id VARCHAR,
         action TEXT NOT NULL,
         details JSONB,
         created_at TIMESTAMP DEFAULT NOW()
@@ -218,8 +218,8 @@ export async function initializeDatabase() {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS client_notes (
         id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id VARCHAR REFERENCES users(id) NOT NULL,
-        conversation_id VARCHAR REFERENCES conversations(id),
+        user_id VARCHAR NOT NULL,
+        conversation_id VARCHAR,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
         tags TEXT[],
@@ -233,8 +233,8 @@ export async function initializeDatabase() {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS signatures (
         id VARCHAR PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id VARCHAR REFERENCES users(id) NOT NULL,
-        document_id VARCHAR REFERENCES documents(id),
+        user_id VARCHAR NOT NULL,
+        document_id VARCHAR,
         document_title TEXT NOT NULL,
         signature_type TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'pending',
