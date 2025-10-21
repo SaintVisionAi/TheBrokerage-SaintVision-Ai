@@ -784,8 +784,8 @@ export default function ClientHub() {
             <div className="space-y-4">
               {messages.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-gray-600 mb-3">Hi! I'm SaintBroker AI 👋</p>
-                  <p className="text-xs text-gray-500 space-y-2">
+                  <div className="text-sm text-gray-600 mb-3">Hi! I'm SaintBroker AI 👋</div>
+                  <div className="text-xs text-gray-500 space-y-2">
                     <div>I can help you with:</div>
                     <div className="mt-2">
                       • Loan questions & qualification<br />
@@ -794,7 +794,7 @@ export default function ClientHub() {
                       • Document requirements<br />
                       • Scheduling appointments
                     </div>
-                  </p>
+                  </div>
                 </div>
               ) : (
                 messages.map((msg, idx) => (
