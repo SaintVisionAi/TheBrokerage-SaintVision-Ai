@@ -63,22 +63,30 @@ export default function Apply() {
     setIsSubmitting(true);
     
     try {
-      // 🔥 POST TO CORRECT ENDPOINT
-      const response = await fetch('/api/ghl/lead-capture', {
+      // 🔥 SUBMIT TO GHL FORM
+      const response = await fetch('/api/ghl/form-submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          businessName: data.businessName,
-          loanAmount: data.loanAmount,
-          type: data.loanPurpose,
-          source: 'pre-qualification-form',
-          notes: `Business: ${data.businessName} | Structure: ${data.businessStructure} | Industry: ${data.industry} | Years: ${data.yearsInBusiness} | Revenue: ${data.annualRevenue} | Timeframe: ${data.fundingTimeframe} | Credit: ${data.creditScore || 'Not provided'} | Additional: ${data.additionalInfo || 'None'}`
+          formId: 'gPGc1pTZGRvxybqPpDRL', // Apply Now SVG2 form from GHL
+          formData: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            businessName: data.businessName,
+            businessStructure: data.businessStructure,
+            yearsInBusiness: data.yearsInBusiness,
+            industry: data.industry,
+            annualRevenue: data.annualRevenue,
+            loanAmount: data.loanAmount,
+            loanPurpose: data.loanPurpose,
+            creditScore: data.creditScore,
+            fundingTimeframe: data.fundingTimeframe,
+            additionalInfo: data.additionalInfo
+          }
         })
       });
 
