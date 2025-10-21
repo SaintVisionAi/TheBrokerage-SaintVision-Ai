@@ -6,6 +6,7 @@ interface SaintBrokerContextType {
   closeChat: () => void;
   toggleChat: () => void;
   initialMessage?: string;
+  setInitialMessage: (message: string) => void;
 }
 
 const SaintBrokerContext = createContext<SaintBrokerContextType | undefined>(undefined);
@@ -18,6 +19,11 @@ export function SaintBrokerProvider({ children }: { children: ReactNode }) {
   const closeChat = () => setIsOpen(false);
   const toggleChat = () => setIsOpen(!isOpen);
 
+  const handleSetInitialMessage = (message: string) => {
+    setInitialMessage(message);
+    setIsOpen(true);
+  };
+
   return (
     <SaintBrokerContext.Provider
       value={{
@@ -26,6 +32,7 @@ export function SaintBrokerProvider({ children }: { children: ReactNode }) {
         closeChat,
         toggleChat,
         initialMessage,
+        setInitialMessage: handleSetInitialMessage,
       }}
     >
       {children}
