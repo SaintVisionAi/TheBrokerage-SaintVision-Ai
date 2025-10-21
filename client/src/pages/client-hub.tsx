@@ -306,7 +306,7 @@ export default function ClientHub() {
                         📋 APPLY NOW & GET PRE-APPROVED! 🔥
                       </Button>
                     </a>
-                    <a href="/apply" className="block">
+                    <a href="/soft-credit-pull" className="block">
                       <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold py-3">
                         💎 GET PREPPED: SOFT CREDIT PULL HERE 🔑
                       </Button>
