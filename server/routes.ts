@@ -1147,7 +1147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Set session cookie for auto-login
           createSession(res, sessionToken);
           
-          console.log(`��� Step 6.5: User account created and session set for ${email}`);
+          console.log(`���� Step 6.5: User account created and session set for ${email}`);
         } else {
           userAccount = existingUser;
           
@@ -1202,7 +1202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await sendEmailViaGHL(contactId, 'Your Saint Vision Group Portal Login', emailHTML);
           console.log(`✅ Step 6.6b: Credential email sent to client`);
         } catch (emailError) {
-          console.error('⚠️  Credential email delivery failed');
+          console.error('���️  Credential email delivery failed');
         }
       }
 
@@ -2915,6 +2915,216 @@ IMPORTANT: You are SaintBroker AI, the master orchestrator. Respond based on the
         success: false,
         error: error.message || "Failed to submit form to GHL"
       });
+    }
+  });
+
+  // ========== SAINTBROKER ROUTES ==========
+
+  // Get user's documents
+  app.get("/api/saint-broker/documents", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      const documents = await db.query.applicationDocuments.findMany({
+        where: (docs, { eq }) => eq(docs.uploadedBy, userId),
+      });
+      res.json(documents || []);
+    } catch (error: any) {
+      console.error('Error fetching documents:', error);
+      res.status(500).json({ error: "Failed to fetch documents" });
+    }
+  });
+
+  // Upload document
+  app.post("/api/saint-broker/upload", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      const { filename, fileType, fileSize, fileUrl } = req.body;
+
+      if (!filename || !fileType) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const doc = await db.insert({
+        id: crypto.randomUUID(),
+        applicationId: crypto.randomUUID(),
+        documentType: fileType,
+        fileName: filename,
+        fileUrl: fileUrl || `/uploads/${filename}`,
+        fileSize: fileSize || 0,
+        mimeType: fileType,
+        uploadedBy: userId,
+        metadata: null,
+        createdAt: new Date(),
+      });
+
+      res.json({ success: true, document: doc });
+    } catch (error: any) {
+      console.error('Error uploading document:', error);
+      res.status(500).json({ error: "Failed to upload document" });
+    }
+  });
+
+  // Get user's notes
+  app.get("/api/saint-broker/notes", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      const notes = await db.query.clientNotes.findMany({
+        where: (n, { eq }) => eq(n.userId, userId),
+        orderBy: (n, { desc }) => [desc(n.createdAt)],
+      });
+      res.json(notes || []);
+    } catch (error: any) {
+      console.error('Error fetching notes:', error);
+      res.status(500).json({ error: "Failed to fetch notes" });
+    }
+  });
+
+  // Create note
+  app.post("/api/saint-broker/notes", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      const { title, content, tags } = req.body;
+
+      if (!title || !content) {
+        return res.status(400).json({ error: "Missing title or content" });
+      }
+
+      const note = {
+        id: crypto.randomUUID(),
+        userId,
+        conversationId: null,
+        title,
+        content,
+        tags: tags || [],
+        isPinned: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      res.json({ success: true, note });
+    } catch (error: any) {
+      console.error('Error creating note:', error);
+      res.status(500).json({ error: "Failed to create note" });
+    }
+  });
+
+  // Get user's signature requests
+  app.get("/api/saint-broker/signatures", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      const signatures = await db.query.signatures.findMany({
+        where: (s, { eq }) => eq(s.userId, userId),
+        orderBy: (s, { desc }) => [desc(s.requestedAt)],
+      });
+      res.json(signatures || []);
+    } catch (error: any) {
+      console.error('Error fetching signatures:', error);
+      res.status(500).json({ error: "Failed to fetch signatures" });
+    }
+  });
+
+  // Request signature
+  app.post("/api/saint-broker/signatures/request", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+      const { documentId, documentTitle } = req.body;
+
+      if (!documentId || !documentTitle) {
+        return res.status(400).json({ error: "Missing documentId or documentTitle" });
+      }
+
+      const signature = {
+        id: crypto.randomUUID(),
+        userId,
+        documentId,
+        documentTitle,
+        signatureType: "document",
+        status: "pending",
+        signedUrl: null,
+        signedAt: null,
+        requestedAt: new Date(),
+      };
+
+      res.json({ success: true, signature });
+    } catch (error: any) {
+      console.error('Error requesting signature:', error);
+      res.status(500).json({ error: "Failed to request signature" });
+    }
+  });
+
+  // SaintBroker chat endpoint
+  app.post("/api/saint-broker/chat", isAuthenticated, async (req: any, res) => {
+    try {
+      const { message } = req.body;
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      // Generate response using AI
+      const response = await generateAssistantResponse({
+        message,
+        context: "You are SaintBroker, a professional financial AI assistant. Be concise and helpful.",
+      });
+
+      res.json({ response });
+    } catch (error: any) {
+      console.error('Error in chat:', error);
+      res.status(500).json({ error: "Failed to process message" });
+    }
+  });
+
+  // Seed test documents (for testing e-signatures)
+  app.post("/api/saint-broker/seed-test-data", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.session?.user?.id;
+
+      const testDocs = [
+        {
+          id: crypto.randomUUID(),
+          applicationId: crypto.randomUUID(),
+          documentType: "pdf",
+          fileName: "Business_Loan_Agreement.pdf",
+          fileUrl: "/documents/sample-loan-agreement.pdf",
+          fileSize: 256000,
+          mimeType: "application/pdf",
+          uploadedBy: userId,
+          metadata: { type: "agreement", version: "1.0" },
+          createdAt: new Date(),
+        },
+        {
+          id: crypto.randomUUID(),
+          applicationId: crypto.randomUUID(),
+          documentType: "pdf",
+          fileName: "Terms_and_Conditions.pdf",
+          fileUrl: "/documents/sample-terms.pdf",
+          fileSize: 128000,
+          mimeType: "application/pdf",
+          uploadedBy: userId,
+          metadata: { type: "terms", version: "1.0" },
+          createdAt: new Date(),
+        },
+        {
+          id: crypto.randomUUID(),
+          applicationId: crypto.randomUUID(),
+          documentType: "docx",
+          fileName: "Disclosure_Statement.docx",
+          fileUrl: "/documents/sample-disclosure.docx",
+          fileSize: 89000,
+          mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          uploadedBy: userId,
+          metadata: { type: "disclosure", version: "1.0" },
+          createdAt: new Date(),
+        },
+      ];
+
+      res.json({
+        success: true,
+        message: "Test documents would be seeded",
+        testDocs
+      });
+    } catch (error: any) {
+      console.error('Error seeding test data:', error);
+      res.status(500).json({ error: "Failed to seed test data" });
     }
   });
 
