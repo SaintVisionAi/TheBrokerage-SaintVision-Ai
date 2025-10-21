@@ -191,19 +191,13 @@ export default function GlobalHeader() {
                   Client Hub
                 </div>
               </Link>
-              
-              <Link href="/apply">
-                <div className={`px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/apply") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
-                  Apply Now
-                </div>
-              </Link>
-              
+
               <Link href="/about">
                 <div className={`px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/about") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
                   About
                 </div>
               </Link>
-              
+
               <Link href="/contact">
                 <div className={`px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/contact") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
                   Contact
