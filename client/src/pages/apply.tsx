@@ -1,4 +1,4 @@
-import { FileText, Zap, Shield, Clock } from 'lucide-react';
+import { FileText, Zap, Shield, Clock, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import GHLPreQualForm from '@/components/forms/ghl-prequal-form';
 import GlobalHeader from '@/components/layout/global-header';
