@@ -32,6 +32,14 @@ import UploadPortal from "@/pages/upload-portal";
 import ApplicationCompletePage from "@/pages/application-complete";
 import SaintBookDashboard from "@/pages/admin/saintbook-dashboard";
 import QuickContactsPage from "@/pages/admin/quick-contacts";
+import SetAppointmentPage from "@/pages/set-appointment";
+import PrequalSuccessPage from "@/pages/prequal-success";
+import LoansDocs4FundingPage from "@/pages/loans-docs-4-funding";
+import RealEstateInvestingPage from "@/pages/real-estate-investing";
+import InvestmentOffering1Page from "@/pages/investment-offering-1";
+import ComprehensiveSolutionsPage from "@/pages/comprehensive-solutions";
+import FileHubPage from "@/pages/file-hub";
+import UploadDocumentsPage from "@/pages/upload-documents";
 import NotFound from "@/pages/not-found";
 
 function ProtectedDashboard() {
