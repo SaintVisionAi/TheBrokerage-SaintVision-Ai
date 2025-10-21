@@ -23,7 +23,8 @@ import {
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useGHLSubmit, GHLFormType } from '@/hooks/useGHLSubmit';
+import { useGHLSubmit } from '@/hooks/useGHLSubmit';
+import { GHLFormType } from '@/config/ghl-forms';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 const realEstateSchema = z.object({
