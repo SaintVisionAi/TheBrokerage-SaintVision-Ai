@@ -9,6 +9,7 @@ export default function GlobalHeader() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const { openChat } = useSaintBroker();
 
   const services = [
     { 
