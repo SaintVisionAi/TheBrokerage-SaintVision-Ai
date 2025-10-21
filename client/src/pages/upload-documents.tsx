@@ -7,15 +7,15 @@ export default function DocumentUploadForm() {
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-bold mb-2">🛡️ Secure Document Upload</h1>
           <p className="text-muted-foreground">
-            Upload required documents for your application
+            Upload your documents securely to Saint Vision Group
           </p>
         </div>
-        
+
         <GHLFormEmbed
           formId="yLjMJMuW3mM08ju9GkWY"
-          formName="Secure SVG Upload Portal"
+          formName="🛡️ Secure SVG Upload Portal"
           height="1304px"
-          title="Secure SVG Upload Portal"
+          title="🛡️ Secure SVG Upload Portal"
           className="w-full"
         />
       </div>
