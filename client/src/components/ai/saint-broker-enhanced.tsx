@@ -430,8 +430,8 @@ export default function SaintBrokerEnhanced() {
           </TabsContent>
 
           {/* DOCUMENTS TAB */}
-          <TabsContent value="documents" className="flex-1 flex flex-col mt-0 p-4 space-y-4">
-            <div className="flex gap-2">
+          <TabsContent value="documents" className="flex-1 flex flex-col mt-0 overflow-hidden w-full min-h-0">
+            <div className="flex-shrink-0 flex gap-2 p-3 border-b border-white/10">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -442,46 +442,45 @@ export default function SaintBrokerEnhanced() {
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black"
+                className="flex-1 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black h-9"
+                size="sm"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 {isUploading ? 'Uploading...' : 'Upload'}
               </Button>
             </div>
 
-            <ScrollArea className="flex-1">
-              <div className="space-y-2">
-                {documents.length === 0 ? (
-                  <div className="text-center text-white/60 py-8">
-                    <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>No documents</p>
-                  </div>
-                ) : (
-                  documents.map((doc) => (
-                    <Card key={doc.id} className="bg-white/5 backdrop-blur-sm border-white/20">
-                      <CardContent className="p-3">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="font-semibold text-white text-sm">{doc.filename}</p>
-                            <p className="text-xs text-white/60">
-                              {(doc.fileSize / 1024).toFixed(1)} KB
-                            </p>
-                          </div>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 text-white/60 hover:text-white"
-                            onClick={() => requestSignature(doc.id, doc.filename)}
-                          >
-                            <FileSignature className="h-4 w-4" />
-                          </Button>
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              {documents.length === 0 ? (
+                <div className="text-center text-white/60 py-8">
+                  <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>No documents</p>
+                </div>
+              ) : (
+                documents.map((doc) => (
+                  <Card key={doc.id} className="bg-white/5 backdrop-blur-sm border-white/20">
+                    <CardContent className="p-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <p className="font-semibold text-white text-sm">{doc.fileName}</p>
+                          <p className="text-xs text-white/60">
+                            {(doc.fileSize / 1024).toFixed(1)} KB
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </div>
-            </ScrollArea>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-white/60 hover:text-white flex-shrink-0"
+                          onClick={() => requestSignature(doc.id, doc.fileName)}
+                        >
+                          <FileSignature className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
           </TabsContent>
 
           {/* NOTES TAB */}
