@@ -325,8 +325,8 @@ export default function SaintBrokerEnhanced() {
           </Button>
         </CardHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid w-full grid-cols-4 bg-black/30 backdrop-blur-md border-b border-white/10">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden w-full">
+          <TabsList className="grid w-full grid-cols-4 bg-black/30 backdrop-blur-md border-b border-white/10 flex-shrink-0">
             <TabsTrigger value="chat">
               <MessageCircle className="h-4 w-4 mr-1" />
               Chat
@@ -361,7 +361,7 @@ export default function SaintBrokerEnhanced() {
           </TabsList>
 
           {/* CHAT TAB */}
-          <TabsContent value="chat" className="flex-1 flex flex-col mt-0 h-full overflow-hidden">
+          <TabsContent value="chat" className="flex-1 flex flex-col mt-0 overflow-hidden w-full">
             <ScrollArea className="flex-1 p-4" ref={scrollRef}>
               <div className="space-y-4">
                 {messages.map((msg, idx) => (
