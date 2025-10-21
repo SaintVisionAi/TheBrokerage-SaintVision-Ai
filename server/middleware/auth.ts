@@ -12,9 +12,21 @@ declare global {
 
 /**
  * Middleware to check if user is authenticated
+ * Supports both session cookies and Bearer tokens
  */
 export function isAuthenticated(req: Request, res: Response, next: NextFunction) {
-  const token = req.cookies?.session;
+  let token: string | undefined;
+
+  // Try to get token from Authorization header first (Bearer token)
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  }
+
+  // Fall back to session cookie
+  if (!token) {
+    token = req.cookies?.session;
+  }
 
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized - Please log in' });
