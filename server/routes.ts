@@ -2873,6 +2873,38 @@ IMPORTANT: You are SaintBroker AI, the master orchestrator. Respond based on the
     }
   });
 
+  // GHL Form Submission Endpoint
+  app.post("/api/ghl/form-submit", async (req: any, res) => {
+    try {
+      const { formId, formData } = req.body;
+
+      if (!formId || !formData) {
+        return res.status(400).json({
+          success: false,
+          message: "formId and formData are required"
+        });
+      }
+
+      // Import the GHL form submission service
+      const { submitFormToGHL } = await import('./services/ghl-form-submission');
+
+      // Submit to GHL
+      const result = await submitFormToGHL(formId, formData);
+
+      res.json({
+        success: true,
+        message: "Form submitted to GHL successfully",
+        result
+      });
+    } catch (error: any) {
+      console.error('GHL Form submission error:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message || "Failed to submit form to GHL"
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
