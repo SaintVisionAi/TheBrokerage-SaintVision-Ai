@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'wouter';
+import { useParams, useLocation, Link } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle, XCircle, Mail } from 'lucide-react';
 
 export default function VerifyEmail() {
   const { token } = useParams();
-  const [, navigate] = useNavigate();
+  const [, setLocation] = useLocation();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
   const [resending, setResending] = useState(false);
@@ -26,117 +26,117 @@ export default function VerifyEmail() {
         setStatus('success');
         setMessage('Your email has been verified successfully!');
         // Redirect to login after 3 seconds
-        setTimeout(() => navigate('/login'), 3000);
+        setTimeout(() => setLocation('/login'), 3000);
       } else {
         setStatus('error');
         setMessage(data.error || 'Failed to verify email');
       }
-    } catch (error) {
+    } catch (err) {
       setStatus('error');
       setMessage('An error occurred while verifying your email');
     }
   };
 
-  const resendVerification = async () => {
+  const handleResendVerification = async () => {
     setResending(true);
     try {
-      // You'll need to pass the email somehow - could be in URL params or stored in session
+      // TODO: Implement resend verification email endpoint
       const response = await fetch('/api/auth/resend-verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: '' }) // TODO: Get email from somewhere
       });
-      
-      const data = await response.json();
+
       if (response.ok) {
-        setMessage('Verification email resent! Please check your inbox.');
+        setMessage('Verification email sent! Please check your inbox.');
       } else {
-        setMessage(data.error || 'Failed to resend verification email');
+        setMessage('Failed to resend verification email. Please try again.');
       }
-    } catch (error) {
-      setMessage('An error occurred while resending verification email');
+    } catch (err) {
+      setMessage('An error occurred. Please try again.');
     } finally {
       setResending(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#1d1d1f] via-[#2d2d2f] to-[#1d1d1f]">
-      <Card className="w-full max-w-md bg-white/95 backdrop-blur border-0 shadow-2xl">
-        <CardHeader className="text-center space-y-2">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#ffd700] to-[#ffed4e] rounded-full flex items-center justify-center mb-4">
-            {status === 'loading' && <Loader2 className="w-8 h-8 text-[#1d1d1f] animate-spin" />}
-            {status === 'success' && <CheckCircle className="w-8 h-8 text-[#1d1d1f]" />}
-            {status === 'error' && <XCircle className="w-8 h-8 text-[#1d1d1f]" />}
-          </div>
-          <CardTitle className="text-2xl font-bold text-[#1d1d1f]">
-            {status === 'loading' && 'Verifying Your Email...'}
-            {status === 'success' && 'Email Verified!'}
-            {status === 'error' && 'Verification Failed'}
-          </CardTitle>
-          <CardDescription className="text-[#666]">
-            {message}
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-neutral-900 border-neutral-800">
+        <CardHeader className="text-center">
+          {status === 'loading' && (
+            <>
+              <div className="mx-auto w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
+                <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+              </div>
+              <CardTitle className="text-2xl text-white">Verifying Email</CardTitle>
+              <CardDescription className="text-gray-400">
+                Please wait while we verify your email address...
+              </CardDescription>
+            </>
+          )}
+
           {status === 'success' && (
             <>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                <p className="text-green-800 text-sm">
-                  ✅ Your account is now active! Redirecting you to login...
-                </p>
+              <div className="mx-auto w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle className="w-6 h-6 text-green-500" />
               </div>
-              <Button 
-                onClick={() => navigate('/login')}
-                className="w-full bg-gradient-to-r from-[#ffd700] to-[#ffed4e] hover:from-[#ffed4e] hover:to-[#ffd700] text-[#1d1d1f] font-semibold shadow-lg"
-              >
-                Go to Login
-              </Button>
+              <CardTitle className="text-2xl text-white">Email Verified!</CardTitle>
+              <CardDescription className="text-gray-400">
+                {message}
+              </CardDescription>
             </>
           )}
-          
+
           {status === 'error' && (
             <>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <p className="text-red-800 text-sm text-center">
-                  {message}
-                </p>
+              <div className="mx-auto w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+                <XCircle className="w-6 h-6 text-red-500" />
               </div>
-              <div className="space-y-2">
-                <Button 
-                  onClick={resendVerification}
-                  disabled={resending}
-                  className="w-full bg-gradient-to-r from-[#ffd700] to-[#ffed4e] hover:from-[#ffed4e] hover:to-[#ffd700] text-[#1d1d1f] font-semibold shadow-lg"
-                >
-                  {resending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="w-4 h-4 mr-2" />
-                      Resend Verification Email
-                    </>
-                  )}
-                </Button>
-                <Button 
-                  onClick={() => navigate('/login')}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Back to Login
-                </Button>
-              </div>
+              <CardTitle className="text-2xl text-white">Verification Failed</CardTitle>
+              <CardDescription className="text-gray-400">
+                {message}
+              </CardDescription>
             </>
           )}
-          
-          {status === 'loading' && (
-            <div className="text-center py-8">
-              <p className="text-sm text-[#666]">
-                Please wait while we verify your email address...
+        </CardHeader>
+
+        <CardContent className="text-center">
+          {status === 'success' && (
+            <div>
+              <p className="text-gray-300 mb-4">
+                Redirecting to login page...
               </p>
+              <Link href="/login">
+                <Button className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold">
+                  Go to Login
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          {status === 'error' && (
+            <div className="space-y-3">
+              <Button
+                onClick={handleResendVerification}
+                disabled={resending}
+                className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-semibold"
+              >
+                {resending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="w-4 h-4 mr-2" />
+                    Resend Verification Email
+                  </>
+                )}
+              </Button>
+              <Link href="/login">
+                <Button variant="outline" className="w-full border-neutral-700 text-white hover:bg-neutral-800">
+                  Back to Login
+                </Button>
+              </Link>
             </div>
           )}
         </CardContent>
