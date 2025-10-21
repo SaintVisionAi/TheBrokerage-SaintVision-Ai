@@ -354,16 +354,16 @@ export default function ClientHub() {
                       href={action.link}
                       className="block"
                     >
-                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full bg-neutral-900/80 border border-yellow-400/20">
                         <CardContent className="pt-6">
-                          <div className={cn('w-12 h-12 rounded-lg flex items-center justify-center mb-4', action.color)}>
-                            <action.icon className="w-6 h-6 text-gray-800" />
+                          <div className={cn('w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-yellow-400/20', action.color)}>
+                            <action.icon className="w-6 h-6 text-yellow-300" />
                           </div>
-                          <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
-                          <p className="text-xs text-gray-600">{action.description}</p>
+                          <h3 className="font-semibold text-yellow-300 mb-1">{action.title}</h3>
+                          <p className="text-xs text-white/60">{action.description}</p>
                           <Button
                             variant="link"
-                            className="mt-4 p-0 text-blue-600 hover:text-blue-700"
+                            className="mt-4 p-0 text-yellow-400 hover:text-yellow-300"
                           >
                             Get Started <ExternalLink className="w-3 h-3 ml-1" />
                           </Button>
@@ -375,19 +375,19 @@ export default function ClientHub() {
 
                 {/* Status Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card>
+                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
                     <CardContent className="pt-6">
-                      <div className="text-sm text-gray-600 mb-2">Pre-Approved Amount</div>
-                      <div className="text-3xl font-bold text-gray-900">$5M</div>
-                      <p className="text-xs text-gray-500 mt-2">Ready to access</p>
+                      <div className="text-sm text-yellow-400/70 mb-2">Pre-Approved Amount</div>
+                      <div className="text-3xl font-bold text-yellow-300">$5M</div>
+                      <p className="text-xs text-white/50 mt-2">Ready to access</p>
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
                     <CardContent className="pt-6">
-                      <div className="text-sm text-gray-600 mb-2">Investment Opportunities</div>
-                      <div className="text-3xl font-bold text-green-600">9-12%</div>
-                      <p className="text-xs text-gray-500 mt-2">Fixed annual returns</p>
+                      <div className="text-sm text-yellow-400/70 mb-2">Investment Opportunities</div>
+                      <div className="text-3xl font-bold text-yellow-300">9-12%</div>
+                      <p className="text-xs text-white/50 mt-2">Fixed annual returns</p>
                     </CardContent>
                   </Card>
 
