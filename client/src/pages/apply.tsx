@@ -1,24 +1,24 @@
-import GHLFormEmbed from '@/components/GHLFormEmbed';
+import GHLPreQualForm from '@/components/forms/ghl-prequal-form';
+import GlobalHeader from '@/components/layout/global-header';
+import GlobalFooter from '@/components/layout/global-footer';
 
 export default function PreQualForm() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold mb-2">Apply Now - Pre-Qualification</h1>
-          <p className="text-muted-foreground">
-            Start your journey with Saint Vision Group
-          </p>
+    <>
+      <GlobalHeader />
+      <div className="bg-black min-h-screen px-4 py-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-bold mb-3 text-white">Apply Now - Pre-Qualification</h1>
+            <p className="text-lg text-gray-400">
+              Start your journey with Saint Vision Group. Complete this quick assessment to determine your eligibility.
+            </p>
+          </div>
+
+          <GHLPreQualForm />
         </div>
-        
-        <GHLFormEmbed
-          formId="gPGc1pTZGRvxybqPpDRL"
-          formName="Apply Now SVG2"
-          height="2067px"
-          title="Apply Now SVG2"
-          className="w-full"
-        />
       </div>
-    </div>
+      <GlobalFooter />
+    </>
   );
 }
