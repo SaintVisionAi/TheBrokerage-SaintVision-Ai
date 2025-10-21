@@ -630,8 +630,9 @@ export default function SaintBrokerGlobal() {
           )}
           
           {/* Messages scroll area */}
-          <ScrollArea className="flex-1 p-4 overflow-y-auto min-h-0" ref={scrollRef}>
-            <div className="space-y-4">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            <ScrollArea className="flex-1" ref={scrollRef}>
+              <div className="p-4 space-y-4">
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
@@ -676,8 +677,9 @@ export default function SaintBrokerGlobal() {
                   </div>
                 </div>
               )}
-            </div>
-          </ScrollArea>
+              </div>
+            </ScrollArea>
+          </div>
           
           {/* Input section at the bottom with voice controls */}
           <div className="p-4 border-t border-white/10 bg-charcoal-800/20">
