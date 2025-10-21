@@ -303,7 +303,7 @@ export async function initializeDatabase() {
         file_url TEXT NOT NULL,
         file_size INTEGER,
         mime_type VARCHAR(100),
-        uploaded_by VARCHAR REFERENCES users(id),
+        uploaded_by VARCHAR,
         metadata JSONB,
         created_at TIMESTAMP DEFAULT NOW()
       )
