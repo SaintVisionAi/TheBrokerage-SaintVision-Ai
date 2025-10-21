@@ -863,8 +863,224 @@ export default function ClientHub() {
             </div>
           )}
 
-          {/* Other sections would go here based on activeSection */}
-          {activeSection !== 'dashboard' && (
+          {/* Applications Section */}
+          {activeSection === 'applications' && (
+            <div className="space-y-6">
+              <Tabs defaultValue="all" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 bg-black/40">
+                  <TabsTrigger value="all">All ({applications.length})</TabsTrigger>
+                  <TabsTrigger value="pending">Pending ({applications.filter(a => a.status === 'pending' || a.status === 'in-review').length})</TabsTrigger>
+                  <TabsTrigger value="approved">Approved ({applications.filter(a => a.status === 'approved').length})</TabsTrigger>
+                  <TabsTrigger value="funded">Funded ({applications.filter(a => a.status === 'funded').length})</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="all" className="space-y-3">
+                  {appsLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="w-6 h-6 text-yellow-400 animate-spin" />
+                    </div>
+                  ) : applications.length === 0 ? (
+                    <Card className="bg-black/40 border-yellow-400/20">
+                      <CardContent className="py-12 text-center">
+                        <Rocket className="w-12 h-12 text-yellow-400/40 mx-auto mb-4" />
+                        <p className="text-gray-400 mb-4">No applications yet</p>
+                        <Button className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Start New Application
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      {applications.map((app) => (
+                        <Card key={app.id} className="bg-black/40 border-yellow-400/20 hover:border-yellow-400/40 transition-colors cursor-pointer">
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between mb-4">
+                              <h3 className="font-semibold text-white flex-1">{app.name}</h3>
+                              <Badge className={cn(
+                                'text-xs px-2 py-1',
+                                app.status === 'funded' ? 'bg-emerald-400/20 text-emerald-400 border-emerald-400/30' :
+                                app.status === 'approved' ? 'bg-blue-400/20 text-blue-400 border-blue-400/30' :
+                                app.status === 'in-review' ? 'bg-yellow-400/20 text-yellow-400 border-yellow-400/30' :
+                                'bg-gray-400/20 text-gray-400 border-gray-400/30'
+                              )}>
+                                {app.status}
+                              </Badge>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div>
+                                <p className="text-xs text-gray-400">Type</p>
+                                <p className="text-sm text-white capitalize">{app.type}</p>
+                              </div>
+
+                              {app.loanAmount && (
+                                <div>
+                                  <p className="text-xs text-gray-400">Amount</p>
+                                  <p className="text-sm font-semibold text-emerald-400">{app.loanAmount}</p>
+                                </div>
+                              )}
+
+                              <div>
+                                <p className="text-xs text-gray-400 mb-1">Progress</p>
+                                <Progress value={app.progress || 0} className="h-2" />
+                                <p className="text-xs text-gray-400 mt-1">{app.progress || 0}% complete</p>
+                              </div>
+
+                              {app.nextStep && (
+                                <div className="p-2 bg-yellow-400/10 rounded-lg border border-yellow-400/20">
+                                  <p className="text-xs text-yellow-400 font-medium">Next Step</p>
+                                  <p className="text-xs text-yellow-300 mt-1">{app.nextStep}</p>
+                                </div>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="pending">
+                  <div className="grid grid-cols-2 gap-4">
+                    {applications.filter(a => a.status === 'pending' || a.status === 'in-review').map((app) => (
+                      <Card key={app.id} className="bg-black/40 border-yellow-400/20">
+                        <CardContent className="p-6">
+                          <h3 className="font-semibold text-white mb-4">{app.name}</h3>
+                          <p className="text-sm text-gray-300">{app.type}</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="approved">
+                  <div className="grid grid-cols-2 gap-4">
+                    {applications.filter(a => a.status === 'approved').map((app) => (
+                      <Card key={app.id} className="bg-black/40 border-emerald-400/20">
+                        <CardContent className="p-6">
+                          <h3 className="font-semibold text-white mb-4">{app.name}</h3>
+                          <p className="text-sm text-emerald-300">Ready to proceed to funding</p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="funded">
+                  <div className="grid grid-cols-2 gap-4">
+                    {applications.filter(a => a.status === 'funded').map((app) => (
+                      <Card key={app.id} className="bg-black/40 border-emerald-400/20">
+                        <CardContent className="p-6">
+                          <h3 className="font-semibold text-white mb-4">{app.name}</h3>
+                          <p className="text-sm text-emerald-300 flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4" />
+                            Successfully funded
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+
+          {/* Portfolio Section */}
+          {activeSection === 'funding' && (
+            <div className="space-y-6">
+              {portfolio.length === 0 ? (
+                <Card className="bg-black/40 border-yellow-400/20">
+                  <CardContent className="py-12 text-center">
+                    <TrendingUp className="w-12 h-12 text-yellow-400/40 mx-auto mb-4" />
+                    <p className="text-gray-400 mb-4">No active investments or funded deals yet</p>
+                    <Button className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:from-yellow-500 hover:to-yellow-700">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Explore Opportunities
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  {/* Portfolio Summary */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-400/30">
+                      <CardContent className="p-6">
+                        <p className="text-xs text-purple-400 mb-2">Total Portfolio Value</p>
+                        <p className="text-3xl font-bold text-white">${(getTotalPortfolioValue(portfolio) / 1000000).toFixed(2)}M</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border-emerald-400/30">
+                      <CardContent className="p-6">
+                        <p className="text-xs text-emerald-400 mb-2">Monthly Returns</p>
+                        <p className="text-3xl font-bold text-white">${(getTotalMonthlyReturns(portfolio) / 1000).toFixed(1)}K</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-400/30">
+                      <CardContent className="p-6">
+                        <p className="text-xs text-blue-400 mb-2">Active Investments</p>
+                        <p className="text-3xl font-bold text-white">{portfolio.length}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Portfolio Items */}
+                  <div className="space-y-3">
+                    {portfolio.map((item) => (
+                      <Card key={item.id} className="bg-black/40 border-purple-400/20 hover:border-purple-400/40 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div>
+                              <h3 className="font-semibold text-white text-lg">{item.name}</h3>
+                              <p className="text-sm text-gray-400 mt-1 capitalize">{item.type}</p>
+                            </div>
+                            <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30">
+                              {item.status}
+                            </Badge>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-gray-400">Investment</p>
+                              <p className="text-lg font-bold text-white mt-1">${(item.value / 1000000).toFixed(2)}M</p>
+                            </div>
+
+                            {item.returnRate && (
+                              <div>
+                                <p className="text-xs text-gray-400">Return Rate</p>
+                                <p className="text-lg font-bold text-emerald-400 mt-1">{item.returnRate}%</p>
+                              </div>
+                            )}
+
+                            {item.monthlyReturn && (
+                              <div>
+                                <p className="text-xs text-gray-400">Monthly Return</p>
+                                <p className="text-lg font-bold text-emerald-400 mt-1">${(item.monthlyReturn / 1000).toFixed(1)}K</p>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex gap-2">
+                            <Button variant="outline" className="flex-1 border-purple-400/30 text-purple-400 hover:bg-purple-400/10 text-sm">
+                              View Details
+                            </Button>
+                            <Button variant="outline" className="flex-1 border-purple-400/30 text-purple-400 hover:bg-purple-400/10 text-sm">
+                              Download Report
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Other sections fallback */}
+          {activeSection !== 'dashboard' && activeSection !== 'applications' && activeSection !== 'funding' && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <div className="w-20 h-20 rounded-full bg-yellow-400/20 flex items-center justify-center mx-auto mb-4">
