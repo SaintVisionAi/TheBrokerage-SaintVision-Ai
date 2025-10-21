@@ -541,6 +541,130 @@ export default function ClientHub() {
         <div className="flex-1 p-6 overflow-auto">
           {activeSection === 'dashboard' && (
             <div className="space-y-6">
+              {/* Pending Applications Summary */}
+              {getPendingApplicationsCount(applications) > 0 && (
+                <Card className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border-blue-400/30">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-blue-400/20 flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-blue-400">Pending Applications</CardTitle>
+                          <CardDescription>Applications awaiting approval or next steps</CardDescription>
+                        </div>
+                      </div>
+                      <Badge className="bg-blue-400/20 text-blue-400 border-blue-400/30">
+                        {getPendingApplicationsCount(applications)} Active
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {appsLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+                      </div>
+                    ) : applications.length === 0 ? (
+                      <p className="text-gray-400 text-sm">No pending applications</p>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3">
+                        {applications.filter(app => app.status === 'pending' || app.status === 'in-review').map((app) => (
+                          <div key={app.id} className="p-4 bg-black/40 rounded-lg border border-blue-400/20 hover:border-blue-400/40 transition-colors cursor-pointer">
+                            <div className="flex items-start justify-between mb-2">
+                              <h4 className="font-semibold text-white text-sm">{app.name}</h4>
+                              <Badge className={cn(
+                                'text-xs px-2 py-0.5',
+                                app.status === 'in-review' ? 'bg-yellow-400/20 text-yellow-400 border-yellow-400/30' : 'bg-blue-400/20 text-blue-400 border-blue-400/30'
+                              )}>
+                                {app.status}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-3">{app.type}</p>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-xs">
+                                <span className="text-gray-400">Progress</span>
+                                <span className="text-blue-400 font-medium">{app.progress || 0}%</span>
+                              </div>
+                              <Progress value={app.progress || 0} className="h-1" />
+                            </div>
+                            {app.loanAmount && (
+                              <p className="text-xs text-emerald-400 mt-3 font-medium">
+                                {app.loanAmount}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Portfolio Overview */}
+              {portfolio.length > 0 && (
+                <Card className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 border-purple-400/30">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-purple-400/20 flex items-center justify-center">
+                          <TrendingUp className="w-5 h-5 text-purple-400" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-purple-400">Your Portfolio</CardTitle>
+                          <CardDescription>Funded investments and active deals</CardDescription>
+                        </div>
+                      </div>
+                      <Badge className="bg-purple-400/20 text-purple-400 border-purple-400/30">
+                        {portfolio.length} Assets
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {portfolioLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-3 gap-3 mb-4">
+                          <div className="p-3 bg-black/40 rounded-lg border border-purple-400/20">
+                            <p className="text-xs text-purple-400 mb-1">Total Value</p>
+                            <p className="text-lg font-bold text-white">${(getTotalPortfolioValue(portfolio) / 1000000).toFixed(2)}M</p>
+                          </div>
+                          <div className="p-3 bg-black/40 rounded-lg border border-purple-400/20">
+                            <p className="text-xs text-purple-400 mb-1">Monthly Returns</p>
+                            <p className="text-lg font-bold text-emerald-400">${(getTotalMonthlyReturns(portfolio) / 1000).toFixed(1)}K</p>
+                          </div>
+                          <div className="p-3 bg-black/40 rounded-lg border border-purple-400/20">
+                            <p className="text-xs text-purple-400 mb-1">Avg Return Rate</p>
+                            <p className="text-lg font-bold text-white">{portfolio.length > 0 ? '10-12%' : 'N/A'}</p>
+                          </div>
+                        </div>
+                        <div className="max-h-[300px] overflow-y-auto space-y-2 pr-2">
+                          {portfolio.map((item) => (
+                            <div key={item.id} className="p-3 bg-black/40 rounded-lg border border-purple-400/20 hover:border-purple-400/40 transition-colors">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <h5 className="font-semibold text-white text-sm">{item.name}</h5>
+                                  <p className="text-xs text-gray-400 mt-1">{item.type}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-bold text-white">${(item.value / 1000000).toFixed(2)}M</p>
+                                  {item.monthlyReturn && (
+                                    <p className="text-xs text-emerald-400 mt-1">${(item.monthlyReturn / 1000).toFixed(1)}K/mo</p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Quick Actions Grid */}
               <div className="grid grid-cols-4 gap-4">
                 {quickActions.map((action) => (
