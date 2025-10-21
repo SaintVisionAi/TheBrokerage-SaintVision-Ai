@@ -295,33 +295,6 @@ export default function Login() {
 
           </div>
 
-          {/* SaintBroker™ Powered By Section */}
-          <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border border-yellow-500/30 rounded-xl p-6 backdrop-blur-sm mb-10">
-            <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center">
-                <Sparkles className="text-black h-5 w-5" />
-              </div>
-              <div>
-                <h4 className="text-lg font-bold text-white">Powered by SaintBroker™ AI</h4>
-                <p className="text-xs text-gray-300">cookin.io Enterprise Platform</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-200 leading-relaxed mb-3">
-              Built on patent-protected AI technology, SaintBroker™ delivers enterprise-grade automation, 
-              intelligent workflows, and 24/7 assistance to power your brokerage operations.
-            </p>
-            <div className="bg-blue-500/10 border border-blue-400/40 rounded-lg p-3 mb-3">
-              <p className="text-blue-400 font-bold text-sm">
-                ✨ Responsible Intelligence™ - Ethical AI with human oversight at every step
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 text-xs text-yellow-400">
-              <Shield className="w-4 h-4" />
-              <span>Patent-Protected Technology</span>
-              <span>•</span>
-              <span>Enterprise Security</span>
-            </div>
-          </div>
 
           {/* Stats/Social Proof */}
           <div className="grid grid-cols-3 gap-6 text-center">
