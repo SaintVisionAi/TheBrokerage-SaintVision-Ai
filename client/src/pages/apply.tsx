@@ -91,16 +91,6 @@ export default function PreQualForm() {
                 </div>
               </div>
 
-              {/* CTA Button */}
-              <div className="pt-4">
-                <button
-                  onClick={scrollToForm}
-                  className="group relative inline-flex items-center gap-3 px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold text-lg md:text-2xl rounded-xl hover:from-yellow-300 hover:to-yellow-400 transition-all duration-300 shadow-2xl shadow-yellow-400/30 hover:shadow-yellow-400/50 hover:scale-105"
-                >
-                  <span>Start Application</span>
-                  <ArrowRight className="w-6 h-6 md:w-7 md:h-7 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
             </div>
           </section>
 
