@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -218,45 +219,78 @@ export default function Lending() {
     <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-black text-white">
       <GlobalHeader />
 
-      {/* Hero Section with Dynamic Background */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1920')] bg-cover bg-center opacity-20"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/20 via-transparent to-neutral-900/20"></div>
-        
-        {/* Floating Money Icons */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <DollarSign className="absolute top-20 left-10 h-12 w-12 text-yellow-400/20 animate-pulse" />
-          <TrendingUp className="absolute top-40 right-20 h-16 w-16 text-yellow-400/20 animate-pulse" style={{ animationDelay: '0.3s' }} />
-          <DollarSign className="absolute bottom-32 left-1/3 h-10 w-10 text-yellow-400/20 animate-pulse" style={{ animationDelay: '0.6s' }} />
-        </div>
+      {/* Premium background with enhanced gradients */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-yellow-400/15 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute -bottom-1/4 right-1/4 w-[700px] h-[700px] bg-blue-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIEwgMCA2MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIwLjUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40" />
+      </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <div className="mb-6">
-            <span className="inline-block px-4 py-2 bg-yellow-400/10 border border-yellow-400/30 rounded-full text-yellow-400 text-sm font-semibold mb-6">
-              🚀 AI-Powered Business Lending
-            </span>
+      {/* Hero Section */}
+      <section className="relative z-10 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+        <div className="w-full max-w-5xl text-center space-y-12">
+          {/* Premium Badge */}
+          <div className="inline-flex items-center justify-center">
+            <Badge className="bg-yellow-400/25 text-yellow-300 border border-yellow-400/60 hover:bg-yellow-400/35 text-sm md:text-base px-4 py-2 font-semibold">
+              💰 Enterprise Business Lending
+            </Badge>
           </div>
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 bg-clip-text text-transparent">
-            $500M+ Funded
-            <br />
-            24-Hour Decisions
-          </h1>
-          <p className="text-2xl text-white/80 mb-8 max-w-3xl mx-auto">
-            Enterprise-grade business lending from $10K to $10M+ with rates starting at 7.99%. 
-            Powered by AI underwriting and <span className="text-yellow-400">13 Active Funding Partners with AI-Powered Routing</span> for faster approvals and better terms. 
-            No collateral required for qualified borrowers.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black px-8 py-6 text-lg font-semibold"
-              onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
-              data-testid="button-apply-now"
+
+          {/* Hero Title - Massive & Viewport Optimized */}
+          <div className="space-y-4">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter">
+              <span className="bg-gradient-to-r from-yellow-200 via-yellow-400 to-yellow-500 bg-clip-text text-transparent">
+                Business Lending
+              </span>
+              <br className="hidden sm:block" />
+              <span className="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                Made Easy
+              </span>
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <div className="space-y-4 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-white/85 leading-relaxed font-light">
+              $10K to $10M+ with <span className="font-semibold text-yellow-400">AI-powered decisions in 24-48 hours</span>
+            </p>
+            <p className="text-base sm:text-lg md:text-xl text-white/70">
+              Starting at 7.99% • 13 Funding Partners • No Collateral Required
+            </p>
+          </div>
+
+          {/* Trust Metrics */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 py-8">
+            <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+              <h3 className="text-2xl md:text-3xl font-black text-yellow-400 mb-2">$500M+</h3>
+              <p className="text-xs md:text-sm text-white/60 leading-snug">Total Funded</p>
+            </div>
+
+            <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+              <h3 className="text-2xl md:text-3xl font-black text-yellow-400 mb-2">24-48hr</h3>
+              <p className="text-xs md:text-sm text-white/60 leading-snug">Decision Time</p>
+            </div>
+
+            <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+              <h3 className="text-2xl md:text-3xl font-black text-yellow-400 mb-2">7.99%</h3>
+              <p className="text-xs md:text-sm text-white/60 leading-snug">Starting Rate</p>
+            </div>
+
+            <div className="group bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl md:rounded-3xl p-4 md:p-6 hover:border-yellow-400/40 transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-400/10">
+              <h3 className="text-2xl md:text-3xl font-black text-yellow-400 mb-2">13</h3>
+              <p className="text-xs md:text-sm text-white/60 leading-snug">Funding Partners</p>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="pt-4">
+            <button
+              onClick={() => setLocation('/apply')}
+              className="group relative inline-flex items-center gap-3 px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold text-lg md:text-2xl rounded-xl hover:from-yellow-300 hover:to-yellow-400 transition-all duration-300 shadow-2xl shadow-yellow-400/30 hover:shadow-yellow-400/50 hover:scale-105"
             >
-              Apply Now - Get Pre-Approved
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+              <span>Apply for Funding</span>
+              <ArrowRight className="w-6 h-6 md:w-7 md:h-7 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
         </div>
       </section>
