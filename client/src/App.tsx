@@ -155,6 +155,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <SaintBrokerEnhanced />
       </TooltipProvider>
     </QueryClientProvider>
   );
