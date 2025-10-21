@@ -19,6 +19,7 @@ import express from 'express';
 import crypto from 'crypto';
 import { setupVoiceRoutes } from './routes/voice';
 import { registerEmailVerificationRoutes } from './routes/email-verification';
+import ghlDataRouter from './routes/ghl-data';
 import rateLimit from 'express-rate-limit';
 import { encrypt, decrypt, redactSSN, isValidBase64 } from './lib/encryption';
 import { applicationSubmitSchema, sanitizeInput, isValidSSN } from './lib/validation';
