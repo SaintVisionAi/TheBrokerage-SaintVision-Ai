@@ -49,13 +49,35 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-  const { data: applications, isLoading: appsLoading } = useQuery<Application[]>({
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const { data: applications, isLoading: appsLoading, refetch: refetchApplications } = useQuery<Application[]>({
     queryKey: ["/api/admin/applications"],
   });
 
-  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery<DashboardStats>({
     queryKey: ["/api/admin/stats"],
   });
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // Try to sync GHL data first
+      const syncResponse = await fetch('/api/admin/sync-ghl', { method: 'POST' });
+      if (syncResponse.ok) {
+        console.log('✅ GHL sync completed');
+      }
+
+      // Then refetch the data
+      await Promise.all([
+        refetchApplications(),
+        refetchStats()
+      ]);
+    } catch (error) {
+      console.error('Refresh error:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
