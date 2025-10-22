@@ -228,9 +228,10 @@ export default function SaintBrokerEnhanced() {
       </div>
 
       {/* TABS */}
-      <div className="flex-shrink-0 flex border-b border-white/10 bg-black/20">
+      <div className="flex-shrink-0 flex border-b border-white/10 bg-black/20 overflow-x-auto">
         {[
           { id: 'chat', label: 'Chat', icon: MessageCircle },
+          { id: 'pipeline', label: 'Pipeline', icon: Zap },
           { id: 'docs', label: 'Docs', icon: FileText },
           { id: 'notes', label: 'Notes', icon: StickyNote },
           { id: 'signs', label: 'Signs', icon: FileSignature }
@@ -241,7 +242,7 @@ export default function SaintBrokerEnhanced() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "flex-1 py-2 px-2 text-xs md:text-sm font-medium transition-colors flex items-center justify-center gap-1",
+                "flex-shrink-0 py-2 px-2 text-xs md:text-sm font-medium transition-colors flex items-center justify-center gap-1 whitespace-nowrap",
                 activeTab === tab.id
                   ? 'text-yellow-400 bg-yellow-400/10 border-b-2 border-yellow-400'
                   : 'text-white/60 hover:text-white'
