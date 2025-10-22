@@ -210,12 +210,12 @@ export default function Dashboard() {
           </div>
 
           {/* Applications Table */}
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardHeader>
+          <Card className="bg-slate-800/80 border-slate-600/50 backdrop-blur-xl shadow-lg shadow-slate-950/50">
+            <CardHeader className="pb-4">
               <CardTitle className="text-white flex items-center justify-between">
-                <span>All Client Applications</span>
-                <Button className="bg-green-400 hover:bg-green-500 text-black font-bold" data-testid="button-refresh">
-                  Refresh
+                <span className="text-2xl font-bold">All Client Applications</span>
+                <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 px-6" data-testid="button-refresh">
+                  🔄 Refresh
                 </Button>
               </CardTitle>
             </CardHeader>
