@@ -90,7 +90,9 @@ export default function FullLendingApplicationPage() {
       authorizeCredit: false,
       agreeToPrivacy: false,
       signature: '',
-      signatureDate: new Date().toISOString().split('T')[0]
+      signatureDate: new Date().toISOString().split('T')[0],
+      signatureData: '',
+      signatureType: undefined
     }
   });
 
