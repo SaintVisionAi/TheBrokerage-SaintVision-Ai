@@ -690,8 +690,8 @@ export default function FullLendingApplicationPage() {
                       <FormItem>
                         <FormLabel className="text-white text-sm font-medium">Additional Information (Optional)</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            {...field} 
+                          <Textarea
+                            {...field}
                             placeholder="Anything else we should know about your business or application?"
                             className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20 min-h-[120px]"
                           />
@@ -700,6 +700,178 @@ export default function FullLendingApplicationPage() {
                       </FormItem>
                     )}
                   />
+                </div>
+
+                {/* DISCLOSURES & LEGAL ACKNOWLEDGMENT SECTION */}
+                <div className="space-y-6 pt-6 border-t-2 border-yellow-400/40 bg-gradient-to-r from-yellow-400/10 to-transparent rounded-xl p-6">
+                  <div className="flex items-start gap-3 mb-4">
+                    <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-bold text-yellow-300 mb-2">
+                        Disclosures & Legal Acknowledgment
+                      </h3>
+                      <p className="text-white/70 text-sm">Please read and acknowledge all disclosures below before submitting your application.</p>
+                    </div>
+                  </div>
+
+                  {/* Disclosure Checkboxes */}
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="agreeToTerms"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 bg-black/30 p-4 rounded-lg border border-yellow-400/20">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-1"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-white text-sm font-medium cursor-pointer">
+                              I acknowledge and agree to all loan terms and conditions *
+                            </FormLabel>
+                            <p className="text-xs text-white/60">
+                              I understand the interest rates, fees, repayment terms, and other conditions of this loan.
+                            </p>
+                            <FormMessage className="text-red-400" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="confirmAccuracy"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 bg-black/30 p-4 rounded-lg border border-yellow-400/20">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-1"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-white text-sm font-medium cursor-pointer">
+                              I confirm that all information provided is accurate and complete *
+                            </FormLabel>
+                            <p className="text-xs text-white/60">
+                              All details in this application are true and complete to the best of my knowledge.
+                            </p>
+                            <FormMessage className="text-red-400" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="authorizeCredit"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 bg-black/30 p-4 rounded-lg border border-yellow-400/20">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-1"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-white text-sm font-medium cursor-pointer">
+                              I authorize Saint Vision Group to run a soft credit inquiry *
+                            </FormLabel>
+                            <p className="text-xs text-white/60">
+                              This will not impact your credit score. A hard pull will only occur with your explicit consent.
+                            </p>
+                            <FormMessage className="text-red-400" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="agreeToPrivacy"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 bg-black/30 p-4 rounded-lg border border-yellow-400/20">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              className="mt-1"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-white text-sm font-medium cursor-pointer">
+                              I agree to the Privacy Policy and Terms of Service *
+                            </FormLabel>
+                            <p className="text-xs text-white/60">
+                              I have read and understand the privacy policy and agree to the terms of service.
+                            </p>
+                            <FormMessage className="text-red-400" />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* SIGNATURE & DATE SECTION */}
+                <div className="space-y-6 pt-6 border-t border-white/10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <FileText className="w-5 h-5 text-yellow-400" />
+                    <h3 className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-semibold text-yellow-400">
+                      Signature & Authorization
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="signature"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Your Full Name (as Signature) *</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Enter your full name"
+                              className="bg-black/50 border-white/20 text-white placeholder:text-gray-500 h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                            />
+                          </FormControl>
+                          <p className="text-xs text-white/50 mt-2">By entering your name, you electronically sign this application.</p>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="signatureDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white text-sm font-medium">Date of Signature *</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="date"
+                              className="bg-black/50 border-white/20 text-white h-12 rounded-xl focus:border-yellow-400 focus:ring-yellow-400/20"
+                            />
+                          </FormControl>
+                          <p className="text-xs text-white/50 mt-2">Today's date</p>
+                          <FormMessage className="text-red-400" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="bg-black/50 border border-yellow-400/30 rounded-lg p-4">
+                    <p className="text-xs text-white/70 leading-relaxed">
+                      <span className="font-semibold text-yellow-300">Electronic Signature Statement:</span> I understand that by providing my name above, I am electronically signing this application and all attached disclosures. This electronic signature has the same legal effect as a handwritten signature and is binding under applicable law. I acknowledge that I have read and understand all disclosures and terms contained in this application.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Submit Button */}
