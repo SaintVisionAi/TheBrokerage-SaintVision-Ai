@@ -37,7 +37,7 @@ class SaintSalAI {
   private openai: OpenAI;
   private azureOpenai: OpenAI;
 
-  private systemPrompt = `You are SaintSal™, an elite AI loan officer and financial advisor with 20+ years of industry expertise.
+  private systemPrompt = `You are SaintSal��, an elite AI loan officer and financial advisor with 20+ years of industry expertise.
 
 Your personality: You're Sal Couzzo - friendly, knowledgeable, professional, and results-oriented. You know lending inside and out.
 
@@ -298,6 +298,104 @@ IMPORTANT: This is a service business. Your job is to guide people to take actio
       needsFollowUp: !hasIndustry || !hasCreditScore,
       urgency
     };
+  }
+
+  private generateActionsForResponse(
+    userMessage: string,
+    analysis: SaintSalResponse['analysis'] | undefined
+  ): SaintSalAction[] {
+    if (!analysis) return [];
+
+    const lowerMessage = userMessage.toLowerCase();
+    const actions: SaintSalAction[] = [];
+
+    // If user is asking about applying or is ready to apply
+    if (analysis.intent === 'apply' || analysis.urgency === 'high') {
+      actions.push({
+        type: 'button',
+        text: 'Start Application Now',
+        url: '/apply',
+        primary: true,
+        variant: 'default'
+      });
+    }
+
+    // If user is asking about loans/lending
+    if (
+      lowerMessage.includes('loan') ||
+      lowerMessage.includes('borrow') ||
+      lowerMessage.includes('capital') ||
+      lowerMessage.includes('fund') ||
+      lowerMessage.includes('financing')
+    ) {
+      if (!actions.some(a => a.url === '/apply')) {
+        actions.push({
+          type: 'button',
+          text: 'Apply for a Loan',
+          url: '/apply',
+          primary: true
+        });
+      }
+    }
+
+    // If user is asking about real estate
+    if (
+      lowerMessage.includes('real estate') ||
+      lowerMessage.includes('property') ||
+      lowerMessage.includes('fix and flip') ||
+      lowerMessage.includes('dscr')
+    ) {
+      if (!actions.some(a => a.url === '/apply')) {
+        actions.push({
+          type: 'button',
+          text: 'Explore Real Estate Options',
+          url: '/apply',
+          primary: true
+        });
+      }
+    }
+
+    // If user is asking about investments
+    if (
+      lowerMessage.includes('invest') ||
+      lowerMessage.includes('return') ||
+      lowerMessage.includes('portfolio')
+    ) {
+      actions.push({
+        type: 'button',
+        text: 'Learn About Investments',
+        url: '/investment-opportunities',
+        primary: false
+      });
+    }
+
+    // If user needs more information or wants to talk to someone
+    if (
+      lowerMessage.includes('talk') ||
+      lowerMessage.includes('speak') ||
+      lowerMessage.includes('call') ||
+      lowerMessage.includes('more info') ||
+      lowerMessage.includes('details')
+    ) {
+      actions.push({
+        type: 'button',
+        text: 'Call Our Team',
+        onClick: 'call:(949) 997-2097',
+        primary: false
+      });
+    }
+
+    // Always provide a general application link if we haven't already
+    if (actions.length === 0 && !lowerMessage.includes('just looking')) {
+      actions.push({
+        type: 'button',
+        text: 'Get Started',
+        url: '/apply',
+        primary: true
+      });
+    }
+
+    return actions;
   }
 }
 
