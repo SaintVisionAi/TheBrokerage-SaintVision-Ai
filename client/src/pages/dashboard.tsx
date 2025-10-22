@@ -105,8 +105,8 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-900">
       <GlobalHeader />
-      <div className="flex-1 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-6">
-        <div className="max-w-7xl mx-auto px-6 space-y-6">
+      <div className="flex-1 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-y-auto">
+        <div className="max-w-7xl mx-auto px-6 py-8 space-y-6 pb-20">
           {/* Header */}
           <header className="mb-8 pt-2">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
