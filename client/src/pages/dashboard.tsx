@@ -237,8 +237,13 @@ export default function Dashboard() {
             <CardHeader className="pb-4">
               <CardTitle className="text-white flex items-center justify-between">
                 <span className="text-2xl font-bold">All Client Applications</span>
-                <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 px-6" data-testid="button-refresh">
-                  🔄 Refresh
+                <Button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold h-10 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="button-refresh"
+                >
+                  {isRefreshing ? '⏳ Syncing...' : '🔄 Refresh'}
                 </Button>
               </CardTitle>
             </CardHeader>
