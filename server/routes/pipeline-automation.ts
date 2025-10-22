@@ -156,14 +156,26 @@ router.post('/pipeline/documents-upload', async (req: Request, res: Response) =>
     const missingDocs = allDocsRequired.filter(doc => !uploadedDocs.includes(doc));
     const ghlStage = allDocsUploaded ? 'Full Application Complete' : 'Documents Pending';
 
-    await updateGHLOpportunity(app.ghlOpportunityId || '', {
-      stage: ghlStage,
-      customFields: {
-        'documents_uploaded': uploadedDocs.join(', '),
-        'documents_missing': missingDocs.join(', '),
-        'all_docs_uploaded': allDocsUploaded ? 'yes' : 'no'
-      }
-    });
+    // Update opportunity in GHL
+    try {
+      await fetch(`https://api.leadconnectorhq.com/opportunities/${app.ghlOpportunityId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.GHL_LOCATION_KEY}`
+        },
+        body: JSON.stringify({
+          stageName: ghlStage,
+          customFields: {
+            'documents_uploaded': uploadedDocs.join(', '),
+            'documents_missing': missingDocs.join(', '),
+            'all_docs_uploaded': allDocsUploaded ? 'yes' : 'no'
+          }
+        })
+      });
+    } catch (err) {
+      console.error('Error updating GHL:', err);
+    }
 
     // If all docs uploaded, move to full app complete
     if (allDocsUploaded) {
@@ -174,22 +186,13 @@ router.post('/pipeline/documents-upload', async (req: Request, res: Response) =>
         })
         .where(eq(applications.id, applicationId));
 
-      // Send confirmation
-      await sendGHLEmail(app.contact.ghlContactId || '', {
-        title: 'Application Complete!',
-        subject: '✅ Your Application is Complete',
-        body: `Hi ${app.contact.firstName},\n\nAwesome! We have all your documents and your application is complete.\n\nNext: We're submitting your application to our lenders. You'll hear from us within 24-48 hours.\n\n- SaintVision AI Team`
-      });
-
-      await sendGHLSms(app.contact.phone || '', {
-        body: `✅ Application complete! We're reviewing now. You'll hear from us within 24 hours.`
-      });
-
-      // Create task for review
-      await createGHLTask(app.ghlOpportunityId || '', {
-        title: 'Review Application #' + applicationId,
-        body: 'All documents received. Ready for lender submission.'
-      });
+      // Send confirmation SMS
+      if (app.contact.phone) {
+        await sendSMS({
+          to: app.contact.phone,
+          body: `✅ Application complete! We're reviewing now. You'll hear from us within 24 hours.`
+        });
+      }
 
       // Trigger lender selection and submission
       setTimeout(() => {
