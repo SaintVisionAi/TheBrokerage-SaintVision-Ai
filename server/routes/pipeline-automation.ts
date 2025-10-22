@@ -466,14 +466,14 @@ router.get('/pipeline/status/:id', async (req: Request, res: Response) => {
  */
 router.get('/pipeline/current', async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user?.id;
+    const userId = (req as any).user?.userId;
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const app = await db.query.applications.findFirst({
-      where: eq(applications.contactId, userId),
+      where: eq(applications.contactId, parseInt(userId)),
       with: { contact: true },
       orderBy: (applications, { desc }) => [desc(applications.createdAt)]
     });
