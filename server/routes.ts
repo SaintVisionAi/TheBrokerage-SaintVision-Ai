@@ -1604,66 +1604,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get client portal data for a specific contact (for now, get the first opportunity)
   app.get("/api/client-portal/:contactId?", isAuthenticated, async (req, res) => {
     try {
-      const { db } = await import('./db');
-      const { opportunities, contacts } = await import('@shared/schema');
-      const { desc, eq } = await import('drizzle-orm');
-      
-      const contactId = req.params.contactId || null;
-      
-      // If no contactId, get the first opportunity with contact details
-      let opportunity;
-      if (contactId) {
-        opportunity = await db.select({
-          oppId: opportunities.id,
-          ghlOpportunityId: opportunities.ghlOpportunityId,
-          division: opportunities.division,
-          monetaryValue: opportunities.monetaryValue,
-          status: opportunities.status,
-          priority: opportunities.priority,
-          stageName: opportunities.stageName,
-          oppCreatedAt: opportunities.createdAt,
-          contactId: contacts.id,
-          firstName: contacts.firstName,
-          lastName: contacts.lastName,
-          email: contacts.email,
-          phone: contacts.phone,
-          contactCreatedAt: contacts.createdAt
-        })
-        .from(opportunities)
-        .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
-        .where(eq(contacts.id, contactId))
-        .limit(1);
-      } else {
-        opportunity = await db.select({
-          oppId: opportunities.id,
-          ghlOpportunityId: opportunities.ghlOpportunityId,
-          division: opportunities.division,
-          monetaryValue: opportunities.monetaryValue,
-          status: opportunities.status,
-          priority: opportunities.priority,
-          stageName: opportunities.stageName,
-          oppCreatedAt: opportunities.createdAt,
-          contactId: contacts.id,
-          firstName: contacts.firstName,
-          lastName: contacts.lastName,
-          email: contacts.email,
-          phone: contacts.phone,
-          contactCreatedAt: contacts.createdAt
-        })
-        .from(opportunities)
-        .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
-        .orderBy(desc(opportunities.createdAt))
-        .limit(1);
-      }
+      const { getAllOpportunities } = await import('./services/ghl-client');
 
-      if (!opportunity || opportunity.length === 0) {
+      // Try to fetch from GHL first
+      const ghlOpportunities = await getAllOpportunities();
+
+      if (!ghlOpportunities || ghlOpportunities.length === 0) {
         return res.json({
           hasData: false,
           message: "No application found"
         });
       }
 
-      const opp = opportunity[0];
+      // Get the first opportunity (or a specific one if contactId is provided)
+      const opp = ghlOpportunities[0];
 
       // Map the 9-stage lending pipeline with EXACT stage matching
       const stageMapping: Record<string, number> = {
@@ -1701,7 +1655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ];
 
       // Get current stage index using EXACT match
-      const normalizedStage = (opp.stageName || 'new_lead').toLowerCase().trim();
+      const normalizedStage = (opp.pipelineStageName || 'new_lead').toLowerCase().trim();
       const currentStageIndex = stageMapping[normalizedStage] ?? 0;
 
       // Mark stages as completed/current/pending
@@ -1716,23 +1670,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         hasData: true,
         client: {
-          name: `${opp.firstName || ''} ${opp.lastName || ''}`.trim() || 'Valued Client',
+          name: opp.contactName || `${opp.firstName || ''} ${opp.lastName || ''}`.trim() || 'Valued Client',
           email: opp.email || 'N/A',
           phone: opp.phone || 'N/A'
         },
         application: {
           loanAmount: `$${(opp.monetaryValue || 0).toLocaleString()}`,
-          loanType: opp.division?.replace(/_/g, ' ').toUpperCase() || 'Lending',
-          applicationDate: opp.contactCreatedAt ? new Date(opp.contactCreatedAt).toLocaleDateString() : 'N/A',
-          currentStage: opp.stageName || 'New Lead',
-          priority: opp.priority || 'medium',
+          loanType: opp.pipelineName?.replace(/_/g, ' ').toUpperCase() || 'Lending',
+          applicationDate: opp.dateAdded ? new Date(opp.dateAdded).toLocaleDateString() : new Date().toLocaleDateString(),
+          currentStage: opp.pipelineStageName || 'New Lead',
+          priority: opp.priority || 'warm',
           status: opp.status || 'Active',
           estimatedFunding: opp.priority === 'hot' ? '3-5 business days' : '7-10 business days'
         },
         pipelineStages: pipelineStages.map((stage, idx) => ({
           name: stage.name,
           status: stage.status,
-          date: stage.status === 'completed' && opp.oppCreatedAt ? new Date(opp.oppCreatedAt).toLocaleDateString() : undefined
+          date: stage.status === 'completed' && opp.dateAdded ? new Date(opp.dateAdded).toLocaleDateString() : undefined
         })),
         documents: {
           needed: [
@@ -1746,7 +1700,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Client portal data error:", error);
-      res.status(500).json({ error: "Failed to fetch client portal data" });
+      // Fallback to database if GHL API fails
+      try {
+        const { db } = await import('./db');
+        const { opportunities, contacts } = await import('@shared/schema');
+        const { desc, eq } = await import('drizzle-orm');
+
+        const contactId = req.params.contactId || null;
+
+        // If no contactId, get the first opportunity with contact details
+        let opportunity;
+        if (contactId) {
+          opportunity = await db.select({
+            oppId: opportunities.id,
+            ghlOpportunityId: opportunities.ghlOpportunityId,
+            division: opportunities.division,
+            monetaryValue: opportunities.monetaryValue,
+            status: opportunities.status,
+            priority: opportunities.priority,
+            stageName: opportunities.stageName,
+            oppCreatedAt: opportunities.createdAt,
+            contactId: contacts.id,
+            firstName: contacts.firstName,
+            lastName: contacts.lastName,
+            email: contacts.email,
+            phone: contacts.phone,
+            contactCreatedAt: contacts.createdAt
+          })
+          .from(opportunities)
+          .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
+          .where(eq(contacts.id, contactId))
+          .limit(1);
+        } else {
+          opportunity = await db.select({
+            oppId: opportunities.id,
+            ghlOpportunityId: opportunities.ghlOpportunityId,
+            division: opportunities.division,
+            monetaryValue: opportunities.monetaryValue,
+            status: opportunities.status,
+            priority: opportunities.priority,
+            stageName: opportunities.stageName,
+            oppCreatedAt: opportunities.createdAt,
+            contactId: contacts.id,
+            firstName: contacts.firstName,
+            lastName: contacts.lastName,
+            email: contacts.email,
+            phone: contacts.phone,
+            contactCreatedAt: contacts.createdAt
+          })
+          .from(opportunities)
+          .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
+          .orderBy(desc(opportunities.createdAt))
+          .limit(1);
+        }
+
+        if (!opportunity || opportunity.length === 0) {
+          return res.json({
+            hasData: false,
+            message: "No application found"
+          });
+        }
+
+        const opp = opportunity[0];
+
+        // Map the 9-stage lending pipeline with EXACT stage matching
+        const stageMapping: Record<string, number> = {
+          'new_lead': 0,
+          'new lead': 0,
+          'contacted': 1,
+          'pre_qualified': 2,
+          'pre qualified': 2,
+          'documents_pending': 3,
+          'documents pending': 3,
+          'full_application_complete': 4,
+          'full application complete': 4,
+          'sent_to_lender': 5,
+          'sent to lender': 5,
+          'documents_pending_followup': 6,
+          'documents pending and follow up': 6,
+          'documents pending followup': 6,
+          'signature_qualified': 7,
+          'signature/qualified': 7,
+          'signature qualified': 7,
+          'funded': 8,
+          'funded $': 8
+        };
+
+        const pipelineStages: Array<{ name: string; status: 'pending' | 'completed' | 'current' }> = [
+          { name: 'New Lead', status: 'pending' },
+          { name: 'Contacted', status: 'pending' },
+          { name: 'Pre Qualified', status: 'pending' },
+          { name: 'Documents pending', status: 'pending' },
+          { name: 'Full Application Complete', status: 'pending' },
+          { name: 'Sent to Lender', status: 'pending' },
+          { name: 'Documents Pending and Follow Up', status: 'pending' },
+          { name: 'Signature/Qualified', status: 'pending' },
+          { name: 'Funded $', status: 'pending' }
+        ];
+
+        // Get current stage index using EXACT match
+        const normalizedStage = (opp.stageName || 'new_lead').toLowerCase().trim();
+        const currentStageIndex = stageMapping[normalizedStage] ?? 0;
+
+        // Mark stages as completed/current/pending
+        pipelineStages.forEach((stage, idx) => {
+          if (idx < currentStageIndex) {
+            stage.status = 'completed';
+          } else if (idx === currentStageIndex) {
+            stage.status = 'current';
+          }
+        });
+
+        res.json({
+          hasData: true,
+          client: {
+            name: `${opp.firstName || ''} ${opp.lastName || ''}`.trim() || 'Valued Client',
+            email: opp.email || 'N/A',
+            phone: opp.phone || 'N/A'
+          },
+          application: {
+            loanAmount: `$${(opp.monetaryValue || 0).toLocaleString()}`,
+            loanType: opp.division?.replace(/_/g, ' ').toUpperCase() || 'Lending',
+            applicationDate: opp.contactCreatedAt ? new Date(opp.contactCreatedAt).toLocaleDateString() : 'N/A',
+            currentStage: opp.stageName || 'New Lead',
+            priority: opp.priority || 'medium',
+            status: opp.status || 'Active',
+            estimatedFunding: opp.priority === 'hot' ? '3-5 business days' : '7-10 business days'
+          },
+          pipelineStages: pipelineStages.map((stage, idx) => ({
+            name: stage.name,
+            status: stage.status,
+            date: stage.status === 'completed' && opp.oppCreatedAt ? new Date(opp.oppCreatedAt).toLocaleDateString() : undefined
+          })),
+          documents: {
+            needed: [
+              'Business bank statements (last 3 months)',
+              'Business tax returns (2 years)',
+              'Personal tax returns (2 years)',
+              'Voided check for disbursement'
+            ],
+            uploaded: []
+          }
+        });
+      } catch (fallbackError: any) {
+        console.error("Fallback client portal error:", fallbackError);
+        res.status(500).json({ error: "Failed to fetch client portal data" });
+      }
     }
   });
 
