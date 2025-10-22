@@ -2922,39 +2922,6 @@ IP Address: ${applicationData.ipAddress || 'Not captured'}
     }
   });
 
-  // SaintBroker chat endpoint
-  app.post("/api/saint-broker/chat", isAuthenticated, async (req: any, res) => {
-    try {
-      const { message } = req.body;
-      if (!message) {
-        return res.status(400).json({ error: "Message is required" });
-      }
-
-      // Use SaintSal AI with structured responses
-      const { saintSal } = await import('./lib/saintvision-ai-core');
-      const aiResponse = await saintSal.chat(req.user?.userId || 'anonymous', message);
-
-      res.json({
-        response: aiResponse.response,
-        actions: aiResponse.actions,
-        model: aiResponse.model,
-        analysis: aiResponse.analysis
-      });
-    } catch (error: any) {
-      console.error('Error in chat:', error);
-      res.json({
-        response: "Hello! I'm SaintBroker. How can I help you today?",
-        actions: [
-          {
-            type: 'button',
-            text: 'Get Started',
-            url: '/apply',
-            primary: true
-          }
-        ]
-      });
-    }
-  });
 
   const httpServer = createServer(app);
   return httpServer;
