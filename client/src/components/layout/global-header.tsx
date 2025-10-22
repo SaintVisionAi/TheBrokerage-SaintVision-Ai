@@ -296,53 +296,78 @@ export default function GlobalHeader() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-yellow-500/20 py-4">
-            <div className="flex flex-col space-y-2">
-              
-              {/* Services Section */}
-              <div className="pb-2 mb-2 border-b border-gray-800">
-                {services.map((category) => (
-                  <div key={category.category} className="mb-3">
-                    <div className="text-xs text-yellow-400/70 uppercase tracking-wider px-4 mb-2 font-bold">
-                      {category.category}
-                    </div>
-                    {category.items.map((service) => (
-                      <Link key={service.href} href={service.href}>
-                        <div className="px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${service.highlight ? 'bg-yellow-500/20' : 'bg-white/5'}`}>
-                            {service.icon}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-white flex items-center gap-2">
-                              {service.name}
-                              {service.highlight && (
-                                <span className="text-[10px] px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full">HOT</span>
-                              )}
-                            </div>
-                            <div className="text-xs text-gray-400">{service.description}</div>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                ))}
-              </div>
+            <div className="flex flex-col space-y-1">
 
-              {/* Quick Links */}
-              <Link href="/client-hub">
-                <div className={`px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/client-hub") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
-                  Client Hub
+              {/* Primary Links */}
+              <Link href="/apply">
+                <div className={`px-4 py-3 font-semibold transition-colors cursor-pointer ${isActive("/apply") || isActive("/full-lending-application-1") ? "text-yellow-400 bg-yellow-500/5" : "text-white hover:bg-yellow-500/10"}`}>
+                  Business Loans
                 </div>
               </Link>
 
+              <Link href="/real-estate">
+                <div className={`px-4 py-3 font-semibold transition-colors cursor-pointer ${isActive("/real-estate") ? "text-yellow-400 bg-yellow-500/5" : "text-white hover:bg-yellow-500/10"}`}>
+                  Real Estate
+                </div>
+              </Link>
+
+              <Link href="/investments">
+                <div className={`px-4 py-3 font-semibold transition-colors cursor-pointer ${isActive("/investments") ? "text-yellow-400 bg-yellow-500/5" : "text-white hover:bg-yellow-500/10"}`}>
+                  Investments
+                </div>
+              </Link>
+
+              <div className="border-t border-gray-800 my-3"></div>
+
+              {/* Services Section */}
+              <div className="text-xs text-yellow-400/70 uppercase tracking-wider px-4 mb-2 font-bold">Services & Tools</div>
+
+              {services.map((category) => (
+                <div key={category.category}>
+                  <div className="text-xs text-yellow-400/50 uppercase tracking-wider px-4 mt-3 mb-2 font-semibold">
+                    {category.category}
+                  </div>
+                  {category.items.map((service) => (
+                    <Link key={service.href} href={service.href}>
+                      <div className="px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer flex items-center gap-2">
+                        <div className={`text-lg ${service.highlight ? 'text-yellow-400' : 'text-white'}`}>
+                          {service.icon}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-white flex items-center gap-2">
+                            {service.name}
+                            {service.highlight && (
+                              <span className="text-[10px] px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full">HOT</span>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-500">{service.description}</div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ))}
+
+              <div className="border-t border-gray-800 my-3"></div>
+
+              {/* Company Section */}
+              <div className="text-xs text-yellow-400/50 uppercase tracking-wider px-4 mb-2 font-semibold">Company</div>
+
               <Link href="/about">
-                <div className={`px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/about") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
-                  About
+                <div className={`px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/about") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
+                  About Us
                 </div>
               </Link>
 
               <Link href="/contact">
-                <div className={`px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/contact") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
+                <div className={`px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/contact") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
                   Contact
+                </div>
+              </Link>
+
+              <Link href="/client-hub">
+                <div className={`px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/client-hub") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
+                  Client Hub
                 </div>
               </Link>
 
@@ -351,20 +376,20 @@ export default function GlobalHeader() {
                   openChat();
                   setMobileMenuOpen(false);
                 }}
-                className="px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer text-white flex items-center gap-2 w-full"
+                className="px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer text-white flex items-center gap-2 w-full font-semibold mt-3"
               >
                 <MessageCircle className="w-4 h-4" />
-                SaintBroker Chat
+                Help/Chat
               </button>
 
               {/* Phone */}
-              <div className="px-4 py-3 flex items-center gap-2 text-gray-400 text-sm">
+              <div className="border-t border-gray-800 my-3 pt-3 px-4 flex items-center gap-2 text-gray-400 text-sm">
                 <Phone className="w-4 h-4" />
                 <span>(949) 755-0720</span>
               </div>
 
               {/* Mobile Auth Buttons */}
-              <div className="px-4 pt-4 space-y-2">
+              <div className="px-4 pt-2 space-y-2">
                 <Link href="/login">
                   <Button variant="outline" className="w-full border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10">
                     Sign In
