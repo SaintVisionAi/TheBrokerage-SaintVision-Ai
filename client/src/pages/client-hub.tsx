@@ -170,15 +170,14 @@ export default function ClientHub() {
   ];
 
   return (
-    <div className="flex flex-col h-screen bg-slate-900">
+    <div className="flex flex-col h-screen bg-slate-900 overflow-hidden">
       <GlobalHeader />
 
-      <div className="flex-1 flex overflow-auto">
+      <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar */}
         <div className={cn(
-          'flex-shrink-0 w-64 bg-gradient-to-br from-slate-800 to-slate-900 border-r border-yellow-500/30 overflow-y-auto',
-          'fixed lg:static inset-y-0 left-0 z-40 transition-transform duration-200 lg:translate-x-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          'w-64 bg-gradient-to-br from-slate-800 to-slate-900 border-r border-yellow-500/30 overflow-y-auto',
+          'hidden lg:flex flex-col'
         )}>
           <div className="p-6 space-y-8">
             <div>
