@@ -426,6 +426,60 @@ export async function processNewLead(leadData: LeadData) {
   }
 }
 
+// ==================== BULK FETCH METHODS ====================
+
+export async function getAllContacts() {
+  validateGHLConfig();
+
+  try {
+    const params = new URLSearchParams({
+      locationId: GHL_LOCATION_ID!,
+      limit: '100'
+    });
+
+    const response = await fetch(`${GHL_API_BASE}/contacts?${params}`, {
+      method: 'GET',
+      headers: getHeaders()
+    });
+
+    if (!response.ok) {
+      throw new Error(`GHL Get All Contacts Failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.contacts || [];
+  } catch (error: any) {
+    console.error('Failed to fetch all contacts:', error);
+    return [];
+  }
+}
+
+export async function getAllOpportunities() {
+  validateGHLConfig();
+
+  try {
+    const params = new URLSearchParams({
+      locationId: GHL_LOCATION_ID!,
+      limit: '100'
+    });
+
+    const response = await fetch(`${GHL_API_BASE}/opportunities?${params}`, {
+      method: 'GET',
+      headers: getHeaders()
+    });
+
+    if (!response.ok) {
+      throw new Error(`GHL Get All Opportunities Failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.opportunities || [];
+  } catch (error: any) {
+    console.error('Failed to fetch all opportunities:', error);
+    return [];
+  }
+}
+
 // ==================== HEALTH CHECK ====================
 
 export async function checkGHLConnection() {
