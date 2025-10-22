@@ -1,15 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  MessageCircle, 
-  X, 
-  Send, 
+import {
+  MessageCircle,
+  X,
+  Send,
   Sparkles,
   FileText,
   StickyNote,
   FileSignature,
   Clock,
+  ArrowRight,
+  Phone,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
