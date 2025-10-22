@@ -370,13 +370,24 @@ router.post('/pipeline/update-status', async (req: Request, res: Response) => {
       .where(eq(applications.id, applicationId));
 
     // Update GHL
-    await updateGHLOpportunity(app.ghlOpportunityId || '', {
-      stage: ghlStage,
-      customFields: {
-        'lender_status': status,
-        'status_updated_at': new Date().toISOString()
-      }
-    });
+    try {
+      await fetch(`https://api.leadconnectorhq.com/opportunities/${app.ghlOpportunityId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.GHL_LOCATION_KEY}`
+        },
+        body: JSON.stringify({
+          stageName: ghlStage,
+          customFields: {
+            'lender_status': status,
+            'status_updated_at': new Date().toISOString()
+          }
+        })
+      });
+    } catch (err) {
+      console.error('Error updating GHL:', err);
+    }
 
     // Handle different status outcomes
     if (status === 'approved' || status === 'conditionally_approved') {
@@ -627,7 +638,7 @@ async function selectAndSubmitToLender(applicationId: number) {
 function scheduleDocumentReminder(applicationId: number, daysDelay: number) {
   // In production, use a job queue (Bull, RabbitMQ, etc.)
   // For now, just log the scheduling
-  console.log(`��� Scheduled document reminder for app ${applicationId} in ${daysDelay} day(s)`);
+  console.log(`📅 Scheduled document reminder for app ${applicationId} in ${daysDelay} day(s)`);
 }
 
 function createUnderwritingFollowUps(applicationId: number, lenderName: string) {
