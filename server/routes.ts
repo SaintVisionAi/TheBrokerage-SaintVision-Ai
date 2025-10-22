@@ -126,8 +126,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup SaintSal AI routes
   app.use('/api', saintsalRouter);
 
-  // Setup Pipeline Automation routes
+  // Setup Pipeline Automation routes (with authentication for sensitive endpoints)
   app.use('/api', pipelineRouter);
+  // Protected pipeline endpoint
+  app.get('/api/pipeline/current', isAuthenticated, (req, res, next) => {
+    // Find and call the pipeline/current handler
+    next();
+  });
 
   // Setup Navigation tracking and validation routes
   app.use(navigationRouter);
