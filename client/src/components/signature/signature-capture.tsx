@@ -14,6 +14,18 @@ interface SignatureCaptureProps {
     type: 'drawn' | 'typed';
     consentChecks: Record<string, boolean>;
     signerName: string;
+    timestamp: string;
+    timestampMs: number;
+    ipAddress?: string;
+    userAgent?: string;
+    auditTrail: {
+      signedAt: string;
+      signedAtMs: number;
+      signatureMethod: 'drawn' | 'typed';
+      consentVerified: boolean;
+      allConsentsChecked: boolean;
+      signatureVerificationStatus: 'verified' | 'pending';
+    };
   }) => void;
   onCancel?: () => void;
   loanAmount?: string;
@@ -193,7 +205,7 @@ export default function SignatureCapture({
     if (newErrors.length === 0) {
       // Generate signature data
       let signatureData = '';
-      
+
       if (signatureType === 'drawn' && canvasRef.current) {
         signatureData = canvasRef.current.toDataURL('image/png');
       } else if (signatureType === 'typed') {
@@ -212,11 +224,31 @@ export default function SignatureCapture({
         }
       }
 
+      // Generate timestamp
+      const now = new Date();
+      const timestamp = now.toISOString();
+      const timestampMs = now.getTime();
+
+      // Check all required consents
+      const allConsentsChecked = CONSENT_ITEMS.every(item => consentChecks[item.id]);
+
       onSignatureComplete({
         data: signatureData,
         type: signatureType,
         consentChecks,
-        signerName
+        signerName,
+        timestamp,
+        timestampMs,
+        ipAddress: undefined, // Will be captured on server if needed
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        auditTrail: {
+          signedAt: timestamp,
+          signedAtMs: timestampMs,
+          signatureMethod: signatureType,
+          consentVerified: allConsentsChecked,
+          allConsentsChecked,
+          signatureVerificationStatus: 'verified' as const
+        }
       });
     }
   };
