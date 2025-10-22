@@ -108,15 +108,15 @@ export default function Dashboard() {
       <div className="flex-1 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-6">
         <div className="max-w-7xl mx-auto px-6 space-y-6">
           {/* Header */}
-          <header className="mb-8">
-            <div className="flex items-center justify-between">
+          <header className="mb-8 pt-2">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                <h1 className="text-4xl font-bold mb-2 text-yellow-400">
                   Admin Dashboard
                 </h1>
-                <p className="text-slate-300">Saint Vision Group - AI Brokerage Platform</p>
+                <p className="text-slate-300 text-lg">Saint Vision Group - AI Brokerage Platform</p>
               </div>
-              <Badge className="bg-green-600/20 text-green-400 border-green-500/30">
+              <Badge className="bg-green-600/30 text-green-300 border-green-500/50 border px-4 py-2 text-sm font-semibold w-fit">
                 ✨ Live Monitoring
               </Badge>
             </div>
