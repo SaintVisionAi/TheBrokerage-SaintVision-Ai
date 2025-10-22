@@ -54,6 +54,13 @@ export default function FullLendingApplicationPage() {
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showSignatureCapture, setShowSignatureCapture] = useState(false);
+  const [signatureData, setSignatureData] = useState<{
+    data: string;
+    type: 'drawn' | 'typed';
+    consentChecks: Record<string, boolean>;
+    signerName: string;
+  } | null>(null);
 
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationSchema),
