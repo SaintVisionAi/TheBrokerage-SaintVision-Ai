@@ -2296,206 +2296,47 @@ IP Address: ${applicationData.ipAddress || 'Not captured'}
   }
 
   // SaintBroker Enhanced API Endpoints - MASTER ORCHESTRATOR
-  // SaintBroker chat endpoint - simple and direct, using SaintSal AI
+  // SaintBroker chat endpoint - using SaintSal AI with structured actions
   app.post("/api/saint-broker/chat", async (req, res) => {
     try {
       const { message } = req.body;
-      // Allow both authenticated and guest users
+
+      if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+      }
+
+      // Get user context
       const userId = req.user?.userId || req.session?.user?.id || 'guest-user';
-      const userRole = req.user?.role || req.session?.user?.role || 'guest';
-      const userEmail = req.user?.email || req.session?.user?.email || 'guest@saintbrokerai.com';
 
-      // BUILD CONTEXT-AWARE DATA FOR SAINTBROKER ORCHESTRATOR
-      let userContext = {
-        role: userRole,
-        email: userEmail,
-        userId: userId,
-        isAdmin: userRole === 'admin' || userRole === 'broker',
-        applicationData: null as any,
-        adminStats: null as any,
-        syncStatus: {
-          adminDashboard: 'synced',
-          clientPortal: 'synced',
-          saintBroker: 'active'
-        }
-      };
+      // Use SaintSal AI to generate response with actions
+      const { saintSal } = await import('./lib/saintvision-ai-core');
+      const aiResponse = await saintSal.chat(userId, message);
 
-      // If ADMIN - Load ALL applications and stats
-      if (userContext.isAdmin) {
-        try {
-          const { db } = await import('./db');
-          const { opportunities, contacts } = await import('@shared/schema');
-          const { eq, desc } = await import('drizzle-orm');
-          
-          // Get all applications
-          const apps = await db.select({
-            oppId: opportunities.id,
-            contactId: contacts.id,
-            firstName: contacts.firstName,
-            lastName: contacts.lastName,
-            email: contacts.email,
-            phone: contacts.phone,
-            monetaryValue: opportunities.monetaryValue,
-            division: opportunities.division,
-            status: opportunities.status,
-            priority: opportunities.priority,
-            stageName: opportunities.stageName,
-            createdAt: opportunities.createdAt
-          })
-          .from(opportunities)
-          .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
-          .orderBy(desc(opportunities.createdAt));
-
-          userContext.applicationData = apps;
-          userContext.adminStats = {
-            totalApplications: apps.length,
-            totalPipeline: apps.reduce((sum, app) => sum + (app.monetaryValue || 0), 0),
-            pendingCount: apps.filter(a => mapStageToStatus(a.stageName || '') === 'pending').length,
-            submittedCount: apps.filter(a => mapStageToStatus(a.stageName || '') === 'submitted').length
-          };
-        } catch (dbError) {
-          console.error('[SaintBroker Admin Context] DB error:', dbError);
-        }
-      } 
-      // If CLIENT - Load only their application
-      else {
-        try {
-          const { db } = await import('./db');
-          const { opportunities, contacts } = await import('@shared/schema');
-          const { eq } = await import('drizzle-orm');
-          
-          // Get client's application by email
-          const contact = await db.select().from(contacts).where(eq(contacts.email, userEmail)).limit(1);
-          if (contact[0]) {
-            const opp = await db.select().from(opportunities).where(eq(opportunities.contactId, contact[0].id)).limit(1);
-            if (opp[0]) {
-              userContext.applicationData = opp[0];
-            }
-          }
-        } catch (dbError) {
-          console.error('[SaintBroker Client Context] DB error:', dbError);
-        }
-      }
-
-      // Load comprehensive knowledge base for SaintBroker
-      const knowledgeBase = [];
-      
-      try {
-        // Load client hub knowledge base (384 lines of complete reference)
-        const hubKnowledgePath = path.join(process.cwd(), 'client-hub-knowledge-base.md');
-        if (fs.existsSync(hubKnowledgePath)) {
-          knowledgeBase.push(fs.readFileSync(hubKnowledgePath, 'utf-8'));
-        }
-        
-        // Load system architecture and workflows
-        const replitMdPath = path.join(process.cwd(), 'replit.md');
-        if (fs.existsSync(replitMdPath)) {
-          knowledgeBase.push(fs.readFileSync(replitMdPath, 'utf-8'));
-        }
-        
-        // Add funding partners knowledge with AI routing logic
-        const fundingPartnersKnowledge = `
-# FUNDING PARTNER NETWORK (13 Active Partners)
-
-Saint Vision Group operates a comprehensive funding partner network with AI-powered routing through SaintBroker™. The system automatically matches applications to the optimal lender based on loan type, amount, credit score, and urgency.
-
-**Network Overview:**
-- **13 Active Partners**: $5K to $50M+ funding range
-- **AI Auto-Selection**: SaintBroker analyzes and routes to best match
-- **Multiple Specialties**: MCA, Real Estate, Equipment, SBA, Startup (0% SLOC)
-- **Speed Range**: 1-3 days (urgent MCA) to 30-60 days (SBA)
-- **Commission**: 8-30% depending on partner and product
-
-**AI Routing Logic:**
-- Equipment loans → Commercial Capital Connect
-- Real Estate → Easy Street Capital or Trinity Bay Lending
-- Startup (700+ credit, <$100K) → Rich Mee (0% SLOC)
-- SBA (Expansion/Acquisition, 650+ credit) → SB Lending Source
-- General Business Lending ($50K-$5M) → SVG In-House first, then partners
-- Working Capital/MCA → SVG Partner Network (fastest)
-- Large Commercial → Rok Financial
-
-**Active Funding Partners:**
-${FUNDING_PARTNERS.filter(p => p.active).map(p => 
-  `- **${p.name}**: ${p.description} (Specialties: ${p.specialties.join(', ')})`
-).join('\n')}
-
-**IMPORTANT**: Saint Vision Group is the white-label brokerage. Clients see "Saint Vision Group - Powered by SaintBroker™ AI" throughout entire journey. Partners are SVG's competitive advantage and backend relationships - generally NOT exposed to clients except in strategic cases for credibility.
-`;
-        knowledgeBase.push(fundingPartnersKnowledge);
-        
-      } catch (fileError) {
-        console.error('[SaintBroker] Error loading knowledge base files:', fileError);
-        // Continue with available knowledge even if some files fail
-      }
-
-      // BUILD ORCHESTRATOR MESSAGE WITH FULL CONTEXT
-      const orchestratorContext = `
-[SAINTBROKER AI ORCHESTRATOR CONTEXT]
-User Role: ${userContext.role}
-User Email: ${userContext.email}
-Is Admin: ${userContext.isAdmin}
-
-${userContext.isAdmin ? `
-[ADMIN CONTEXT - FULL PIPELINE VIEW]
-Total Applications: ${userContext.adminStats?.totalApplications || 0}
-Total Pipeline Value: $${(userContext.adminStats?.totalPipeline || 0).toLocaleString()}
-Pending Applications: ${userContext.adminStats?.pendingCount || 0}
-Submitted Applications: ${userContext.adminStats?.submittedCount || 0}
-
-Recent Applications:
-${userContext.applicationData?.slice(0, 5).map((app: any) => 
-  `- ${app.firstName} ${app.lastName}: $${(app.monetaryValue || 0).toLocaleString()} (${app.stageName})`
-).join('\n') || 'No applications'}
-` : `
-[CLIENT CONTEXT - PERSONAL APPLICATION]
-${userContext.applicationData ? `
-Application Status: ${userContext.applicationData.stageName}
-Loan Amount: $${(userContext.applicationData.monetaryValue || 0).toLocaleString()}
-Division: ${userContext.applicationData.division}
-Priority: ${userContext.applicationData.priority}
-` : 'No active application'}
-`}
-
-[SYNC STATUS]
-Admin Dashboard: ${userContext.syncStatus.adminDashboard}
-Client Portal: ${userContext.syncStatus.clientPortal}
-SaintBroker AI: ${userContext.syncStatus.saintBroker}
-
-[USER MESSAGE]
-${message}
-
-${knowledgeBase.length > 0 ? `
-[KNOWLEDGE BASE]
-${knowledgeBase.slice(0, 2).join('\n\n')}
-` : ''}
-
-IMPORTANT: You are SaintBroker AI, the master orchestrator. Respond based on the user's role:
-- For ADMINS: Provide comprehensive pipeline insights, all applications, and management advice
-- For CLIENTS: Focus on their specific application, next steps, and personalized guidance
-- Always maintain sync awareness between admin dashboard, client portal, and your responses
-      `;
-
-      // Use the production AI orchestrator with full context
-      const enhancedResponse = await saintBrokerAI.chat({
-        message: orchestratorContext,
-        context: {
-          division: 'lending',
-          stage: context?.stage || 'initial',
-          userRole: userContext.role,
-          isAdmin: userContext.isAdmin
-        }
-      });
-      
-      res.json({ 
-        response: enhancedResponse.response,
-        context: {
-          role: userContext.role,
-          syncStatus: userContext.syncStatus
-        }
+      res.json({
+        response: aiResponse.response,
+        actions: aiResponse.actions,
+        model: aiResponse.model,
+        analysis: aiResponse.analysis
       });
     } catch (error: any) {
-      res.status(500).json({ error: "Failed to process chat message" });
+      console.error('[SaintBroker Chat] Error:', error);
+      res.json({
+        response: "Hello! I'm SaintBroker, your personal financial advisor. How can I help you with business lending, real estate, or investments today?",
+        actions: [
+          {
+            type: 'button',
+            text: 'Get Started',
+            url: '/apply',
+            primary: true
+          },
+          {
+            type: 'button',
+            text: 'Call Our Team',
+            onClick: 'call:(949) 997-2097',
+            primary: false
+          }
+        ]
+      });
     }
   });
 
