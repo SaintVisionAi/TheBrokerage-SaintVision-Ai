@@ -124,74 +124,86 @@ export default function Dashboard() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-slate-800/80 border-slate-600/50 backdrop-blur-xl shadow-lg shadow-slate-950/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Total</p>
-                    <p className="text-3xl font-bold text-white">{stats?.totalApplications || 0}</p>
+                    <p className="text-slate-300 text-sm font-semibold uppercase tracking-wide">Total</p>
+                    <p className="text-3xl font-bold text-white mt-2">{stats?.totalApplications || 0}</p>
                   </div>
-                  <Users className="w-8 h-8 text-blue-400" />
+                  <div className="h-12 w-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                    <Users className="w-6 h-6 text-blue-400" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-yellow-500/30">
+            <Card className="bg-slate-800/80 border-yellow-500/50 backdrop-blur-xl shadow-lg shadow-slate-950/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Pending</p>
-                    <p className="text-3xl font-bold text-yellow-400">{stats?.pending || 0}</p>
+                    <p className="text-slate-300 text-sm font-semibold uppercase tracking-wide">Pending</p>
+                    <p className="text-3xl font-bold text-yellow-400 mt-2">{stats?.pending || 0}</p>
                   </div>
-                  <Clock className="w-8 h-8 text-yellow-400" />
+                  <div className="h-12 w-12 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-yellow-400" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-blue-500/30">
+            <Card className="bg-slate-800/80 border-blue-500/50 backdrop-blur-xl shadow-lg shadow-slate-950/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Submitted</p>
-                    <p className="text-3xl font-bold text-blue-400">{stats?.submitted || 0}</p>
+                    <p className="text-slate-300 text-sm font-semibold uppercase tracking-wide">Submitted</p>
+                    <p className="text-3xl font-bold text-blue-400 mt-2">{stats?.submitted || 0}</p>
                   </div>
-                  <FileText className="w-8 h-8 text-blue-400" />
+                  <div className="h-12 w-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-blue-400" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-red-500/30">
+            <Card className="bg-slate-800/80 border-red-500/50 backdrop-blur-xl shadow-lg shadow-slate-950/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Incomplete</p>
-                    <p className="text-3xl font-bold text-red-400">{stats?.incomplete || 0}</p>
+                    <p className="text-slate-300 text-sm font-semibold uppercase tracking-wide">Incomplete</p>
+                    <p className="text-3xl font-bold text-red-400 mt-2">{stats?.incomplete || 0}</p>
                   </div>
-                  <AlertCircle className="w-8 h-8 text-red-400" />
+                  <div className="h-12 w-12 rounded-lg bg-red-500/20 flex items-center justify-center">
+                    <AlertCircle className="w-6 h-6 text-red-400" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-green-500/30">
+            <Card className="bg-slate-800/80 border-green-500/50 backdrop-blur-xl shadow-lg shadow-slate-950/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Completed</p>
-                    <p className="text-3xl font-bold text-green-400">{stats?.completed || 0}</p>
+                    <p className="text-slate-300 text-sm font-semibold uppercase tracking-wide">Completed</p>
+                    <p className="text-3xl font-bold text-green-400 mt-2">{stats?.completed || 0}</p>
                   </div>
-                  <CheckCircle className="w-8 h-8 text-green-400" />
+                  <div className="h-12 w-12 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-green-400" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-emerald-500/30">
+            <Card className="bg-slate-800/80 border-emerald-500/50 backdrop-blur-xl shadow-lg shadow-slate-950/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm">Total Value</p>
-                    <p className="text-2xl font-bold text-emerald-400">{stats?.totalLoanValue || "$0"}</p>
+                    <p className="text-slate-300 text-sm font-semibold uppercase tracking-wide">Total Value</p>
+                    <p className="text-2xl font-bold text-emerald-400 mt-2">{stats?.totalLoanValue || "$0"}</p>
                   </div>
-                  <DollarSign className="w-8 h-8 text-emerald-400" />
+                  <div className="h-12 w-12 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-emerald-400" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
