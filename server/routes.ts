@@ -2314,7 +2314,7 @@ IP Address: ${applicationData.ipAddress || 'Not captured'}
   // SaintBroker chat endpoint - using SaintSal AI with structured actions
   app.post("/api/saint-broker/chat", async (req, res) => {
     try {
-      const { message } = req.body;
+      const { message, pipelineContext } = req.body;
 
       if (!message) {
         return res.status(400).json({ error: "Message is required" });
@@ -2323,9 +2323,15 @@ IP Address: ${applicationData.ipAddress || 'Not captured'}
       // Get user context
       const userId = req.user?.userId || req.session?.user?.id || 'guest-user';
 
+      // Build context string for the AI to understand user's current application status
+      let contextMsg = message;
+      if (pipelineContext && pipelineContext.hasApplication) {
+        contextMsg = `[Application Context: User is at stage "${pipelineContext.currentStage}", ${pipelineContext.progressPercentage}% through pipeline. Loan Type: ${pipelineContext.loanType}, Amount: $${pipelineContext.loanAmount}. Documents uploaded: ${pipelineContext.documentsUploaded}/${pipelineContext.documentsNeeded?.length || 0}. Funding Partner: ${pipelineContext.fundingPartner || 'Not selected'}]\n\nUser message: ${message}`;
+      }
+
       // Use SaintSal AI to generate response with actions
       const { saintSal } = await import('./lib/saintvision-ai-core');
-      const aiResponse = await saintSal.chat(userId, message);
+      const aiResponse = await saintSal.chat(userId, contextMsg);
 
       res.json({
         response: aiResponse.response,
