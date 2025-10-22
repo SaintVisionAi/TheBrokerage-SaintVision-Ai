@@ -575,8 +575,8 @@ export default function ClientHub() {
         </div>
 
         {/* Pipeline Progress Panel */}
-        <div className="hidden lg:flex w-96 border-l border-yellow-500/30 flex-col bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 shadow-lg shadow-slate-950/50">
-          <ScrollArea className="flex-1 p-6">
+        <div className="hidden lg:flex w-96 border-l border-yellow-500/30 flex-col bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 shadow-lg shadow-slate-950/50 overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-6">
             {pipelineLoading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400 mx-auto mb-3" />
@@ -600,7 +600,7 @@ export default function ClientHub() {
                 </Button>
               </div>
             )}
-          </ScrollArea>
+          </div>
         </div>
       </div>
       <GlobalFooter />
