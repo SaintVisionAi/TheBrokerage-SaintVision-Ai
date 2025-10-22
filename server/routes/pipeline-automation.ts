@@ -460,6 +460,96 @@ router.get('/pipeline/status/:id', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/pipeline/current
+ * Get current authenticated user's active application status
+ * Returns pipeline progress, documents needed, signatures pending, etc.
+ */
+router.get('/pipeline/current', async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const app = await db.query.applications.findFirst({
+      where: eq(applications.contactId, userId),
+      with: { contact: true },
+      orderBy: (applications, { desc }) => [desc(applications.createdAt)]
+    });
+
+    if (!app) {
+      return res.json({
+        success: true,
+        hasApplication: false,
+        message: 'No active application'
+      });
+    }
+
+    const stages = [
+      { name: 'New Lead', status: app.status ? 'completed' : 'current', stage: 'new_lead' },
+      { name: 'Pre-Qualified', status: app.creditScore ? 'completed' : (app.status ? 'current' : 'pending'), stage: 'pre_qualified' },
+      { name: 'Credit Pull', status: app.creditScore ? 'completed' : 'pending', stage: 'credit_pull' },
+      { name: 'Documents Pending', status: app.documentsUploaded?.length ? 'completed' : (app.creditScore ? 'current' : 'pending'), stage: 'documents_pending' },
+      { name: 'Full Application', status: app.applicationCompleteDate ? 'completed' : (app.documentsUploaded?.length ? 'current' : 'pending'), stage: 'full_application' },
+      { name: 'Sent to Lender', status: app.submissionDate ? 'completed' : (app.applicationCompleteDate ? 'current' : 'pending'), stage: 'sent_to_lender' },
+      { name: 'Under Review', status: app.lenderStatus === 'under_review' ? 'current' : (app.submissionDate ? (app.approvalDate ? 'completed' : 'current') : 'pending'), stage: 'under_review' },
+      { name: 'Approved', status: app.approvalDate ? 'completed' : 'pending', stage: 'approved' },
+      { name: 'Signatures/Qualified', status: app.approvalDate && !app.fundingDate ? 'current' : (app.fundingDate ? 'completed' : 'pending'), stage: 'signatures' },
+      { name: 'Funded', status: app.fundingDate ? 'completed' : 'pending', stage: 'funded' }
+    ];
+
+    const currentStageIndex = stages.findIndex(s => s.status === 'current');
+    const progressPercentage = currentStageIndex >= 0 ? ((currentStageIndex + 1) / stages.length) * 100 : 10;
+
+    res.json({
+      success: true,
+      hasApplication: true,
+      application: {
+        id: app.id,
+        loanType: app.loanType,
+        loanAmount: app.loanAmount,
+        loanPurpose: app.loanPurpose,
+        businessName: app.businessName,
+        status: app.status,
+        stage: app.stage,
+        lenderStatus: app.lenderStatus
+      },
+      pipeline: {
+        stages,
+        currentStage: currentStageIndex >= 0 ? stages[currentStageIndex].name : 'Not Started',
+        progressPercentage: Math.round(progressPercentage),
+        completedStages: stages.filter(s => s.status === 'completed').length,
+        totalStages: stages.length
+      },
+      documents: {
+        uploaded: app.documentsUploaded || [],
+        needed: ['tax_returns', 'bank_statements', 'drivers_license', 'business_license'],
+        uploadedCount: (app.documentsUploaded || []).length
+      },
+      timeline: {
+        submissionDate: app.submissionDate,
+        statusLastUpdated: app.statusLastUpdated,
+        approvalDate: app.approvalDate,
+        fundingDate: app.fundingDate,
+        applicationCompleteDate: app.applicationCompleteDate
+      },
+      funding: {
+        creditScore: app.creditScore,
+        fundingPartner: app.lenderSelected,
+        interestRate: app.interestRate,
+        loanTerm: app.loanTerm,
+        amountWon: app.amountWon
+      }
+    });
+
+  } catch (error: any) {
+    console.error('Get current pipeline error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * POST /api/webhook/ghl-pipeline
  * Webhook handler for GHL updates
  * Receives real-time updates from GHL when pipeline stage changes
