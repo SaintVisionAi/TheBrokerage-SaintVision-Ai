@@ -538,15 +538,12 @@ async function handleAdditionalDocsNeeded(applicationId: number, app: any, lende
     })
     .where(eq(applications.id, applicationId));
 
-  await sendGHLEmail(contact.ghlContactId, {
-    title: 'Additional Documents Needed',
-    subject: 'We need a few more documents',
-    body: `Hi ${contact.firstName},\n\nThe lender needs some additional documents to move forward:\n\n${lenderNotes}\n\nPlease upload them here: [DOCUMENT_UPLOAD_LINK]\n\nIf you have questions, call us at (949) 997-2097.\n\n- Ryan @ SaintVision`
-  });
-
-  await sendGHLSms(contact.phone, {
-    body: `📄 Lender needs additional docs. Check your email for details.`
-  });
+  if (contact.phone) {
+    await sendSMS({
+      to: contact.phone,
+      body: `📄 Lender needs additional docs: ${lenderNotes.substring(0, 50)}... Call us: (949) 997-2097`
+    });
+  }
 }
 
 async function handleDeclined(applicationId: number, app: any, lenderNotes: string) {
@@ -559,16 +556,12 @@ async function handleDeclined(applicationId: number, app: any, lenderNotes: stri
     })
     .where(eq(applications.id, applicationId));
 
-  await sendGHLEmail(contact.ghlContactId, {
-    title: 'Alternative Options Available',
-    subject: 'Let\'s Explore Alternative Solutions',
-    body: `Hi ${contact.firstName},\n\nThis particular lender wasn't able to move forward at this time.\n\nBut don't worry! We have other options available.\n\nLet's talk about alternatives:\nCall us: (949) 997-2097\n\nWe're here to help!\n\n- Ryan @ SaintVision`
-  });
-
-  await createGHLTask(app.ghlOpportunityId, {
-    title: 'Call client - Declined Alternative',
-    body: 'Application declined. Discuss alternative options.'
-  });
+  if (contact.phone) {
+    await sendSMS({
+      to: contact.phone,
+      body: `We have other lending options available. Let's talk! Call: (949) 997-2097`
+    });
+  }
 
   // Schedule 3-month follow-up for retry
   scheduleRetryFollowUp(applicationId, 90); // 90 days
@@ -590,24 +583,32 @@ async function handleFunded(applicationId: number, app: any) {
     .where(eq(applications.id, applicationId));
 
   // Update GHL with funding info
-  await updateGHLOpportunity(app.ghlOpportunityId, {
-    stage: 'Funded $',
-    customFields: {
-      'amount_won': amountWon.toString(),
-      'funded_date': new Date().toISOString().split('T')[0]
-    }
-  });
+  try {
+    await fetch(`https://api.leadconnectorhq.com/opportunities/${app.ghlOpportunityId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.GHL_LOCATION_KEY}`
+      },
+      body: JSON.stringify({
+        stageName: 'Funded $',
+        customFields: {
+          'amount_won': amountWon.toString(),
+          'funded_date': new Date().toISOString().split('T')[0]
+        }
+      })
+    });
+  } catch (err) {
+    console.error('Error updating GHL:', err);
+  }
 
-  // Celebration email
-  await sendGHLEmail(contact.ghlContactId, {
-    title: '💰 FUNDED!',
-    subject: '💰 Your Loan is FUNDED!',
-    body: `Hi ${contact.firstName},\n\nIT'S OFFICIAL! Your loan is FUNDED!\n\nAmount: $${amountWon.toLocaleString()}\n\nYour funds will be transferred within 24-48 hours.\n\nThank you for trusting SaintVision Group!\n\nGet back to growing your business!\n\n- Ryan @ SaintVision`
-  });
-
-  await sendGHLSms(contact.phone, {
-    body: `💰 YOU'RE FUNDED! $${amountWon.toLocaleString()} is on the way! Expect it within 24-48 hours.`
-  });
+  // Celebration SMS
+  if (contact.phone) {
+    await sendSMS({
+      to: contact.phone,
+      body: `💰 YOU'RE FUNDED! $${amountWon.toLocaleString()} is on the way! Expect it within 24-48 hours.`
+    });
+  }
 
   // Schedule 30-day check-in
   schedulePostFundingFollowUp(applicationId, 30);
