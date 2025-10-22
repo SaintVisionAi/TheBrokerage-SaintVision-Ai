@@ -504,39 +504,39 @@ export default function ClientHub() {
                       </div>
 
                       <div className="space-y-4">
-                        <Card className="bg-gradient-to-br from-emerald-400/10 to-emerald-600/10 border-emerald-400/30 backdrop-blur-xl">
+                        <Card className="bg-gradient-to-br from-yellow-500/30 to-yellow-600/30 border-yellow-400/60 backdrop-blur-xl shadow-lg shadow-yellow-400/20">
                           <CardHeader>
-                            <CardTitle className="text-white text-lg">Status</CardTitle>
+                            <CardTitle className="text-yellow-100 text-lg">Status</CardTitle>
                           </CardHeader>
                           <CardContent className="space-y-4">
                             <div>
-                              <p className="text-white/60 text-sm mb-2">Priority</p>
-                              <Badge className="bg-emerald-400/30 text-emerald-300 border border-emerald-400/50">
+                              <p className="text-yellow-200/70 text-sm mb-2 uppercase font-bold">Priority</p>
+                              <Badge className="bg-yellow-400/40 text-yellow-100 border border-yellow-400/60 font-semibold">
                                 {application?.priority || 'Standard'}
                               </Badge>
                             </div>
-                            <Separator className="bg-white/10" />
+                            <Separator className="bg-yellow-400/20" />
                             <div>
-                              <p className="text-white/60 text-sm mb-2">App Status</p>
-                              <p className="text-white font-semibold">{application?.status}</p>
+                              <p className="text-yellow-200/70 text-sm mb-2 uppercase font-bold">App Status</p>
+                              <p className="text-yellow-100 font-semibold">{application?.status || 'Pending'}</p>
                             </div>
                           </CardContent>
                         </Card>
 
-                        <Card className="bg-gradient-to-br from-blue-400/10 to-blue-600/10 border-blue-400/30 backdrop-blur-xl">
+                        <Card className="bg-gradient-to-br from-yellow-500/30 to-yellow-600/30 border-yellow-400/60 backdrop-blur-xl shadow-lg shadow-yellow-400/20">
                           <CardHeader>
-                            <CardTitle className="text-white text-lg">Actions</CardTitle>
+                            <CardTitle className="text-yellow-100 text-lg">Actions</CardTitle>
                           </CardHeader>
                           <CardContent className="space-y-2">
-                            <Button variant="outline" className="w-full border-blue-400/30 text-blue-400 hover:bg-blue-400/10 justify-start">
+                            <Button variant="outline" className="w-full border-yellow-400/50 text-yellow-200 bg-yellow-400/10 hover:bg-yellow-400/20 justify-start font-semibold">
                               <Calendar className="mr-2 h-4 w-4" />
                               Schedule
                             </Button>
-                            <Button variant="outline" className="w-full border-blue-400/30 text-blue-400 hover:bg-blue-400/10 justify-start">
+                            <Button variant="outline" className="w-full border-yellow-400/50 text-yellow-200 bg-yellow-400/10 hover:bg-yellow-400/20 justify-start font-semibold">
                               <FileText className="mr-2 h-4 w-4" />
                               View App
                             </Button>
-                            <Button variant="outline" className="w-full border-blue-400/30 text-blue-400 hover:bg-blue-400/10 justify-start">
+                            <Button variant="outline" className="w-full border-yellow-400/50 text-yellow-200 bg-yellow-400/10 hover:bg-yellow-400/20 justify-start font-semibold">
                               <Upload className="mr-2 h-4 w-4" />
                               Docs
                             </Button>
