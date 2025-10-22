@@ -578,7 +578,7 @@ export default function ClientHub() {
                           <p className="font-semibold text-yellow-300">6 months - 24 months</p>
                         </div>
                       </div>
-                      <a href="/real-estate-investing">
+                      <a href="/apply">
                         <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">Learn More</Button>
                       </a>
                     </CardContent>
@@ -600,7 +600,7 @@ export default function ClientHub() {
                           <p className="font-semibold text-yellow-300">Investment properties</p>
                         </div>
                       </div>
-                      <a href="/real-estate-investing">
+                      <a href="/apply">
                         <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">Learn More</Button>
                       </a>
                     </CardContent>
@@ -622,7 +622,7 @@ export default function ClientHub() {
                           <p className="font-semibold text-yellow-300">Buy before you sell</p>
                         </div>
                       </div>
-                      <a href="/real-estate-investing">
+                      <a href="/apply">
                         <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">Learn More</Button>
                       </a>
                     </CardContent>
@@ -644,7 +644,7 @@ export default function ClientHub() {
                           <p className="font-semibold text-yellow-300">Any purpose</p>
                         </div>
                       </div>
-                      <a href="/real-estate-investing">
+                      <a href="/apply">
                         <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">Learn More</Button>
                       </a>
                     </CardContent>
