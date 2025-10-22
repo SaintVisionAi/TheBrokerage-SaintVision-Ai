@@ -47,19 +47,19 @@ export default function Landing() {
       icon: Building2,
       title: "Real Estate Services",
       description: "AI-powered property solutions for buying, selling, and financing with expert guidance and market insights",
-      link: "/real-estate"
+      link: "/apply"
     },
     {
-      icon: TrendingUp, 
+      icon: TrendingUp,
       title: "Business Lending",
       description: "Competitive capital solutions from $50K to $5M with fast approval and flexible terms starting at 9%",
-      link: "/lending"
+      link: "/apply"
     },
     {
       icon: Award,
       title: "Investment Suite",
       description: "Fixed 9-12% annual returns with faith-aligned strategies and HACP™-powered portfolio management",
-      link: "/investments"
+      link: "/apply"
     }
   ];
 
