@@ -374,57 +374,57 @@ export default function ClientHub() {
 
                     {/* Key Metrics Cards */}
                     <div className="grid md:grid-cols-4 gap-4">
-                      <Card className="bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 border-yellow-400/30 backdrop-blur-xl hover:border-yellow-400/50 transition-all">
+                      <Card className="bg-gradient-to-br from-yellow-500/30 to-yellow-600/30 border-yellow-400/60 backdrop-blur-xl hover:border-yellow-400/80 transition-all shadow-lg shadow-yellow-400/20">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="text-white/60 text-sm font-medium">Loan Amount</p>
-                              <p className="text-3xl font-bold text-yellow-400 mt-2">{application?.loanAmount}</p>
+                              <p className="text-yellow-200 text-xs uppercase tracking-wide font-bold">Loan Amount</p>
+                              <p className="text-3xl font-bold text-yellow-300 mt-2">{application?.loanAmount || '$0'}</p>
                             </div>
-                            <div className="h-12 w-12 rounded-lg bg-yellow-400/20 flex items-center justify-center">
-                              <DollarSign className="h-6 w-6 text-yellow-400" />
+                            <div className="h-12 w-12 rounded-lg bg-yellow-400/40 flex items-center justify-center">
+                              <DollarSign className="h-6 w-6 text-yellow-100" />
                             </div>
                           </div>
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-gradient-to-br from-emerald-400/10 to-emerald-600/10 border-emerald-400/30 backdrop-blur-xl hover:border-emerald-400/50 transition-all">
+                      <Card className="bg-gradient-to-br from-yellow-500/30 to-yellow-600/30 border-yellow-400/60 backdrop-blur-xl hover:border-yellow-400/80 transition-all shadow-lg shadow-yellow-400/20">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="text-white/60 text-sm font-medium">Loan Type</p>
-                              <p className="text-lg font-bold text-emerald-400 mt-2">{application?.loanType}</p>
+                              <p className="text-yellow-200 text-xs uppercase tracking-wide font-bold">Loan Type</p>
+                              <p className="text-lg font-bold text-yellow-300 mt-2">{application?.loanType || 'N/A'}</p>
                             </div>
-                            <div className="h-12 w-12 rounded-lg bg-emerald-400/20 flex items-center justify-center">
-                              <TrendingUp className="h-6 w-6 text-emerald-400" />
+                            <div className="h-12 w-12 rounded-lg bg-yellow-400/40 flex items-center justify-center">
+                              <TrendingUp className="h-6 w-6 text-yellow-100" />
                             </div>
                           </div>
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-gradient-to-br from-blue-400/10 to-blue-600/10 border-blue-400/30 backdrop-blur-xl hover:border-blue-400/50 transition-all">
+                      <Card className="bg-gradient-to-br from-yellow-500/30 to-yellow-600/30 border-yellow-400/60 backdrop-blur-xl hover:border-yellow-400/80 transition-all shadow-lg shadow-yellow-400/20">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="text-white/60 text-sm font-medium">Applied</p>
-                              <p className="text-lg font-bold text-blue-400 mt-2">{application?.applicationDate}</p>
+                              <p className="text-yellow-200 text-xs uppercase tracking-wide font-bold">Applied</p>
+                              <p className="text-lg font-bold text-yellow-300 mt-2">{application?.applicationDate || 'N/A'}</p>
                             </div>
-                            <div className="h-12 w-12 rounded-lg bg-blue-400/20 flex items-center justify-center">
-                              <Calendar className="h-6 w-6 text-blue-400" />
+                            <div className="h-12 w-12 rounded-lg bg-yellow-400/40 flex items-center justify-center">
+                              <Calendar className="h-6 w-6 text-yellow-100" />
                             </div>
                           </div>
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-gradient-to-br from-green-400/10 to-green-600/10 border-green-400/30 backdrop-blur-xl hover:border-green-400/50 transition-all">
+                      <Card className="bg-gradient-to-br from-yellow-500/30 to-yellow-600/30 border-yellow-400/60 backdrop-blur-xl hover:border-yellow-400/80 transition-all shadow-lg shadow-yellow-400/20">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="text-white/60 text-sm font-medium">Est. Funding</p>
-                              <p className="text-2xl font-bold text-green-400 mt-2">{application?.estimatedFunding}</p>
+                              <p className="text-yellow-200 text-xs uppercase tracking-wide font-bold">Est. Funding</p>
+                              <p className="text-2xl font-bold text-yellow-300 mt-2">{application?.estimatedFunding || 'TBD'}</p>
                             </div>
-                            <div className="h-12 w-12 rounded-lg bg-green-400/20 flex items-center justify-center">
-                              <Zap className="h-6 w-6 text-green-400" />
+                            <div className="h-12 w-12 rounded-lg bg-yellow-400/40 flex items-center justify-center">
+                              <Zap className="h-6 w-6 text-yellow-100" />
                             </div>
                           </div>
                         </CardContent>
