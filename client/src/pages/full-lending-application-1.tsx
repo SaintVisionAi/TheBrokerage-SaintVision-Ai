@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import SignatureCapture from '@/components/signature/signature-capture';
 import { useToast } from '@/hooks/use-toast';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
@@ -41,7 +42,9 @@ const applicationSchema = z.object({
   authorizeCredit: z.boolean().refine(val => val === true, 'You must authorize credit inquiry'),
   agreeToPrivacy: z.boolean().refine(val => val === true, 'You must agree to the privacy policy'),
   signature: z.string().min(2, 'Your full name (signature) is required'),
-  signatureDate: z.string().min(1, 'Date is required')
+  signatureDate: z.string().min(1, 'Date is required'),
+  signatureData: z.string().optional(),
+  signatureType: z.enum(['drawn', 'typed']).optional()
 });
 
 type ApplicationFormValues = z.infer<typeof applicationSchema>;
