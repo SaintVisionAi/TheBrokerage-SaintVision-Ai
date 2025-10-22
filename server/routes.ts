@@ -1206,7 +1206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // ALWAYS send via Email as backup
         try {
           await sendEmailViaGHL(contactId, 'Your Saint Vision Group Portal Login', emailHTML);
-          console.log(`✅ Step 6.6b: Credential email sent to client`);
+          console.log(`�� Step 6.6b: Credential email sent to client`);
         } catch (emailError) {
           console.error('���️  Credential email delivery failed');
         }
@@ -2296,10 +2296,10 @@ IP Address: ${applicationData.ipAddress || 'Not captured'}
   }
 
   // SaintBroker Enhanced API Endpoints - MASTER ORCHESTRATOR
-  // FIXED: Made authentication optional for public access
+  // SaintBroker chat endpoint - simple and direct, using SaintSal AI
   app.post("/api/saint-broker/chat", async (req, res) => {
     try {
-      const { message, context } = req.body;
+      const { message } = req.body;
       // Allow both authenticated and guest users
       const userId = req.user?.userId || req.session?.user?.id || 'guest-user';
       const userRole = req.user?.role || req.session?.user?.role || 'guest';
