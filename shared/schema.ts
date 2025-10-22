@@ -330,6 +330,41 @@ export const applicationDocuments = pgTable("application_documents", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Applications table - stores detailed loan application data for pipeline automation
+export const applications = pgTable("applications", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  contactId: varchar("contact_id").references(() => contacts.id),
+  ghlContactId: varchar("ghl_contact_id"),
+  ghlOpportunityId: varchar("ghl_opportunity_id"),
+  loanType: varchar("loan_type", { length: 50 }), // business, real_estate, bridge, equipment
+  loanAmount: integer("loan_amount"),
+  loanPurpose: varchar("loan_purpose", { length: 255 }),
+  businessName: varchar("business_name", { length: 255 }),
+  businessIndustry: varchar("business_industry", { length: 255 }),
+  creditScore: integer("credit_score"),
+  status: varchar("status", { length: 50 }).default("pending"), // pending, approved, declined, funded
+  stage: varchar("stage", { length: 100 }), // GHL pipeline stage
+  lenderStatus: varchar("lender_status", { length: 50 }),
+  fundingPartnerId: varchar("funding_partner_id", { length: 255 }),
+  lenderSelected: varchar("lender_selected", { length: 255 }),
+  documentsUploaded: text("documents_uploaded").array(),
+  documentUploadDate: timestamp("document_upload_date"),
+  submissionDate: timestamp("submission_date"),
+  approvalDate: timestamp("approval_date"),
+  fundingDate: timestamp("funding_date"),
+  amountWon: integer("amount_won"),
+  interestRate: varchar("interest_rate", { length: 20 }),
+  loanTerm: integer("loan_term"), // in months
+  lenderNotes: text("lender_notes"),
+  ssn: varchar("ssn", { length: 20 }), // Last 4 only for security
+  dob: varchar("dob", { length: 10 }),
+  creditAddress: varchar("credit_address", { length: 255 }),
+  applicationCompleteDate: timestamp("application_complete_date"),
+  statusLastUpdated: timestamp("status_last_updated"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas for new tables
 export const insertContactSchema = createInsertSchema(contacts).omit({
   id: true,
