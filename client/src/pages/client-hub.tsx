@@ -42,6 +42,7 @@ import { cn } from '@/lib/utils';
 import { useChat } from '@/hooks/use-chat';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
+import PipelineProgress from '@/components/pipeline/pipeline-progress';
 
 interface ClientPortalData {
   hasData: boolean;
