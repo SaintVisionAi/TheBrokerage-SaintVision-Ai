@@ -1091,91 +1091,33 @@ export default function ClientHub() {
           </div>
         </div>
 
-        {/* Chat Panel */}
-        <div className="hidden lg:flex w-96 border-l border-yellow-400/20 flex-col bg-gradient-to-br from-neutral-900/50 via-black/50 to-neutral-950/50">
-          <div className="border-b border-yellow-400/20 p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl">🤖</span>
-              <p className="font-semibold text-yellow-300">SaintBroker AI</p>
-            </div>
-            <p className="text-xs text-yellow-400/70">Online & ready to help</p>
-          </div>
-
-          <ScrollArea className="flex-1 p-4" ref={chatScrollRef}>
-            <div className="space-y-4">
-              {messages.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="text-sm text-white/60 mb-3">Hi! I'm SaintBroker AI 👋</div>
-                  <div className="text-xs text-white/50 space-y-2">
-                    <div>I can help you with:</div>
-                    <div className="mt-2">
-                      • Loan questions & qualification<br />
-                      • Investment opportunities<br />
-                      • Application guidance<br />
-                      • Document requirements<br />
-                      • Scheduling appointments
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                messages.map((msg, idx) => (
-                  <div key={idx} className={cn('flex gap-2', msg.role === 'user' ? 'justify-end' : '')}>
-                    {msg.role === 'assistant' && (
-                      <span className="text-xl flex-shrink-0">🤖</span>
-                    )}
-                    <div
-                      className={cn(
-                        'max-w-xs px-3 py-2 rounded-lg text-sm',
-                        msg.role === 'user'
-                          ? 'bg-yellow-400 text-black'
-                          : 'bg-neutral-800/80 text-white/80 border border-yellow-400/20'
-                      )}
-                    >
-                      {msg.content}
-                    </div>
-                  </div>
-                ))
-              )}
-              {chatLoading && (
-                <div className="flex gap-2">
-                  <span className="text-xl">🤖</span>
-                  <div className="bg-neutral-800/80 border border-yellow-400/20 px-3 py-2 rounded-lg">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-
-          <div className="border-t border-yellow-400/20 p-4">
-            <div className="flex gap-2">
-              <Input
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }}
-                placeholder="Ask anything..."
-                className="text-sm border-yellow-400/20 bg-white/10 text-white placeholder:text-white/40"
-                disabled={chatLoading}
+        {/* Pipeline Progress Panel */}
+        <div className="hidden lg:flex w-96 border-l border-yellow-400/20 flex-col bg-gradient-to-br from-yellow-500/20 via-black/50 to-yellow-600/20">
+          <ScrollArea className="flex-1 p-6">
+            {pipelineLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400 mx-auto mb-3" />
+                <p className="text-yellow-200/70 text-sm">Loading pipeline...</p>
+              </div>
+            ) : pipelineData?.hasApplication ? (
+              <PipelineProgress
+                stages={pipelineData.pipeline?.stages || []}
+                currentStage={pipelineData.pipeline?.currentStage}
+                progressPercentage={pipelineData.pipeline?.progressPercentage || 0}
               />
-              <Button
-                onClick={handleSendMessage}
-                disabled={!chatInput.trim() || chatLoading}
-                className="bg-yellow-400 hover:bg-yellow-300 text-black"
-                size="sm"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
+            ) : (
+              <div className="text-center py-12 space-y-4">
+                <div className="text-5xl">📋</div>
+                <div>
+                  <p className="text-yellow-200 font-semibold text-sm mb-2">No Active Application</p>
+                  <p className="text-yellow-100/60 text-xs">Start an application to track your pipeline progress</p>
+                </div>
+                <Button className="bg-yellow-400 text-black hover:bg-yellow-300 h-8 text-xs w-full">
+                  Start Application
+                </Button>
+              </div>
+            )}
+          </ScrollArea>
         </div>
       </div>
       <GlobalFooter />
