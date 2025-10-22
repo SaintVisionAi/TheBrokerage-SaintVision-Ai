@@ -989,7 +989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         source: leadData.source || 'website'
       });
       const contactId = (contactResponse as any).contact?.id || (contactResponse as any).data?.contact?.id || '';
-      console.log(`�� Step 2: Contact created - ${contactId}`);
+      console.log(`✅ Step 2: Contact created - ${contactId}`);
 
       // STEP 2.5: Save contact to PostgreSQL database
       try {
@@ -1753,45 +1753,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin Dashboard Endpoints
   app.get("/api/admin/applications", isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const { db } = await import('./db');
-      const { opportunities, contacts } = await import('@shared/schema');
-      const { eq, desc } = await import('drizzle-orm');
-      
-      const apps = await db.select({
-        oppId: opportunities.id,
-        contactId: contacts.id,
-        firstName: contacts.firstName,
-        lastName: contacts.lastName,
-        email: contacts.email,
-        phone: contacts.phone,
-        monetaryValue: opportunities.monetaryValue,
-        division: opportunities.division,
-        status: opportunities.status,
-        priority: opportunities.priority,
-        stageName: opportunities.stageName,
-        createdAt: opportunities.createdAt
-      })
-      .from(opportunities)
-      .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
-      .orderBy(desc(opportunities.createdAt));
+      const { getAllOpportunities } = await import('./services/ghl-client');
 
-      const applications = apps.map(app => ({
-        id: app.oppId.toString(),
-        clientName: `${app.firstName || ''} ${app.lastName || ''}`.trim() || 'Unknown Client',
-        clientEmail: app.email || 'N/A',
-        clientPhone: app.phone || 'N/A',
-        loanAmount: `$${(app.monetaryValue || 0).toLocaleString()}`,
-        loanType: app.division?.replace(/_/g, ' ').toUpperCase() || 'Lending',
-        status: mapStageToStatus(app.stageName || 'new_lead'),
-        currentStage: app.stageName || 'New Lead',
-        applicationDate: app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'N/A',
-        priority: app.priority || 'medium'
+      // Fetch all opportunities from GHL for real-time data
+      const ghlOpportunities = await getAllOpportunities();
+
+      const applications = ghlOpportunities.map((opp: any) => ({
+        id: opp.id,
+        clientName: opp.contactName || `${opp.firstName || ''} ${opp.lastName || ''}`.trim() || 'Unknown Client',
+        clientEmail: opp.email || 'N/A',
+        clientPhone: opp.phone || 'N/A',
+        loanAmount: `$${(opp.monetaryValue || 0).toLocaleString()}`,
+        loanType: opp.pipelineName?.replace(/_/g, ' ').toUpperCase() || 'Lending',
+        status: mapStageToStatus(opp.pipelineStageName || 'new_lead'),
+        currentStage: opp.pipelineStageName || 'New Lead',
+        applicationDate: opp.dateAdded ? new Date(opp.dateAdded).toLocaleDateString() : new Date().toLocaleDateString(),
+        priority: opp.priority || 'warm'
       }));
 
       res.json(applications);
     } catch (error: any) {
       console.error("Admin applications error:", error);
-      res.status(500).json({ error: "Failed to fetch applications" });
+      // Fallback to database if GHL API fails
+      try {
+        const { db } = await import('./db');
+        const { opportunities, contacts } = await import('@shared/schema');
+        const { eq, desc } = await import('drizzle-orm');
+
+        const apps = await db.select({
+          oppId: opportunities.id,
+          contactId: contacts.id,
+          firstName: contacts.firstName,
+          lastName: contacts.lastName,
+          email: contacts.email,
+          phone: contacts.phone,
+          monetaryValue: opportunities.monetaryValue,
+          division: opportunities.division,
+          status: opportunities.status,
+          priority: opportunities.priority,
+          stageName: opportunities.stageName,
+          createdAt: opportunities.createdAt
+        })
+        .from(opportunities)
+        .leftJoin(contacts, eq(opportunities.contactId, contacts.id))
+        .orderBy(desc(opportunities.createdAt));
+
+        const applications = apps.map(app => ({
+          id: app.oppId.toString(),
+          clientName: `${app.firstName || ''} ${app.lastName || ''}`.trim() || 'Unknown Client',
+          clientEmail: app.email || 'N/A',
+          clientPhone: app.phone || 'N/A',
+          loanAmount: `$${(app.monetaryValue || 0).toLocaleString()}`,
+          loanType: app.division?.replace(/_/g, ' ').toUpperCase() || 'Lending',
+          status: mapStageToStatus(app.stageName || 'new_lead'),
+          currentStage: app.stageName || 'New Lead',
+          applicationDate: app.createdAt ? new Date(app.createdAt).toLocaleDateString() : 'N/A',
+          priority: app.priority || 'medium'
+        }));
+
+        res.json(applications);
+      } catch (fallbackError: any) {
+        console.error("Fallback error:", fallbackError);
+        res.status(500).json({ error: "Failed to fetch applications" });
+      }
     }
   });
 
