@@ -64,19 +64,16 @@ function ProtectedDashboard() {
   }
 
   if (user?.role !== "admin" && user?.role !== "broker") {
-    return <Redirect to="/client-portal" />;
+    return <Redirect to="/client-hub" />;
   }
 
   return <Dashboard />;
 }
 
-function ProtectedClientPortal() {
+function ProtectedClientHub() {
   const { isLoading, isAuthenticated } = useAuth();
 
-  console.log('[PROTECTED_PORTAL] Auth check:', { isLoading, isAuthenticated });
-
   if (isLoading) {
-    console.log('[PROTECTED_PORTAL] Still loading auth...');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -88,12 +85,10 @@ function ProtectedClientPortal() {
   }
 
   if (!isAuthenticated) {
-    console.log('[PROTECTED_PORTAL] Not authenticated, redirecting to /login');
     return <Redirect to="/login" />;
   }
 
-  console.log('[PROTECTED_PORTAL] Authenticated, showing portal');
-  return <ClientPortal />;
+  return <ClientHub />;
 }
 
 function ProtectedAdminRoute({ component: Component }: { component: React.ComponentType }) {
@@ -115,7 +110,7 @@ function ProtectedAdminRoute({ component: Component }: { component: React.Compon
   }
 
   if (user?.role !== "admin" && user?.role !== "broker") {
-    return <Redirect to="/client-portal" />;
+    return <Redirect to="/client-hub" />;
   }
 
   return <Component />;
