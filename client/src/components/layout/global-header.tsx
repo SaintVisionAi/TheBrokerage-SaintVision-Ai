@@ -174,32 +174,43 @@ export default function GlobalHeader() {
               </button>
               
               {servicesOpen && (
-                <div 
-                  className="absolute top-full left-0 pt-1 min-w-[280px]"
+                <div
+                  className="absolute top-full left-0 pt-1 min-w-fit"
                   onMouseEnter={() => setServicesOpen(true)}
                   onMouseLeave={() => setServicesOpen(false)}
                 >
                   <div className="bg-neutral-900 border border-yellow-500/20 rounded-lg shadow-2xl overflow-hidden">
-                    {services.map((service) => (
-                      <Link key={service.href} href={service.href}>
-                        <div className={`p-4 hover:bg-yellow-500/10 transition-all cursor-pointer ${service.highlight ? 'bg-gradient-to-r from-yellow-500/5 to-transparent' : ''}`}>
-                          <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded-lg ${service.highlight ? 'bg-yellow-500/20' : 'bg-white/5'}`}>
-                              {service.icon}
-                            </div>
-                            <div className="flex-1">
-                              <div className="font-semibold text-white flex items-center gap-2">
-                                {service.name}
-                                {service.highlight && (
-                                  <span className="text-[10px] px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full">POPULAR</span>
-                                )}
-                              </div>
-                              <div className="text-sm text-gray-400 mt-0.5">{service.description}</div>
-                            </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-0">
+                      {services.map((category) => (
+                        <div key={category.category} className="border-r border-yellow-500/10 last:border-r-0 px-4 py-4">
+                          <div className="text-xs text-yellow-400/70 uppercase tracking-wider font-bold mb-3">
+                            {category.category}
+                          </div>
+                          <div className="space-y-2">
+                            {category.items.map((service) => (
+                              <Link key={service.href} href={service.href}>
+                                <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg group">
+                                  <div className="flex items-start gap-2">
+                                    <div className={`p-1.5 rounded ${service.highlight ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-gray-400 group-hover:text-yellow-400'}`}>
+                                      {service.icon}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="font-medium text-white text-sm flex items-center gap-1">
+                                        {service.name}
+                                        {service.highlight && (
+                                          <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full whitespace-nowrap">POPULAR</span>
+                                        )}
+                                      </div>
+                                      <div className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-400">{service.description}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </Link>
+                            ))}
                           </div>
                         </div>
-                      </Link>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
