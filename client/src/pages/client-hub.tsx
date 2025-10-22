@@ -102,12 +102,36 @@ export default function ClientHub() {
   const [searchQuery, setSearchQuery] = useState('');
   const { messages, sendMessage, isLoading: chatLoading } = useChat('user-123', 'hub-chat');
   const [chatInput, setChatInput] = useState('');
+  const [pipelineData, setPipelineData] = useState<PipelineData | null>(null);
+  const [pipelineLoading, setPipelineLoading] = useState(true);
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
   const { data: portalData, isLoading: portalLoading } = useQuery<ClientPortalData>({
     queryKey: ["/api/client-portal"],
     refetchInterval: 30000,
   });
+
+  useEffect(() => {
+    const fetchPipelineData = async () => {
+      try {
+        const response = await fetch('/api/pipeline/current', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPipelineData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch pipeline:', error);
+      } finally {
+        setPipelineLoading(false);
+      }
+    };
+
+    fetchPipelineData();
+    const interval = setInterval(fetchPipelineData, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (chatScrollRef.current) {
