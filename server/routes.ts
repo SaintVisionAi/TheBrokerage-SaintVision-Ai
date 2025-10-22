@@ -103,6 +103,11 @@ function requireApiKey(req: any, res: any, next: any) {
 export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use(cookieParser());
+
+  // Global middleware for tracking and validation
+  app.use(navigationTracking);
+  app.use(validateRoute);
+
   app.use(webhooksRouter);
 
   // Setup voice routes for speech-to-text and text-to-speech
