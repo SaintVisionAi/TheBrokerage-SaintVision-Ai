@@ -328,7 +328,7 @@ export default function GlobalHeader() {
                     {category.category}
                   </div>
                   {category.items.map((service) => (
-                    <Link key={service.href} href={service.href}>
+                    <Link key={`${category.category}-${service.name}`} href={service.href}>
                       <div className="px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer flex items-center gap-2">
                         <div className={`text-lg ${service.highlight ? 'text-yellow-400' : 'text-white'}`}>
                           {service.icon}
