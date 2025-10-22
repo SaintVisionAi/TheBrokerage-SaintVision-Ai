@@ -26,6 +26,7 @@ import databaseQueryRouter from './routes/database-query';
 import saintsalRouter from './routes/saintsal';
 import pipelineRouter from './routes/pipeline-automation';
 import navigationRouter from './routes/navigation';
+import intakeRouter from './routes/intake-api-routes';
 import { navigationTracking } from './middleware/navigation-tracking';
 import { validateRoute } from './middleware/route-validation';
 import rateLimit from 'express-rate-limit';
