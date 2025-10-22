@@ -1,11 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../db';
 import { applications, contacts } from '@shared/schema';
-import { eq, and } from 'drizzle-orm';
-import { captureGHLLead, updateGHLOpportunity, createGHLTask, sendGHLEmail, sendGHLSms } from '../services/ghl';
-import { sendEmail } from '../services/email';
-import { sendSMS } from '../services/twilio';
-import { fundingPartnerSelector } from '@shared/lender-routing-config';
+import { eq } from 'drizzle-orm';
+import { captureGHLLead } from '../services/ghl';
+import { sendSMS } from '../services/twilio-service';
+import { FUNDING_PARTNERS, autoSelectFundingPartner } from '@shared/funding-partners-ai';
 
 const router = Router();
 
