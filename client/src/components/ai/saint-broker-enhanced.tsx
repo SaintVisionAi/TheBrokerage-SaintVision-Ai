@@ -13,9 +13,19 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+interface MessageAction {
+  type: 'button' | 'link';
+  text: string;
+  url?: string;
+  onClick?: string;
+  primary?: boolean;
+  variant?: 'default' | 'secondary' | 'destructive';
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  actions?: MessageAction[];
 }
 
 export default function SaintBrokerEnhanced() {
