@@ -51,12 +51,18 @@ export default function SaintBrokerGlobal() {
         body: JSON.stringify({ message: currentInput })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
       }
+
+      const data = await response.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
     } catch (error) {
       console.error('Chat error:', error);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: "I'm having trouble connecting right now. Please try again or contact our team at (949) 997-2097."
+      }]);
     } finally {
       setIsLoading(false);
     }
