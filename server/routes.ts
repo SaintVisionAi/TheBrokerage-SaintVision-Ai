@@ -129,6 +129,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Pipeline Automation routes
   app.use('/api', pipelineRouter);
 
+  // Setup Navigation tracking and validation routes
+  app.use(navigationRouter);
+
   // Setup vision analysis routes
   app.use('/api/vision', visionRouter);
 
