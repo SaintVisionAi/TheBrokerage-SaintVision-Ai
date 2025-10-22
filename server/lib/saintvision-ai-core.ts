@@ -7,12 +7,22 @@ export interface SaintSalMessage {
   content: string;
 }
 
+export interface SaintSalAction {
+  type: 'button' | 'link';
+  text: string;
+  url?: string;
+  onClick?: string;
+  primary?: boolean;
+  variant?: 'default' | 'secondary' | 'destructive';
+}
+
 export interface SaintSalResponse {
   success: boolean;
   response: string;
   model: string;
   latencyMs: number;
   tokensUsed: number;
+  actions?: SaintSalAction[];
   analysis?: {
     intent: string;
     qualified: boolean;
@@ -132,7 +142,7 @@ Always:
         analysis: this.analyzeIntent(userMessage, response.content)
       };
     } catch (error) {
-      console.warn('⚠️ Gemini failed, trying OpenAI...');
+      console.warn('⚠�� Gemini failed, trying OpenAI...');
     }
 
     // Final fallback to OpenAI
