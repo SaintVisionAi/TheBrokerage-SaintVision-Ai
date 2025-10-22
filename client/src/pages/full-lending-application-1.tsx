@@ -120,7 +120,17 @@ export default function FullLendingApplicationPage() {
         credentials: 'include',
         body: JSON.stringify({
           formId: '0zcz0ZlG2eEddg94wcbq',
-          formData: data
+          formData: data,
+          signatureMetadata: signatureData ? {
+            signedBy: signatureData.signerName,
+            signatureType: signatureData.type,
+            signatureImage: signatureData.data,
+            signedAtTimestamp: signatureData.timestamp,
+            signedAtMs: signatureData.timestampMs,
+            userAgent: signatureData.userAgent,
+            auditTrail: signatureData.auditTrail,
+            consentChecks: signatureData.consentChecks
+          } : null
         })
       });
 
