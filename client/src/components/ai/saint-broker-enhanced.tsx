@@ -63,7 +63,11 @@ export default function SaintBrokerEnhanced() {
 
       if (response.ok) {
         const data = await response.json();
-        setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: data.response,
+          actions: data.actions
+        }]);
       }
     } catch (error) {
       console.error('Chat error:', error);
