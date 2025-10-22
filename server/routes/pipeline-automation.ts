@@ -83,12 +83,13 @@ router.post('/pipeline/credit-pull', async (req: Request, res: Response) => {
       scheduleDocumentReminder(applicationId, 1);
 
     } else {
-      // Credit denied - offer alternatives
-      await sendGHLEmail(app.contact.ghlContactId || '', {
-        title: 'Alternative Solutions Available',
-        subject: 'Let\'s Explore Other Options',
-        body: `Hi ${app.contact.firstName},\n\nWe reviewed your credit and found alternative solutions that might work better for you.\n\nLet's discuss options: Call us at (949) 997-2097\n\n- Ryan @ SaintVision`
-      });
+      // Credit denied - offer alternatives via SMS
+      if (app.contact.phone) {
+        await sendSMS({
+          to: app.contact.phone,
+          body: `Hi ${app.contact.firstName}. We found alternative lending options for you. Call us: (949) 997-2097`
+        });
+      }
     }
 
     res.json({
