@@ -24,6 +24,7 @@ import visionRouter from './routes/vision';
 import ghlFormsRouter from './routes/ghl-forms';
 import databaseQueryRouter from './routes/database-query';
 import saintsalRouter from './routes/saintsal';
+import pipelineRouter from './routes/pipeline-automation';
 import rateLimit from 'express-rate-limit';
 import { encrypt, decrypt, redactSSN, isValidBase64 } from './lib/encryption';
 import { applicationSubmitSchema, sanitizeInput, isValidSSN } from './lib/validation';
