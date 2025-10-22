@@ -49,27 +49,35 @@ router.post('/pipeline/credit-pull', async (req: Request, res: Response) => {
       })
       .where(eq(applications.id, applicationId));
 
-    // Update GHL with credit info
-    await updateGHLOpportunity(app.ghlOpportunityId || '', {
-      stage: 'Documents Pending',
-      customFields: {
-        'credit_score': creditScore.toString(),
-        'credit_approved': creditApproved ? 'yes' : 'no'
-      }
-    });
+    // Update GHL with credit info via API
+    try {
+      const ghlResponse = await fetch(`https://api.leadconnectorhq.com/opportunities/${app.ghlOpportunityId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.GHL_LOCATION_KEY}`
+        },
+        body: JSON.stringify({
+          stageName: 'Documents Pending',
+          customFields: {
+            'credit_score': creditScore.toString(),
+            'credit_approved': creditApproved ? 'yes' : 'no'
+          }
+        })
+      });
+    } catch (err) {
+      console.error('Error updating GHL opportunity:', err);
+    }
 
     // Send approval/decision email
     if (creditApproved) {
-      await sendGHLEmail(app.contact.ghlContactId || '', {
-        title: 'Great News! Credit Approved',
-        subject: 'Credit Approved - Upload Documents',
-        body: `Hi ${app.contact.firstName},\n\nGreat news! Your credit has been approved with a score of ${creditScore}.\n\nNext step: Upload your documents (tax returns, bank statements, ID) here: [DOCUMENT_UPLOAD_LINK]\n\nThis takes about 5 minutes. Let me know if you need help!\n\n- SaintVision AI Team`
-      });
-
-      // Send SMS
-      await sendGHLSms(app.contact.phone || '', {
-        body: `🎉 Hi ${app.contact.firstName}! Your credit is approved (${creditScore}). Upload docs here: [LINK] - Takes 5 mins!`
-      });
+      // Send SMS via Twilio
+      if (app.contact.phone) {
+        await sendSMS({
+          to: app.contact.phone,
+          body: `🎉 Hi ${app.contact.firstName}! Your credit is approved (${creditScore}). Upload docs here: [LINK] - Takes 5 mins!`
+        });
+      }
 
       // Trigger first follow-up (1 day later if not uploaded)
       scheduleDocumentReminder(applicationId, 1);
