@@ -174,7 +174,7 @@ export default function GlobalHeader() {
               Investments
             </Link>
 
-            {/* Services Dropdown */}
+            {/* Services Dropdown - Simplified */}
             <div className="relative">
               <button
                 className="flex items-center gap-2 px-3 py-2 text-white hover:text-yellow-400 transition-colors font-semibold"
@@ -187,68 +187,43 @@ export default function GlobalHeader() {
 
               {servicesOpen && (
                 <div
-                  className="absolute top-full left-0 pt-1 min-w-fit"
+                  className="absolute top-full right-0 pt-2 z-50"
                   onMouseEnter={() => setServicesOpen(true)}
                   onMouseLeave={() => setServicesOpen(false)}
                 >
-                  <div className="bg-neutral-900 border border-yellow-500/20 rounded-lg shadow-2xl overflow-hidden">
-                    <div className="grid grid-cols-4 gap-0">
-                      {services.map((category) => (
-                        <div key={category.category} className="border-r border-yellow-500/10 last:border-r-0 px-4 py-4">
-                          <div className="text-xs text-yellow-400/70 uppercase tracking-wider font-bold mb-3">
-                            {category.category}
-                          </div>
-                          <div className="space-y-2">
-                            {category.items.map((service) => (
-                              <Link key={`${category.category}-${service.name}`} href={service.href}>
-                                <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg group">
-                                  <div className="flex items-start gap-2">
-                                    <div className={`p-1.5 rounded flex-shrink-0 ${service.highlight ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-gray-400 group-hover:text-yellow-400'}`}>
-                                      {service.icon}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <div className="font-medium text-white text-sm flex items-center gap-1">
-                                        {service.name}
-                                        {service.highlight && (
-                                          <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full whitespace-nowrap">HOT</span>
-                                        )}
-                                      </div>
-                                      <div className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-400">{service.description}</div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
+                  <div className="bg-slate-900 border border-yellow-500/30 rounded-lg shadow-2xl overflow-hidden min-w-max">
+                    <div className="space-y-1 p-2">
+                      <Link href="/lending">
+                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer font-medium">
+                          💰 Business Lending
                         </div>
-                      ))}
-
-                      {/* Info Section */}
-                      <div className="border-r border-yellow-500/10 px-4 py-4">
-                        <div className="text-xs text-yellow-400/70 uppercase tracking-wider font-bold mb-3">
-                          Company
+                      </Link>
+                      <Link href="/real-estate">
+                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer font-medium">
+                          🏡 Real Estate Services
                         </div>
-                        <div className="space-y-2">
-                          <Link href="/about">
-                            <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg">
-                              <div className="font-medium text-white text-sm">About Us</div>
-                              <div className="text-xs text-gray-500 mt-0.5">Who we are & our mission</div>
-                            </div>
-                          </Link>
-                          <Link href="/contact">
-                            <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg">
-                              <div className="font-medium text-white text-sm">Contact</div>
-                              <div className="text-xs text-gray-500 mt-0.5">Get in touch with our team</div>
-                            </div>
-                          </Link>
-                          <Link href="/client-hub">
-                            <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg">
-                              <div className="font-medium text-white text-sm">Client Hub</div>
-                              <div className="text-xs text-gray-500 mt-0.5">Manage your applications</div>
-                            </div>
-                          </Link>
+                      </Link>
+                      <Link href="/investments">
+                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer font-medium">
+                          📈 Investment Opportunities
                         </div>
-                      </div>
+                      </Link>
+                      <div className="border-t border-yellow-500/20 my-1"></div>
+                      <Link href="/about">
+                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer text-sm">
+                          About Us
+                        </div>
+                      </Link>
+                      <Link href="/contact">
+                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer text-sm">
+                          Contact
+                        </div>
+                      </Link>
+                      <Link href="/client-hub">
+                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer text-sm">
+                          Client Hub
+                        </div>
+                      </Link>
                     </div>
                   </div>
                 </div>
