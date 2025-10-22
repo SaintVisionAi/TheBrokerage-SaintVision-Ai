@@ -72,6 +72,29 @@ interface ClientPortalData {
   };
 }
 
+interface PipelineData {
+  hasApplication: boolean;
+  application?: any;
+  pipeline?: {
+    stages: Array<{
+      name: string;
+      status: 'completed' | 'current' | 'pending';
+      stage: string;
+    }>;
+    currentStage: string;
+    progressPercentage: number;
+    completedStages: number;
+    totalStages: number;
+  };
+  documents?: {
+    uploaded: string[];
+    needed: string[];
+    uploadedCount: number;
+  };
+  funding?: any;
+  timeline?: any;
+}
+
 export default function ClientHub() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'lending' | 'investments' | 'real-estate' | 'tools' | 'account'>('dashboard');
