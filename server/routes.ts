@@ -1821,14 +1821,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/stats", isAuthenticated, isAdmin, async (req, res) => {
     try {
-      const { db } = await import('./db');
-      const { opportunities } = await import('@shared/schema');
-      const { sql } = await import('drizzle-orm');
-      
-      const allOpps = await db.select().from(opportunities);
-      
+      const { getAllOpportunities } = await import('./services/ghl-client');
+
+      // Fetch all opportunities from GHL for real-time stats
+      const ghlOpportunities = await getAllOpportunities();
+
       const stats = {
-        totalApplications: allOpps.length,
+        totalApplications: ghlOpportunities.length,
         pending: 0,
         submitted: 0,
         incomplete: 0,
@@ -1837,14 +1836,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       let totalValue = 0;
-      
-      allOpps.forEach(opp => {
-        const status = mapStageToStatus(opp.stageName || 'new_lead');
+
+      ghlOpportunities.forEach((opp: any) => {
+        const status = mapStageToStatus(opp.pipelineStageName || 'new_lead');
         if (status === 'pending') stats.pending++;
         else if (status === 'submitted') stats.submitted++;
         else if (status === 'incomplete') stats.incomplete++;
         else if (status === 'completed') stats.completed++;
-        
+
         totalValue += opp.monetaryValue || 0;
       });
 
@@ -1853,7 +1852,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error: any) {
       console.error("Admin stats error:", error);
-      res.status(500).json({ error: "Failed to fetch stats" });
+      // Fallback to database if GHL API fails
+      try {
+        const { db } = await import('./db');
+        const { opportunities } = await import('@shared/schema');
+        const { sql } = await import('drizzle-orm');
+
+        const allOpps = await db.select().from(opportunities);
+
+        const stats = {
+          totalApplications: allOpps.length,
+          pending: 0,
+          submitted: 0,
+          incomplete: 0,
+          completed: 0,
+          totalLoanValue: '$0'
+        };
+
+        let totalValue = 0;
+
+        allOpps.forEach(opp => {
+          const status = mapStageToStatus(opp.stageName || 'new_lead');
+          if (status === 'pending') stats.pending++;
+          else if (status === 'submitted') stats.submitted++;
+          else if (status === 'incomplete') stats.incomplete++;
+          else if (status === 'completed') stats.completed++;
+
+          totalValue += opp.monetaryValue || 0;
+        });
+
+        stats.totalLoanValue = `$${(totalValue / 1000000).toFixed(1)}M`;
+
+        res.json(stats);
+      } catch (fallbackError: any) {
+        console.error("Fallback stats error:", fallbackError);
+        res.status(500).json({ error: "Failed to fetch stats" });
+      }
     }
   });
 
