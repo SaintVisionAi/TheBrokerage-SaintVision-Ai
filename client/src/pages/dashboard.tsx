@@ -244,35 +244,35 @@ export default function Dashboard() {
                   <TableBody>
                     {applications.map((app) => (
                       <TableRow key={app.id} className="border-b border-slate-700/50 hover:bg-slate-800/40 transition-colors" data-testid={`row-application-${app.id}`}>
-                        <TableCell className="text-white font-medium" data-testid={`text-client-${app.id}`}>
+                        <TableCell className="text-white font-semibold py-4" data-testid={`text-client-${app.id}`}>
                           {app.clientName}
                         </TableCell>
-                        <TableCell className="text-slate-300">
+                        <TableCell className="text-slate-100 py-4">
                           <div className="space-y-1">
                             <div className="flex items-center gap-1 text-xs">
-                              <Mail className="w-3 h-3" />
-                              {app.clientEmail}
+                              <Mail className="w-3 h-3 text-slate-400" />
+                              <span className="text-slate-300">{app.clientEmail}</span>
                             </div>
                             <div className="flex items-center gap-1 text-xs">
-                              <Phone className="w-3 h-3" />
-                              {app.clientPhone}
+                              <Phone className="w-3 h-3 text-slate-400" />
+                              <span className="text-slate-300">{app.clientPhone}</span>
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell className="text-slate-300">{app.loanType}</TableCell>
-                        <TableCell className="text-green-400 font-semibold">{app.loanAmount}</TableCell>
-                        <TableCell data-testid={`status-${app.id}`}>
+                        <TableCell className="text-slate-100 font-medium py-4">{app.loanType}</TableCell>
+                        <TableCell className="text-green-300 font-bold py-4">{app.loanAmount}</TableCell>
+                        <TableCell className="py-4" data-testid={`status-${app.id}`}>
                           {getStatusBadge(app.status)}
                         </TableCell>
-                        <TableCell className="text-slate-300 text-sm">{app.currentStage}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-slate-100 text-sm py-4 font-medium">{app.currentStage}</TableCell>
+                        <TableCell className="py-4">
                           {getPriorityBadge(app.priority)}
                         </TableCell>
-                        <TableCell className="text-slate-400 text-sm">{app.applicationDate}</TableCell>
-                        <TableCell>
-                          <Button 
-                            size="sm" 
-                            className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-400/30"
+                        <TableCell className="text-slate-200 text-sm py-4">{app.applicationDate}</TableCell>
+                        <TableCell className="py-4">
+                          <Button
+                            size="sm"
+                            className="bg-blue-500/30 text-blue-300 hover:bg-blue-500/50 border border-blue-400/50 font-semibold"
                             data-testid={`button-view-${app.id}`}
                           >
                             View Details
