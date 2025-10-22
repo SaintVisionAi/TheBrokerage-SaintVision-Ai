@@ -257,6 +257,103 @@ export default function SaintBrokerEnhanced() {
 
       {/* CONTENT AREA */}
       <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+        {activeTab === 'pipeline' && (
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {pipelineLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400 mx-auto mb-3" />
+                <p className="text-white/60 text-sm">Loading pipeline status...</p>
+              </div>
+            ) : pipelineData?.hasApplication ? (
+              <>
+                <div className="bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 border border-yellow-400/30 rounded-lg p-4">
+                  <PipelineProgress
+                    stages={pipelineData.pipeline?.stages || []}
+                    currentStage={pipelineData.pipeline?.currentStage}
+                    progressPercentage={pipelineData.pipeline?.progressPercentage || 0}
+                  />
+                </div>
+
+                {pipelineData.documents && pipelineData.documents.needed.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-white font-semibold text-sm">
+                      <AlertCircle className="h-4 w-4 text-amber-400" />
+                      Documents Needed
+                    </div>
+                    {pipelineData.documents.needed.map((doc, idx) => (
+                      <div key={idx} className="bg-amber-400/10 border border-amber-400/30 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-amber-400" />
+                            <span className="text-xs text-white capitalize">{doc.replace('_', ' ')}</span>
+                          </div>
+                          <Button size="sm" variant="ghost" className="h-6 text-amber-400 hover:bg-amber-400/20">
+                            <Upload className="h-3 w-3 mr-1" />
+                            Upload
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {pipelineData.documents && pipelineData.documents.uploaded.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-white font-semibold text-sm">
+                      <CheckCircle className="h-4 w-4 text-emerald-400" />
+                      Documents Uploaded ({pipelineData.documents.uploadedCount})
+                    </div>
+                    {pipelineData.documents.uploaded.map((doc, idx) => (
+                      <div key={idx} className="bg-emerald-400/10 border border-emerald-400/30 rounded-lg p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-emerald-400" />
+                          <span className="text-xs text-white capitalize">{doc.replace('_', ' ')}</span>
+                        </div>
+                        <Button size="sm" variant="ghost" className="h-6 text-emerald-400 hover:bg-emerald-400/20">
+                          <Download className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {pipelineData.funding && (
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2">
+                    <div className="text-xs font-semibold text-white uppercase">Funding Details</div>
+                    {pipelineData.funding.creditScore && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-white/60">Credit Score</span>
+                        <span className="text-yellow-400 font-medium">{pipelineData.funding.creditScore}</span>
+                      </div>
+                    )}
+                    {pipelineData.funding.fundingPartner && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-white/60">Lender</span>
+                        <span className="text-white font-medium">{pipelineData.funding.fundingPartner}</span>
+                      </div>
+                    )}
+                    {pipelineData.funding.interestRate && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-white/60">Rate</span>
+                        <span className="text-white font-medium">{pipelineData.funding.interestRate}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-8 space-y-3">
+                <AlertCircle className="h-8 w-8 text-white/40 mx-auto" />
+                <p className="text-white/60 text-sm">No active application</p>
+                <Button className="bg-yellow-400 text-black hover:bg-yellow-300 h-8 text-xs">
+                  Start Application
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === 'chat' && (
           <>
             {/* MESSAGES SCROLL AREA */}
