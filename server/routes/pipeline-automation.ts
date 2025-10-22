@@ -251,7 +251,7 @@ router.post('/pipeline/submit-to-lender', async (req: Request, res: Response) =>
     // Auto-select lender if not provided
     let selectedPartnerId = fundingPartnerId;
     if (!selectedPartnerId) {
-      selectedPartnerId = fundingPartnerSelector({
+      selectedPartnerId = autoSelectFundingPartner({
         loanType: app.loanType,
         loanAmount: app.loanAmount || 0,
         creditScore: app.creditScore || 600,
@@ -260,7 +260,6 @@ router.post('/pipeline/submit-to-lender', async (req: Request, res: Response) =>
     }
 
     // Get partner details
-    const { FUNDING_PARTNERS } = await import('@shared/lender-routing-config');
     const partner = FUNDING_PARTNERS.find(p => p.id === selectedPartnerId);
 
     if (!partner) {
@@ -279,25 +278,33 @@ router.post('/pipeline/submit-to-lender', async (req: Request, res: Response) =>
       .where(eq(applications.id, applicationId));
 
     // Update GHL stage
-    await updateGHLOpportunity(app.ghlOpportunityId || '', {
-      stage: 'Sent to Lender',
-      customFields: {
-        'funding_partner': partner.name,
-        'submission_date': new Date().toISOString().split('T')[0],
-        'lender_contact': partner.primaryContact || ''
-      }
-    });
+    try {
+      await fetch(`https://api.leadconnectorhq.com/opportunities/${app.ghlOpportunityId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.GHL_LOCATION_KEY}`
+        },
+        body: JSON.stringify({
+          stageName: 'Sent to Lender',
+          customFields: {
+            'funding_partner': partner.name,
+            'submission_date': new Date().toISOString().split('T')[0],
+            'lender_contact': partner.primaryContact || ''
+          }
+        })
+      });
+    } catch (err) {
+      console.error('Error updating GHL:', err);
+    }
 
-    // Send notification to client
-    await sendGHLEmail(app.contact.ghlContactId || '', {
-      title: 'Submitted to Lender!',
-      subject: `✅ Your Application Sent to ${partner.name}`,
-      body: `Hi ${app.contact.firstName},\n\nGreat news! Your application for $${(app.loanAmount || 0).toLocaleString()} has been submitted to ${partner.name}.\n\nWhat's next:\n- They'll review your application (typically 1-3 days)\n- We'll stay in touch with them for updates\n- You'll be notified as soon as we hear back\n\nThank you for choosing SaintVision!\n\n- Ryan @ SaintVision`
-    });
-
-    await sendGHLSms(app.contact.phone || '', {
-      body: `✅ Your $${(app.loanAmount || 0).toLocaleString()} loan application sent to ${partner.name}! Check email for details.`
-    });
+    // Send notification to client via SMS
+    if (app.contact.phone) {
+      await sendSMS({
+        to: app.contact.phone,
+        body: `✅ Your $${(app.loanAmount || 0).toLocaleString()} loan application sent to ${partner.name}! You'll hear back in 1-3 days.`
+      });
+    }
 
     // Create follow-up tasks
     createUnderwritingFollowUps(applicationId, partner.name);
@@ -620,7 +627,7 @@ async function selectAndSubmitToLender(applicationId: number) {
 function scheduleDocumentReminder(applicationId: number, daysDelay: number) {
   // In production, use a job queue (Bull, RabbitMQ, etc.)
   // For now, just log the scheduling
-  console.log(`📅 Scheduled document reminder for app ${applicationId} in ${daysDelay} day(s)`);
+  console.log(`��� Scheduled document reminder for app ${applicationId} in ${daysDelay} day(s)`);
 }
 
 function createUnderwritingFollowUps(applicationId: number, lenderName: string) {
