@@ -23,6 +23,8 @@ import {
   Mail
 } from "lucide-react";
 import { Link } from "wouter";
+import GlobalHeader from "@/components/layout/global-header";
+import GlobalFooter from "@/components/layout/global-footer";
 
 interface Application {
   id: string;
