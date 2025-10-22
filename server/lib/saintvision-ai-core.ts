@@ -37,7 +37,7 @@ class SaintSalAI {
   private openai: OpenAI;
   private azureOpenai: OpenAI;
 
-  private systemPrompt = `You are SaintSal��, an elite AI loan officer and financial advisor with 20+ years of industry expertise.
+  private systemPrompt = `You are SaintSal™, an elite AI loan officer and financial advisor with 20+ years of industry expertise.
 
 Your personality: You're Sal Couzzo - friendly, knowledgeable, professional, and results-oriented. You know lending inside and out.
 
@@ -94,15 +94,19 @@ IMPORTANT: This is a service business. Your job is to guide people to take actio
         { role: 'system', content: this.systemPrompt },
         { role: 'user', content: userMessage }
       ]);
-      
+
       const latency = Date.now() - startTime;
+      const analysis = this.analyzeIntent(userMessage, response.content);
+      const actions = this.generateActionsForResponse(userMessage, analysis);
+
       return {
         success: true,
         response: response.content,
         model: 'Azure GPT-5',
         latencyMs: latency,
         tokensUsed: response.tokens,
-        analysis: this.analyzeIntent(userMessage, response.content)
+        actions,
+        analysis
       };
     } catch (error) {
       console.warn('⚠️ Azure failed, trying Claude...');
@@ -114,15 +118,19 @@ IMPORTANT: This is a service business. Your job is to guide people to take actio
       const response = await this.callClaude([
         { role: 'user', content: this.systemPrompt + '\n\n' + userMessage }
       ]);
-      
+
       const latency = Date.now() - startTime;
+      const analysis = this.analyzeIntent(userMessage, response.content);
+      const actions = this.generateActionsForResponse(userMessage, analysis);
+
       return {
         success: true,
         response: response.content,
         model: 'Claude Sonnet 4',
         latencyMs: latency,
         tokensUsed: response.tokens,
-        analysis: this.analyzeIntent(userMessage, response.content)
+        actions,
+        analysis
       };
     } catch (error) {
       console.warn('⚠️ Claude failed, trying Gemini...');
@@ -132,15 +140,19 @@ IMPORTANT: This is a service business. Your job is to guide people to take actio
     try {
       console.log('🤖 SaintSal: Trying Gemini Pro...');
       const response = await this.callGemini(userMessage);
-      
+
       const latency = Date.now() - startTime;
+      const analysis = this.analyzeIntent(userMessage, response.content);
+      const actions = this.generateActionsForResponse(userMessage, analysis);
+
       return {
         success: true,
         response: response.content,
         model: 'Gemini Pro',
         latencyMs: latency,
         tokensUsed: response.tokens,
-        analysis: this.analyzeIntent(userMessage, response.content)
+        actions,
+        analysis
       };
     } catch (error) {
       console.warn('⚠️ Gemini failed, trying OpenAI...');
@@ -153,26 +165,38 @@ IMPORTANT: This is a service business. Your job is to guide people to take actio
         { role: 'system', content: this.systemPrompt },
         { role: 'user', content: userMessage }
       ]);
-      
+
       const latency = Date.now() - startTime;
+      const analysis = this.analyzeIntent(userMessage, response.content);
+      const actions = this.generateActionsForResponse(userMessage, analysis);
+
       return {
         success: true,
         response: response.content,
         model: 'OpenAI GPT-4',
         latencyMs: latency,
         tokensUsed: response.tokens,
-        analysis: this.analyzeIntent(userMessage, response.content)
+        actions,
+        analysis
       };
     } catch (error) {
       console.error('❌ All AI models failed:', error);
-      
+
       const latency = Date.now() - startTime;
       return {
         success: false,
         response: "I'm experiencing technical difficulties, but I'm here to help! Please call us at (949) 997-2097 or visit saintvisionai.com to continue.",
         model: 'Fallback',
         latencyMs: latency,
-        tokensUsed: 0
+        tokensUsed: 0,
+        actions: [
+          {
+            type: 'button',
+            text: 'Call Our Team',
+            onClick: 'call:(949) 997-2097',
+            primary: true
+          }
+        ]
       };
     }
   }
