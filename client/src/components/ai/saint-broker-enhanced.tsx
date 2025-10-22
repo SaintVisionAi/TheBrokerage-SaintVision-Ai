@@ -166,7 +166,19 @@ export default function SaintBrokerEnhanced() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ message: currentInput })
+        body: JSON.stringify({
+          message: currentInput,
+          pipelineContext: pipelineData ? {
+            hasApplication: pipelineData.hasApplication,
+            currentStage: pipelineData.pipeline?.currentStage,
+            progressPercentage: pipelineData.pipeline?.progressPercentage,
+            documentsUploaded: pipelineData.documents?.uploadedCount,
+            documentsNeeded: pipelineData.documents?.needed,
+            fundingPartner: pipelineData.funding?.fundingPartner,
+            loanAmount: pipelineData.application?.loanAmount,
+            loanType: pipelineData.application?.loanType
+          } : null
+        })
       });
 
       if (response.ok) {
