@@ -519,23 +519,13 @@ async function handleApproval(applicationId: number, app: any) {
     })
     .where(eq(applications.id, applicationId));
 
-  // Send approval email
-  await sendGHLEmail(contact.ghlContactId, {
-    title: '🎉 APPROVED!',
-    subject: '🎉 Your Loan is APPROVED!',
-    body: `Hi ${contact.firstName},\n\nGreat news! Your loan application has been APPROVED!\n\nLoan Amount: $${(app.loanAmount || 0).toLocaleString()}\nInterest Rate: ${app.interestRate || 'TBD'}%\nLoan Term: ${app.loanTerm || 'TBD'} months\n\nNext Step: Sign your closing documents here: [DOCUSIGN_LINK]\n\nOnce signed, your funds will be transferred within 24-48 hours.\n\n🎉 Congratulations!\n- Ryan @ SaintVision`
-  });
-
   // Send celebration SMS
-  await sendGHLSms(contact.phone, {
-    body: `🎉 APPROVED! Your $${(app.loanAmount || 0).toLocaleString()} loan is approved! Sign docs here: [LINK]`
-  });
-
-  // Create task for closing
-  await createGHLTask(app.ghlOpportunityId, {
-    title: 'Send Closing Documents',
-    body: 'Application approved. Send DocuSign package for signature.'
-  });
+  if (contact.phone) {
+    await sendSMS({
+      to: contact.phone,
+      body: `🎉 APPROVED! Your $${(app.loanAmount || 0).toLocaleString()} loan is approved! Sign docs here: [LINK]`
+    });
+  }
 }
 
 async function handleAdditionalDocsNeeded(applicationId: number, app: any, lenderNotes: string) {
