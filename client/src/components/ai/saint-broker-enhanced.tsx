@@ -41,6 +41,61 @@ export default function SaintBrokerEnhanced() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
+
+  const renderAction = (action: MessageAction) => {
+    if (action.type === 'button') {
+      if (action.onClick?.startsWith('call:')) {
+        const phone = action.onClick.replace('call:', '');
+        return (
+          <button
+            key={action.text}
+            onClick={() => window.location.href = `tel:${phone}`}
+            className={cn(
+              "inline-flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition-all",
+              action.primary
+                ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:shadow-lg hover:scale-105'
+                : 'bg-white/10 text-white hover:bg-white/20'
+            )}
+          >
+            <Phone className="h-4 w-4" />
+            {action.text}
+          </button>
+        );
+      }
+
+      if (action.url) {
+        return (
+          <button
+            key={action.text}
+            onClick={() => setLocation(action.url!)}
+            className={cn(
+              "inline-flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm transition-all",
+              action.primary
+                ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-black hover:shadow-lg hover:scale-105'
+                : 'bg-white/10 text-white hover:bg-white/20'
+            )}
+          >
+            {action.text}
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        );
+      }
+    }
+
+    if (action.type === 'link') {
+      return (
+        <a
+          key={action.text}
+          href={action.url}
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm text-yellow-400 hover:text-yellow-300 transition-colors"
+        >
+          {action.text}
+          <ArrowRight className="h-4 w-4" />
+        </a>
+      );
+    }
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
