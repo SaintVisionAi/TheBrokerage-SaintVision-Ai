@@ -200,12 +200,13 @@ router.post('/pipeline/documents-upload', async (req: Request, res: Response) =>
       }, 2000);
 
     } else {
-      // Still missing documents - send reminder
-      await sendGHLEmail(app.contact.ghlContactId || '', {
-        title: 'Still Need Documents',
-        subject: 'Missing Documents: ' + missingDocs.join(', '),
-        body: `Hi ${app.contact.firstName},\n\nWe're still missing:\n${missingDocs.map(doc => `- ${formatDocName(doc)}`).join('\n')}\n\nPlease upload here: [DOCUMENT_UPLOAD_LINK]\n\n- SaintVision`
-      });
+      // Still missing documents - send reminder SMS
+      if (app.contact.phone) {
+        await sendSMS({
+          to: app.contact.phone,
+          body: `📄 Still need docs: ${missingDocs.map(formatDocName).join(', ')}. Upload here: [LINK]`
+        });
+      }
     }
 
     res.json({
