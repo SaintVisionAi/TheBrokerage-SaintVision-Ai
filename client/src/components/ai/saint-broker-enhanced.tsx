@@ -38,6 +38,25 @@ interface Message {
   actions?: MessageAction[];
 }
 
+interface PipelineData {
+  hasApplication: boolean;
+  application?: any;
+  pipeline?: {
+    stages: any[];
+    currentStage: string;
+    progressPercentage: number;
+    completedStages: number;
+    totalStages: number;
+  };
+  documents?: {
+    uploaded: string[];
+    needed: string[];
+    uploadedCount: number;
+  };
+  funding?: any;
+  timeline?: any;
+}
+
 export default function SaintBrokerEnhanced() {
   const [isOpen, setIsOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('chat');
@@ -47,8 +66,32 @@ export default function SaintBrokerEnhanced() {
   }]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [pipelineData, setPipelineData] = useState<PipelineData | null>(null);
+  const [pipelineLoading, setPipelineLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    const fetchPipelineStatus = async () => {
+      try {
+        const response = await fetch('/api/pipeline/current', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPipelineData(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch pipeline status:', error);
+      } finally {
+        setPipelineLoading(false);
+      }
+    };
+
+    fetchPipelineStatus();
+    const interval = setInterval(fetchPipelineStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const renderAction = (action: MessageAction) => {
     if (action.type === 'button') {
