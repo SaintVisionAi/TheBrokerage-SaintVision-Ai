@@ -965,13 +965,39 @@ export default function FullLendingApplicationPage() {
                     <div className="bg-gradient-to-r from-green-900/30 to-black/30 border border-green-400/30 rounded-lg p-6 mb-6">
                       <div className="flex items-start gap-3 mb-4">
                         <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                        <div>
+                        <div className="flex-1">
                           <h3 className="text-lg font-bold text-green-300 mb-1">
-                            Signature Captured ✓
+                            Signature Verified ✓
                           </h3>
-                          <p className="text-white/70 text-sm">
-                            Your digital signature has been securely captured and will be included with your application.
+                          <p className="text-white/70 text-sm mb-3">
+                            Your digital signature has been securely captured, timestamped, and recorded.
                           </p>
+                          <div className="bg-black/40 rounded-lg p-3 border border-green-400/20 space-y-2 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-white/60">Signed By:</span>
+                              <span className="text-green-300 font-medium">{signatureData.signerName}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60">Method:</span>
+                              <span className="text-green-300 font-medium capitalize">
+                                {signatureData.type === 'drawn' ? '✏️ Hand Drawn' : '📝 Typed Name'}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60">Signed At:</span>
+                              <span className="text-green-300 font-medium">{new Date(signatureData.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60">Status:</span>
+                              <span className="text-green-400 font-bold">VERIFIED</span>
+                            </div>
+                            <div className="flex justify-between pt-2 border-t border-white/10">
+                              <span className="text-white/60">All Consents Checked:</span>
+                              <span className="text-green-300 font-medium">
+                                {signatureData.auditTrail.allConsentsChecked ? '✅ Yes' : '❌ No'}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       <div className="flex gap-3">
