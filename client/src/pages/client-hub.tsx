@@ -434,16 +434,16 @@ export default function ClientHub() {
                     {/* Pipeline & Quick Actions */}
                     <div className="grid lg:grid-cols-3 gap-6">
                       <div className="lg:col-span-2">
-                        <Card className="bg-gradient-to-br from-yellow-400/10 via-purple-400/5 to-yellow-600/10 border-yellow-400/30 backdrop-blur-xl h-full">
+                        <Card className="bg-gradient-to-br from-yellow-500/40 via-yellow-400/20 to-yellow-600/40 border-yellow-400/70 backdrop-blur-xl h-full shadow-lg shadow-yellow-400/30">
                           <CardHeader>
                             <div className="flex items-start justify-between">
                               <div>
-                                <CardTitle className="text-white text-2xl flex items-center gap-2">
-                                  <Zap className="h-6 w-6 text-yellow-400" />
+                                <CardTitle className="text-yellow-100 text-2xl flex items-center gap-2">
+                                  <Zap className="h-6 w-6 text-yellow-300" />
                                   Pipeline Status
                                 </CardTitle>
-                                <CardDescription className="text-white/60 mt-2">
-                                  Current Stage: <span className="font-bold text-yellow-400 text-base">{application?.currentStage}</span>
+                                <CardDescription className="text-yellow-100/80 mt-2">
+                                  Current Stage: <span className="font-bold text-yellow-300 text-base">{application?.currentStage || 'Not Started'}</span>
                                 </CardDescription>
                               </div>
                             </div>
