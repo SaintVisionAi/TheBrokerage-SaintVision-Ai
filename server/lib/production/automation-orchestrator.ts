@@ -77,7 +77,7 @@ interface WorkflowExecutionState {
 
 // ═══════════════════════════════════════════════════════════
 // AUTOMATION ENGINE
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════���═══════════════════
 
 export class AutomationOrchestrator {
   private workflows: Workflow[] = [];
@@ -198,7 +198,7 @@ export class AutomationOrchestrator {
         name: 'New Lending Lead - Instant Response',
         trigger: { type: 'new_lead' },
         conditions: [
-          { field: 'division', operator: 'equals', value: 'lending' },
+          // division field not in schema - skip for now
         ],
         actions: [
           { 
@@ -387,7 +387,7 @@ export class AutomationOrchestrator {
       
       // ═══════════════════════════════════════════════════════
       // UNIVERSAL WORKFLOWS (ALL DIVISIONS)
-      // ══════��════════════════════════════════════════════════
+      // ═══════════════════════════════════════════════════════
       
       {
         id: 'universal-abandoned-lead-recovery',
