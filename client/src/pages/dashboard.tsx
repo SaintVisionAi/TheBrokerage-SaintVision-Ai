@@ -229,21 +229,21 @@ export default function Dashboard() {
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700 hover:bg-slate-800/50">
-                      <TableHead className="text-slate-300">Client</TableHead>
-                      <TableHead className="text-slate-300">Contact</TableHead>
-                      <TableHead className="text-slate-300">Loan Type</TableHead>
-                      <TableHead className="text-slate-300">Amount</TableHead>
-                      <TableHead className="text-slate-300">Status</TableHead>
-                      <TableHead className="text-slate-300">Stage</TableHead>
-                      <TableHead className="text-slate-300">Priority</TableHead>
-                      <TableHead className="text-slate-300">Date</TableHead>
-                      <TableHead className="text-slate-300">Actions</TableHead>
+                    <TableRow className="border-b border-slate-600/50 bg-slate-800/30 hover:bg-slate-800/30">
+                      <TableHead className="text-slate-200 font-bold">Client</TableHead>
+                      <TableHead className="text-slate-200 font-bold">Contact</TableHead>
+                      <TableHead className="text-slate-200 font-bold">Loan Type</TableHead>
+                      <TableHead className="text-slate-200 font-bold">Amount</TableHead>
+                      <TableHead className="text-slate-200 font-bold">Status</TableHead>
+                      <TableHead className="text-slate-200 font-bold">Stage</TableHead>
+                      <TableHead className="text-slate-200 font-bold">Priority</TableHead>
+                      <TableHead className="text-slate-200 font-bold">Date</TableHead>
+                      <TableHead className="text-slate-200 font-bold">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {applications.map((app) => (
-                      <TableRow key={app.id} className="border-slate-700 hover:bg-slate-800/50" data-testid={`row-application-${app.id}`}>
+                      <TableRow key={app.id} className="border-b border-slate-700/50 hover:bg-slate-800/40 transition-colors" data-testid={`row-application-${app.id}`}>
                         <TableCell className="text-white font-medium" data-testid={`text-client-${app.id}`}>
                           {app.clientName}
                         </TableCell>
