@@ -302,7 +302,7 @@ export default function GHLPreQualForm({
                             <SelectValue placeholder="Select type" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-black border-yellow-400/30">
+                        <SelectContent className="bg-black border-yellow-400/30 text-white">
                           <SelectItem value="sole-proprietor">Sole Proprietor</SelectItem>
                           <SelectItem value="llc">LLC</SelectItem>
                           <SelectItem value="corp">Corporation</SelectItem>
@@ -393,7 +393,7 @@ export default function GHLPreQualForm({
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-black border-yellow-400/30">
+                      <SelectContent className="bg-black border-yellow-400/30 text-white">
                         <SelectItem value="lending">Business Lending</SelectItem>
                         <SelectItem value="real-estate">Real Estate</SelectItem>
                         <SelectItem value="investments">Investments</SelectItem>
@@ -464,7 +464,7 @@ export default function GHLPreQualForm({
                             <SelectValue placeholder="Select range" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-black border-yellow-400/30">
+                        <SelectContent className="bg-black border-yellow-400/30 text-white">
                           <SelectItem value="excellent">Excellent (750+)</SelectItem>
                           <SelectItem value="good">Good (700-749)</SelectItem>
                           <SelectItem value="fair">Fair (650-699)</SelectItem>
@@ -489,7 +489,7 @@ export default function GHLPreQualForm({
                             <SelectValue placeholder="Select option" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-black border-yellow-400/30">
+                        <SelectContent className="bg-black border-yellow-400/30 text-white">
                           <SelectItem value="yes">Yes</SelectItem>
                           <SelectItem value="no">No</SelectItem>
                           <SelectItem value="maybe">Maybe</SelectItem>
