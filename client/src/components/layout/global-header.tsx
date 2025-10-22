@@ -200,7 +200,7 @@ export default function GlobalHeader() {
                           </div>
                           <div className="space-y-2">
                             {category.items.map((service) => (
-                              <Link key={service.href} href={service.href}>
+                              <Link key={`${category.category}-${service.name}`} href={service.href}>
                                 <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg group">
                                   <div className="flex items-start gap-2">
                                     <div className={`p-1.5 rounded flex-shrink-0 ${service.highlight ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-gray-400 group-hover:text-yellow-400'}`}>
