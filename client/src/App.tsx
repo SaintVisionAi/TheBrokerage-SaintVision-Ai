@@ -24,7 +24,6 @@ import Cookies from "@/pages/cookies";
 import RealEstate from "@/pages/real-estate";
 import Lending from "@/pages/lending";
 import Investments from "@/pages/investments";
-import ClientPortal from "@/pages/client-portal";
 import ClientHub from "@/pages/client-hub";
 import REBrokerageIntakePage from "@/pages/re-brokerage-intake";
 import REFinanceIntakePage from "@/pages/re-finance-intake";
@@ -133,7 +132,6 @@ function Router() {
       <Route path="/reset-password/:token" component={ResetPassword} />
       <Route path="/dashboard" component={ProtectedDashboard} />
       <Route path="/admin" component={ProtectedDashboard} />
-      <Route path="/client-portal" component={ProtectedClientPortal} />
       <Route path="/client-hub" component={ClientHub} />
       <Route path="/admin/saintbook">
         {() => <ProtectedAdminRoute component={SaintBookDashboard} />}
@@ -166,7 +164,7 @@ function Router() {
       <Route path="/upload-documents" component={UploadDocumentsPage} />
       <Route path="/full-lending-application-1" component={FullLendingApplicationPage} />
       <Route path="/soft-credit-pull" component={SoftCreditPullPage} />
-      <Route path="/m/account" component={ProtectedClientPortal} />
+      <Route path="/m/account" component={ProtectedClientHub} />
       <Route component={NotFound} />
     </Switch>
   );
