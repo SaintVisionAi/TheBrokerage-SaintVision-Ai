@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Building2, TrendingUp, DollarSign, Menu, X, ChevronDown, Sparkles, Briefcase, Phone, Home, MessageCircle } from "lucide-react";
+import { Building2, TrendingUp, DollarSign, Menu, X, ChevronDown, Sparkles, Briefcase, Phone, Home, MessageCircle, CreditCard, ArrowRight, PieChart, FileText, Calendar } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useSaintBroker } from "@/context/SaintBrokerContext";
 import svgLogo from "../../assets/logo.png";
