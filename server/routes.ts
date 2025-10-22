@@ -118,6 +118,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup SaintSal AI routes
   app.use('/api', saintsalRouter);
 
+  // Setup Pipeline Automation routes
+  app.use('/api', pipelineRouter);
+
   // Setup vision analysis routes
   app.use('/api/vision', visionRouter);
 
