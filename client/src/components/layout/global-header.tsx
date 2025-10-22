@@ -12,24 +12,123 @@ export default function GlobalHeader() {
   const { openChat } = useSaintBroker();
 
   const services = [
-    { 
-      name: "Commercial Lending", 
-      href: "/lending", 
-      icon: <DollarSign className="w-4 h-4" />,
-      description: "$50K-$5M Business Loans",
-      highlight: true 
+    {
+      category: "Lending Solutions",
+      items: [
+        {
+          name: "Business Loans",
+          href: "/apply",
+          icon: <DollarSign className="w-4 h-4" />,
+          description: "$50K-$5M at 9%+",
+          highlight: true
+        },
+        {
+          name: "Full Application",
+          href: "/full-lending-application-1",
+          icon: <Briefcase className="w-4 h-4" />,
+          description: "Complete loan process"
+        },
+        {
+          name: "Equipment Financing",
+          href: "/apply",
+          icon: <Building2 className="w-4 h-4" />,
+          description: "Purchase & financing"
+        },
+        {
+          name: "Lines of Credit",
+          href: "/apply",
+          icon: <CreditCard className="w-4 h-4" />,
+          description: "Flexible credit access"
+        },
+      ]
     },
-    { 
-      name: "Real Estate", 
-      href: "/real-estate", 
-      icon: <Building2 className="w-4 h-4" />,
-      description: "Buy, Sell & Finance" 
+    {
+      category: "Real Estate",
+      items: [
+        {
+          name: "Real Estate Solutions",
+          href: "/real-estate",
+          icon: <Building2 className="w-4 h-4" />,
+          description: "Buy, Sell & Finance"
+        },
+        {
+          name: "Fix & Flip Loans",
+          href: "/apply",
+          icon: <Home className="w-4 h-4" />,
+          description: "Quick project funding"
+        },
+        {
+          name: "DSCR Loans",
+          href: "/apply",
+          icon: <TrendingUp className="w-4 h-4" />,
+          description: "Investment properties"
+        },
+        {
+          name: "Bridge Loans",
+          href: "/apply",
+          icon: <ArrowRight className="w-4 h-4" />,
+          description: "48-72hr closing"
+        },
+      ]
     },
-    { 
-      name: "Investments", 
-      href: "/investments", 
-      icon: <TrendingUp className="w-4 h-4" />,
-      description: "9-12% Fixed Returns" 
+    {
+      category: "Investments",
+      items: [
+        {
+          name: "Investment Opportunities",
+          href: "/investments",
+          icon: <TrendingUp className="w-4 h-4" />,
+          description: "9-12% Fixed Returns",
+          highlight: true
+        },
+        {
+          name: "Lending Fund",
+          href: "/investments",
+          icon: <DollarSign className="w-4 h-4" />,
+          description: "Private lending syndicate"
+        },
+        {
+          name: "Real Estate Fund",
+          href: "/investments",
+          icon: <Building2 className="w-4 h-4" />,
+          description: "Diversified portfolio"
+        },
+        {
+          name: "1031 Exchanges",
+          href: "/investments",
+          icon: <PieChart className="w-4 h-4" />,
+          description: "Tax-advantaged strategies"
+        },
+      ]
+    },
+    {
+      category: "Tools & Resources",
+      items: [
+        {
+          name: "Document Upload",
+          href: "/upload-documents",
+          icon: <FileText className="w-4 h-4" />,
+          description: "Submit loan documents"
+        },
+        {
+          name: "File Hub",
+          href: "/file-hub",
+          icon: <FileText className="w-4 h-4" />,
+          description: "Secure document storage"
+        },
+        {
+          name: "Deal Analyzer",
+          href: "/",
+          icon: <TrendingUp className="w-4 h-4" />,
+          description: "RE deal analysis"
+        },
+        {
+          name: "Schedule Appointment",
+          href: "/set-appointment",
+          icon: <Calendar className="w-4 h-4" />,
+          description: "Book a consultation"
+        },
+      ]
     }
   ];
 
