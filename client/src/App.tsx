@@ -127,7 +127,7 @@ function Router() {
       <Route path="/reset-password/:token" component={ResetPassword} />
       <Route path="/dashboard" component={ProtectedDashboard} />
       <Route path="/admin" component={ProtectedDashboard} />
-      <Route path="/client-hub" component={ClientHub} />
+      <Route path="/client-hub" component={ProtectedClientHub} />
       <Route path="/admin/saintbook">
         {() => <ProtectedAdminRoute component={SaintBookDashboard} />}
       </Route>
