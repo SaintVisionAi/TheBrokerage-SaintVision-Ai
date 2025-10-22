@@ -23,6 +23,7 @@ import ghlDataRouter from './routes/ghl-data';
 import visionRouter from './routes/vision';
 import ghlFormsRouter from './routes/ghl-forms';
 import databaseQueryRouter from './routes/database-query';
+import saintsalRouter from './routes/saintsal';
 import rateLimit from 'express-rate-limit';
 import { encrypt, decrypt, redactSSN, isValidBase64 } from './lib/encryption';
 import { applicationSubmitSchema, sanitizeInput, isValidSSN } from './lib/validation';
@@ -112,6 +113,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Setup GHL form routes
   app.use('/api/ghl-forms', ghlFormsRouter);
+
+  // Setup SaintSal AI routes
+  app.use('/api', saintsalRouter);
 
   // Setup vision analysis routes
   app.use('/api/vision', visionRouter);
