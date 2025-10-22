@@ -159,20 +159,32 @@ export default function GlobalHeader() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
-            
+          <div className="hidden lg:flex items-center gap-8">
+
+            {/* Primary Navigation Links */}
+            <Link href="/apply" className={`px-3 py-2 font-semibold transition-colors ${isActive("/apply") || isActive("/full-lending-application-1") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
+              Business Loans
+            </Link>
+
+            <Link href="/real-estate" className={`px-3 py-2 font-semibold transition-colors ${isActive("/real-estate") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
+              Real Estate
+            </Link>
+
+            <Link href="/investments" className={`px-3 py-2 font-semibold transition-colors ${isActive("/investments") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
+              Investments
+            </Link>
+
             {/* Services Dropdown */}
             <div className="relative">
               <button
-                className="flex items-center gap-2 px-4 py-2 text-white hover:text-yellow-400 transition-colors font-medium"
+                className="flex items-center gap-2 px-3 py-2 text-white hover:text-yellow-400 transition-colors font-semibold"
                 onMouseEnter={() => setServicesOpen(true)}
                 onMouseLeave={() => setServicesOpen(false)}
               >
-                <Briefcase className="w-4 h-4" />
                 Services
                 <ChevronDown className="w-3 h-3" />
               </button>
-              
+
               {servicesOpen && (
                 <div
                   className="absolute top-full left-0 pt-1 min-w-fit"
@@ -180,7 +192,7 @@ export default function GlobalHeader() {
                   onMouseLeave={() => setServicesOpen(false)}
                 >
                   <div className="bg-neutral-900 border border-yellow-500/20 rounded-lg shadow-2xl overflow-hidden">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-0">
+                    <div className="grid grid-cols-4 gap-0">
                       {services.map((category) => (
                         <div key={category.category} className="border-r border-yellow-500/10 last:border-r-0 px-4 py-4">
                           <div className="text-xs text-yellow-400/70 uppercase tracking-wider font-bold mb-3">
@@ -191,14 +203,14 @@ export default function GlobalHeader() {
                               <Link key={service.href} href={service.href}>
                                 <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg group">
                                   <div className="flex items-start gap-2">
-                                    <div className={`p-1.5 rounded ${service.highlight ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-gray-400 group-hover:text-yellow-400'}`}>
+                                    <div className={`p-1.5 rounded flex-shrink-0 ${service.highlight ? 'bg-yellow-500/20 text-yellow-400' : 'bg-white/5 text-gray-400 group-hover:text-yellow-400'}`}>
                                       {service.icon}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <div className="font-medium text-white text-sm flex items-center gap-1">
                                         {service.name}
                                         {service.highlight && (
-                                          <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full whitespace-nowrap">POPULAR</span>
+                                          <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full whitespace-nowrap">HOT</span>
                                         )}
                                       </div>
                                       <div className="text-xs text-gray-500 mt-0.5 group-hover:text-gray-400">{service.description}</div>
@@ -210,29 +222,43 @@ export default function GlobalHeader() {
                           </div>
                         </div>
                       ))}
+
+                      {/* Info Section */}
+                      <div className="border-r border-yellow-500/10 px-4 py-4">
+                        <div className="text-xs text-yellow-400/70 uppercase tracking-wider font-bold mb-3">
+                          Company
+                        </div>
+                        <div className="space-y-2">
+                          <Link href="/about">
+                            <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg">
+                              <div className="font-medium text-white text-sm">About Us</div>
+                              <div className="text-xs text-gray-500 mt-0.5">Who we are & our mission</div>
+                            </div>
+                          </Link>
+                          <Link href="/contact">
+                            <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg">
+                              <div className="font-medium text-white text-sm">Contact</div>
+                              <div className="text-xs text-gray-500 mt-0.5">Get in touch with our team</div>
+                            </div>
+                          </Link>
+                          <Link href="/client-hub">
+                            <div className="p-3 hover:bg-yellow-500/10 transition-all cursor-pointer rounded-lg">
+                              <div className="font-medium text-white text-sm">Client Hub</div>
+                              <div className="text-xs text-gray-500 mt-0.5">Manage your applications</div>
+                            </div>
+                          </Link>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Quick Links */}
-            <Link href="/client-hub" className={`px-4 py-2 font-medium transition-colors ${isActive("/client-hub") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
-              Client Hub
-            </Link>
-
-            <Link href="/about" className={`px-4 py-2 font-medium transition-colors ${isActive("/about") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
-              About
-            </Link>
-
-            <Link href="/contact" className={`px-4 py-2 font-medium transition-colors ${isActive("/contact") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
-              Contact
-            </Link>
-
             <Button
               onClick={openChat}
               variant="ghost"
-              className="text-white hover:text-yellow-400 hover:bg-yellow-400/10 font-medium flex items-center gap-2"
+              className="text-white hover:text-yellow-400 hover:bg-yellow-400/10 font-semibold flex items-center gap-2 ml-4"
             >
               <MessageCircle className="w-4 h-4" />
               Help/Chat
