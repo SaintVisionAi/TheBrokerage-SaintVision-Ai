@@ -205,13 +205,13 @@ export default function SaintBrokerEnhanced() {
                 <div
                   key={idx}
                   className={cn(
-                    "flex gap-2",
-                    msg.role === 'user' ? 'justify-end' : 'justify-start'
+                    "flex gap-2 flex-col",
+                    msg.role === 'user' ? 'items-end' : 'items-start'
                   )}
                 >
                   <div
                     className={cn(
-                      "rounded-lg px-3 py-2 max-w-[80%] text-sm break-words",
+                      "rounded-lg px-4 py-3 max-w-[85%] text-sm break-words",
                       msg.role === 'user'
                         ? 'bg-yellow-400 text-black'
                         : 'bg-white/10 text-white'
@@ -219,6 +219,14 @@ export default function SaintBrokerEnhanced() {
                   >
                     {msg.content}
                   </div>
+                  {msg.actions && msg.actions.length > 0 && (
+                    <div className={cn(
+                      "flex gap-2 flex-wrap max-w-[85%]",
+                      msg.role === 'user' ? 'justify-end' : 'justify-start'
+                    )}>
+                      {msg.actions.map(action => renderAction(action))}
+                    </div>
+                  )}
                 </div>
               ))}
               {isLoading && (
