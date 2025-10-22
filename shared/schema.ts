@@ -365,6 +365,56 @@ export const applications = pgTable("applications", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Page Metadata - stores info about all application pages and services
+export const pageMetadata = pgTable("page_metadata", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  path: varchar("path", { length: 255 }).unique().notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 100 }), // 'lending', 'real-estate', 'investments', 'tools', 'company'
+  subcategory: varchar("subcategory", { length: 100 }),
+  requiresAuth: boolean("requires_auth").default(false),
+  requiresRole: varchar("requires_role", { length: 100 }), // 'admin', 'broker', 'client', 'public'
+  icon: varchar("icon", { length: 100 }), // lucide icon name
+  isActive: boolean("is_active").default(true),
+  displayOrder: integer("display_order"),
+  metadata: jsonb("metadata"), // Additional metadata like SEO, tags, etc.
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Navigation Tracking - tracks user page visits and navigation flow
+export const userNavigation = pgTable("user_navigation", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  path: varchar("path", { length: 255 }).notNull(),
+  pageId: varchar("page_id").references(() => pageMetadata.id),
+  referrerPath: varchar("referrer_path", { length: 255 }),
+  deviceType: varchar("device_type", { length: 50 }), // 'desktop', 'mobile', 'tablet'
+  userAgent: text("user_agent"),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  sessionDurationMs: integer("session_duration_ms"),
+  timeOnPageMs: integer("time_on_page_ms"),
+  interactionMetadata: jsonb("interaction_metadata"), // clicks, form fills, etc.
+  visitedAt: timestamp("visited_at").defaultNow(),
+  leftAt: timestamp("left_at"),
+});
+
+// Route Validation - manages all valid routes in the application
+export const routeValidation = pgTable("route_validation", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  path: varchar("path", { length: 255 }).unique().notNull(),
+  method: varchar("method", { length: 20 }).default("GET"), // GET, POST, etc.
+  description: varchar("description", { length: 500 }),
+  requiresAuth: boolean("requires_auth").default(false),
+  allowedRoles: varchar("allowed_roles", { length: 255 }).array(), // ['admin', 'broker', 'client']
+  rateLimitPerMinute: integer("rate_limit_per_minute"),
+  isActive: boolean("is_active").default(true),
+  lastValidatedAt: timestamp("last_validated_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas for new tables
 export const insertContactSchema = createInsertSchema(contacts).omit({
   id: true,
