@@ -884,24 +884,102 @@ export default function FullLendingApplicationPage() {
                   </div>
                 </div>
 
+                {/* VISUAL SIGNATURE CAPTURE SECTION */}
+                {!signatureData && (
+                  <div className="pt-6 border-t border-white/10">
+                    <Button
+                      type="button"
+                      onClick={() => setShowSignatureCapture(true)}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold h-12 text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      <FileText className="w-5 h-5" />
+                      Add Digital Signature
+                    </Button>
+                    <p className="text-center text-xs text-yellow-400/70 mt-3">
+                      You can sign with your finger or mouse • Typed signature also available
+                    </p>
+                  </div>
+                )}
+
+                {/* Signature Capture Modal */}
+                {showSignatureCapture && (
+                  <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-lg">
+                      <SignatureCapture
+                        onSignatureComplete={(data) => {
+                          setSignatureData(data);
+                          setShowSignatureCapture(false);
+                          form.setValue('signatureData', data.data);
+                          form.setValue('signatureType', data.type);
+                          toast({
+                            title: 'Signature Captured',
+                            description: 'Your digital signature has been securely captured.',
+                          });
+                        }}
+                        onCancel={() => {
+                          setShowSignatureCapture(false);
+                        }}
+                        loanAmount={form.watch('loanAmount') || ''}
+                        applicantName={`${form.watch('firstName')} ${form.watch('lastName')}`}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Signature Confirmed Section */}
+                {signatureData && (
+                  <div className="pt-6 border-t border-white/10">
+                    <div className="bg-gradient-to-r from-green-900/30 to-black/30 border border-green-400/30 rounded-lg p-6 mb-6">
+                      <div className="flex items-start gap-3 mb-4">
+                        <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h3 className="text-lg font-bold text-green-300 mb-1">
+                            Signature Captured ✓
+                          </h3>
+                          <p className="text-white/70 text-sm">
+                            Your digital signature has been securely captured and will be included with your application.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSignatureData(null);
+                            form.setValue('signatureData', '');
+                            form.setValue('signatureType', undefined);
+                          }}
+                          className="border-white/20 text-white hover:bg-white/10"
+                        >
+                          Recapture Signature
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Submit Button */}
                 <div className="pt-6 border-t border-white/10">
                   <Button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold h-12 text-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                    disabled={isSubmitting || !signatureData}
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 disabled:from-gray-600 disabled:to-gray-700 text-black font-bold h-12 text-lg shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center">
                         <Loader2 className="animate-spin h-5 w-5 mr-2" />
                         Submitting Application...
                       </span>
+                    ) : !signatureData ? (
+                      'Complete Signature to Submit'
                     ) : (
                       'Submit Full Application'
                     )}
                   </Button>
                   <p className="text-center text-sm text-gray-400 mt-4">
-                    * Required fields. We'll never share your information.
+                    * Required fields. Digital signature required. We'll never share your information.
                   </p>
                 </div>
               </form>
