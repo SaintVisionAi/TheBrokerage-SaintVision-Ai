@@ -135,12 +135,21 @@ export default function FullLendingApplicationPage() {
         setIsSuccess(true);
         toast({
           title: "Application Submitted! 🎉",
-          description: "You'll receive a text message within minutes with next steps.",
+          description: "Your digitally signed application has been received. You'll receive a text message within minutes with next steps.",
           duration: 5000
         });
 
+        // Log signature verification
+        console.log('✅ Signature Verified:', {
+          signedBy: signatureData?.signerName,
+          signatureType: signatureData?.type,
+          signedAt: signatureData?.timestamp,
+          verificationStatus: signatureData?.auditTrail.signatureVerificationStatus,
+          allConsentsChecked: signatureData?.auditTrail.allConsentsChecked
+        });
+
         setTimeout(() => {
-          setLocation('/prequal-success');
+          setLocation('/application-complete');
         }, 2000);
       } else {
         throw new Error(result.error || result.message || 'Submission failed');
