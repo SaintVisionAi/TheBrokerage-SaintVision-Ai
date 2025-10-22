@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import {
   DollarSign,
   Home,
@@ -27,11 +30,46 @@ import {
   PieChart,
   Wrench,
   HelpCircle,
+  Clock,
+  Phone,
+  Upload,
+  Download,
+  Zap,
+  ArrowRight
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useChat } from '@/hooks/use-chat';
 import GlobalHeader from '@/components/layout/global-header';
+import GlobalFooter from '@/components/layout/global-footer';
+
+interface ClientPortalData {
+  hasData: boolean;
+  message?: string;
+  client?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  application?: {
+    loanAmount: string;
+    loanType: string;
+    applicationDate: string;
+    currentStage: string;
+    priority: string;
+    status: string;
+    estimatedFunding: string;
+  };
+  pipelineStages?: Array<{
+    name: string;
+    status: 'completed' | 'current' | 'pending';
+    date?: string;
+  }>;
+  documents?: {
+    needed: string[];
+    uploaded: string[];
+  };
+}
 
 export default function ClientHub() {
   const { toast } = useToast();
@@ -41,6 +79,11 @@ export default function ClientHub() {
   const { messages, sendMessage, isLoading: chatLoading } = useChat('user-123', 'hub-chat');
   const [chatInput, setChatInput] = useState('');
   const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  const { data: portalData, isLoading: portalLoading } = useQuery<ClientPortalData>({
+    queryKey: ["/api/client-portal"],
+    refetchInterval: 30000,
+  });
 
   useEffect(() => {
     if (chatScrollRef.current) {
@@ -190,10 +233,10 @@ export default function ClientHub() {
       color: 'bg-yellow-100',
     },
     {
-      icon: Home,
-      title: 'Client Portal',
-      description: 'Access your account & documents',
-      link: '/m/account',
+      icon: Upload,
+      title: 'Upload Docs',
+      description: 'Submit documents securely',
+      link: '/upload-documents',
       color: 'bg-purple-100',
     },
   ];
@@ -206,6 +249,14 @@ export default function ClientHub() {
     { id: 'tools' as const, label: 'Tools & Resources', icon: Wrench },
     { id: 'account' as const, label: 'Account', icon: Settings },
   ];
+
+  const client = portalData?.client;
+  const application = portalData?.application;
+  const pipelineStages = portalData?.pipelineStages || [];
+  const documents = portalData?.documents;
+  const currentStageIndex = pipelineStages?.findIndex(s => s.status === 'current') || 0;
+  const progressPercentage = pipelineStages ? ((currentStageIndex + 1) / pipelineStages.length) * 100 : 0;
+  const hasActiveApplication = portalData?.hasData;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-neutral-900 to-black text-white">
@@ -223,7 +274,7 @@ export default function ClientHub() {
               </button>
               <div>
                 <h1 className="text-xl font-bold text-yellow-400">Saint Vision Group</h1>
-                <p className="text-xs text-yellow-400/70 uppercase tracking-wider">Client Hub & Resource Center</p>
+                <p className="text-xs text-yellow-400/70 uppercase tracking-wider">Client Portal & Resource Center</p>
               </div>
             </div>
 
@@ -240,7 +291,7 @@ export default function ClientHub() {
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-sm text-yellow-400/80">Ryan Capatosto</span>
+              <span className="text-sm text-yellow-400/80">{client?.name || 'Client'}</span>
               <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
                 <LogOut className="w-5 h-5 text-yellow-400" />
               </button>
@@ -286,7 +337,7 @@ export default function ClientHub() {
               <span className="text-sm font-semibold text-yellow-300">SaintBroker AI</span>
             </div>
             <p className="text-xs text-white/60">
-              Need help navigating your options? I can answer questions, help with applications, or guide you through any process.
+              Need help? I can answer questions, guide you through applications, or help with any process.
             </p>
           </div>
         </div>
@@ -297,126 +348,347 @@ export default function ClientHub() {
             {/* Dashboard Tab */}
             {activeTab === 'dashboard' && (
               <div className="space-y-6">
-                {/* Quick Links Section - Prominent Top Links */}
-                <div className="bg-gradient-to-r from-yellow-900/30 to-black/30 border border-yellow-400/30 rounded-lg p-8 text-center text-white">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-1 text-yellow-300">⚡ Client Hub Quick Links ⚡</h2>
-                  <p className="text-yellow-400/80 mb-6">We Listen. Simple. Fast & Easy. Access. Click. Upload. Connect</p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
-                    <a href="/apply" className="block">
-                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-semibold py-3">
-                        📋 APPLY NOW & GET PRE-APPROVED! 🔥
-                      </Button>
-                    </a>
-                    <a href="/soft-credit-pull" className="block">
-                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-semibold py-3">
-                        💎 GET PREPPED: SOFT CREDIT PULL HERE 🔑
-                      </Button>
-                    </a>
-                    <a href="/full-lending-application-1" className="block">
-                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-semibold py-3">
-                        🏗 FULL LENDING APPLICATION 👊
-                      </Button>
-                    </a>
-                    <a href="/real-estate-investing" className="block">
-                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-semibold py-3">
-                        📈 SVG FIXED RETURN 9-12% APP 📊
-                      </Button>
-                    </a>
-                    <a href="/set-appointment" className="block">
-                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-semibold py-3">
-                        🍎 SCHEDULE & APPOINTMENTS 🍎
-                      </Button>
-                    </a>
-                    <a href="/contact" className="block">
-                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-semibold py-3">
-                        💼 SAINT VISION MERCHANT SERVICES APPLICATION 🚀
-                      </Button>
-                    </a>
-                    <a href="/file-hub" className="block">
-                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-semibold py-3">
-                        📁 SAINT VISION GROUP | SECURE FILE HUB 🔒
-                      </Button>
-                    </a>
+                {portalLoading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400 mx-auto mb-4"></div>
+                    <p className="text-yellow-400">Loading your application...</p>
                   </div>
-                </div>
+                ) : hasActiveApplication ? (
+                  <>
+                    {/* Welcome Header */}
+                    <div className="space-y-4">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="space-y-1">
+                          <h1 className="text-4xl font-bold text-white">
+                            Welcome back, <span className="text-yellow-400">{client?.name}</span>
+                          </h1>
+                          <p className="text-lg text-white/60">Your active application and resources</p>
+                        </div>
+                        <Button className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold h-11 px-6 whitespace-nowrap">
+                          <Phone className="mr-2 h-5 w-5" />
+                          Contact Agent
+                        </Button>
+                      </div>
+                      <Separator className="bg-yellow-400/20" />
+                    </div>
 
-                <div>
-                  <h2 className="text-3xl font-bold text-yellow-300 mb-2">Welcome to Saint Vision Group</h2>
-                  <p className="text-white/70">Your complete hub for lending, investments, and real estate financing</p>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {quickActions.map((action, idx) => (
-                    <a
-                      key={idx}
-                      href={action.link}
-                      className="block"
-                    >
-                      <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full bg-neutral-900/80 border border-yellow-400/20">
-                        <CardContent className="pt-6">
-                          <div className={cn('w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-yellow-400/20', action.color)}>
-                            <action.icon className="w-6 h-6 text-yellow-300" />
+                    {/* Key Metrics Cards */}
+                    <div className="grid md:grid-cols-4 gap-4">
+                      <Card className="bg-gradient-to-br from-yellow-400/10 to-yellow-600/10 border-yellow-400/30 backdrop-blur-xl hover:border-yellow-400/50 transition-all">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-white/60 text-sm font-medium">Loan Amount</p>
+                              <p className="text-3xl font-bold text-yellow-400 mt-2">{application?.loanAmount}</p>
+                            </div>
+                            <div className="h-12 w-12 rounded-lg bg-yellow-400/20 flex items-center justify-center">
+                              <DollarSign className="h-6 w-6 text-yellow-400" />
+                            </div>
                           </div>
-                          <h3 className="font-semibold text-yellow-300 mb-1">{action.title}</h3>
-                          <p className="text-xs text-white/60">{action.description}</p>
-                          <Button
-                            variant="link"
-                            className="mt-4 p-0 text-yellow-400 hover:text-yellow-300"
-                          >
-                            Get Started <ExternalLink className="w-3 h-3 ml-1" />
-                          </Button>
                         </CardContent>
                       </Card>
-                    </a>
-                  ))}
-                </div>
 
-                {/* Status Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
-                    <CardContent className="pt-6">
-                      <div className="text-sm text-yellow-400/70 mb-2">Pre-Approved Amount</div>
-                      <div className="text-3xl font-bold text-yellow-300">$5M</div>
-                      <p className="text-xs text-white/50 mt-2">Ready to access</p>
-                    </CardContent>
+                      <Card className="bg-gradient-to-br from-emerald-400/10 to-emerald-600/10 border-emerald-400/30 backdrop-blur-xl hover:border-emerald-400/50 transition-all">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-white/60 text-sm font-medium">Loan Type</p>
+                              <p className="text-lg font-bold text-emerald-400 mt-2">{application?.loanType}</p>
+                            </div>
+                            <div className="h-12 w-12 rounded-lg bg-emerald-400/20 flex items-center justify-center">
+                              <TrendingUp className="h-6 w-6 text-emerald-400" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-gradient-to-br from-blue-400/10 to-blue-600/10 border-blue-400/30 backdrop-blur-xl hover:border-blue-400/50 transition-all">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-white/60 text-sm font-medium">Applied</p>
+                              <p className="text-lg font-bold text-blue-400 mt-2">{application?.applicationDate}</p>
+                            </div>
+                            <div className="h-12 w-12 rounded-lg bg-blue-400/20 flex items-center justify-center">
+                              <Calendar className="h-6 w-6 text-blue-400" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-gradient-to-br from-green-400/10 to-green-600/10 border-green-400/30 backdrop-blur-xl hover:border-green-400/50 transition-all">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-white/60 text-sm font-medium">Est. Funding</p>
+                              <p className="text-2xl font-bold text-green-400 mt-2">{application?.estimatedFunding}</p>
+                            </div>
+                            <div className="h-12 w-12 rounded-lg bg-green-400/20 flex items-center justify-center">
+                              <Zap className="h-6 w-6 text-green-400" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Pipeline & Quick Actions */}
+                    <div className="grid lg:grid-cols-3 gap-6">
+                      <div className="lg:col-span-2">
+                        <Card className="bg-gradient-to-br from-yellow-400/10 via-purple-400/5 to-yellow-600/10 border-yellow-400/30 backdrop-blur-xl h-full">
+                          <CardHeader>
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <CardTitle className="text-white text-2xl flex items-center gap-2">
+                                  <Zap className="h-6 w-6 text-yellow-400" />
+                                  Pipeline Status
+                                </CardTitle>
+                                <CardDescription className="text-white/60 mt-2">
+                                  Current Stage: <span className="font-bold text-yellow-400 text-base">{application?.currentStage}</span>
+                                </CardDescription>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-6">
+                            <div>
+                              <div className="flex justify-between items-center mb-3">
+                                <span className="text-white/80 text-sm font-medium">Overall Progress</span>
+                                <Badge className="bg-yellow-400 text-black font-bold text-xs">{Math.round(progressPercentage)}%</Badge>
+                              </div>
+                              <Progress value={progressPercentage} className="h-2" />
+                            </div>
+
+                            <div className="space-y-3">
+                              {pipelineStages?.map((stage, index) => (
+                                <div
+                                  key={index}
+                                  className={`flex items-start gap-4 p-4 rounded-lg border transition-all ${
+                                    stage.status === 'current'
+                                      ? 'bg-yellow-400/15 border-yellow-400/50 shadow-lg shadow-yellow-400/10'
+                                      : stage.status === 'completed'
+                                      ? 'bg-emerald-400/10 border-emerald-400/30'
+                                      : 'bg-white/5 border-white/10'
+                                  }`}
+                                >
+                                  <div className="flex-shrink-0 mt-1">
+                                    {stage.status === 'completed' ? (
+                                      <div className="h-8 w-8 rounded-full bg-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-400/30">
+                                        <CheckCircle className="h-5 w-5 text-black" />
+                                      </div>
+                                    ) : stage.status === 'current' ? (
+                                      <div className="h-8 w-8 rounded-full bg-yellow-400 flex items-center justify-center animate-pulse shadow-lg shadow-yellow-400/30">
+                                        <Clock className="h-5 w-5 text-black" />
+                                      </div>
+                                    ) : (
+                                      <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center">
+                                        <div className="h-3 w-3 rounded-full bg-white/40" />
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <h4 className="font-semibold text-white">{stage.name}</h4>
+                                      {stage.date && (
+                                        <span className="text-xs text-white/60 font-medium">{stage.date}</span>
+                                      )}
+                                    </div>
+                                    {stage.status === 'current' && (
+                                      <Badge className="mt-2 bg-yellow-400 text-black font-semibold">Action Required</Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Card className="bg-gradient-to-br from-emerald-400/10 to-emerald-600/10 border-emerald-400/30 backdrop-blur-xl">
+                          <CardHeader>
+                            <CardTitle className="text-white text-lg">Status</CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div>
+                              <p className="text-white/60 text-sm mb-2">Priority</p>
+                              <Badge className="bg-emerald-400/30 text-emerald-300 border border-emerald-400/50">
+                                {application?.priority || 'Standard'}
+                              </Badge>
+                            </div>
+                            <Separator className="bg-white/10" />
+                            <div>
+                              <p className="text-white/60 text-sm mb-2">App Status</p>
+                              <p className="text-white font-semibold">{application?.status}</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="bg-gradient-to-br from-blue-400/10 to-blue-600/10 border-blue-400/30 backdrop-blur-xl">
+                          <CardHeader>
+                            <CardTitle className="text-white text-lg">Actions</CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-2">
+                            <Button variant="outline" className="w-full border-blue-400/30 text-blue-400 hover:bg-blue-400/10 justify-start">
+                              <Calendar className="mr-2 h-4 w-4" />
+                              Schedule
+                            </Button>
+                            <Button variant="outline" className="w-full border-blue-400/30 text-blue-400 hover:bg-blue-400/10 justify-start">
+                              <FileText className="mr-2 h-4 w-4" />
+                              View App
+                            </Button>
+                            <Button variant="outline" className="w-full border-blue-400/30 text-blue-400 hover:bg-blue-400/10 justify-start">
+                              <Upload className="mr-2 h-4 w-4" />
+                              Docs
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+
+                    {/* Documents */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <Card className="bg-gradient-to-br from-amber-400/10 to-amber-600/10 border-amber-400/30 backdrop-blur-xl">
+                        <CardHeader>
+                          <CardTitle className="text-white flex items-center gap-2 text-xl">
+                            <AlertCircle className="h-6 w-6 text-amber-400" />
+                            Docs Needed
+                          </CardTitle>
+                          <CardDescription className="text-white/70">
+                            Upload to proceed to next stage
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {documents?.needed && documents.needed.length > 0 ? (
+                              <>
+                                {documents.needed.map((doc, index) => (
+                                  <div key={index} className="flex items-center justify-between p-4 bg-amber-400/10 rounded-lg border border-amber-400/20 hover:border-amber-400/40 transition-all">
+                                    <div className="flex items-center gap-3">
+                                      <div className="h-10 w-10 rounded-lg bg-amber-400/20 flex items-center justify-center flex-shrink-0">
+                                        <FileText className="h-5 w-5 text-amber-400" />
+                                      </div>
+                                      <span className="text-sm text-white font-medium">{doc}</span>
+                                    </div>
+                                    <Button size="sm" className="bg-amber-400 hover:bg-amber-500 text-black font-semibold">
+                                      <Upload className="h-3 w-3 mr-1" />
+                                      Upload
+                                    </Button>
+                                  </div>
+                                ))}
+                                <Button className="w-full mt-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-bold h-11">
+                                  <Upload className="mr-2 h-4 w-4" />
+                                  Upload All
+                                </Button>
+                              </>
+                            ) : (
+                              <p className="text-white/50 text-center py-8">All documents submitted ✓</p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-gradient-to-br from-emerald-400/10 to-emerald-600/10 border-emerald-400/30 backdrop-blur-xl">
+                        <CardHeader>
+                          <CardTitle className="text-white flex items-center gap-2 text-xl">
+                            <CheckCircle className="h-6 w-6 text-emerald-400" />
+                            Docs Uploaded
+                          </CardTitle>
+                          <CardDescription className="text-white/70">
+                            Successfully submitted
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {documents?.uploaded && documents.uploaded.length > 0 ? (
+                              documents.uploaded.map((doc, index) => (
+                                <div key={index} className="flex items-center justify-between p-4 bg-emerald-400/10 rounded-lg border border-emerald-400/20 hover:border-emerald-400/40 transition-all">
+                                  <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-lg bg-emerald-400/20 flex items-center justify-center flex-shrink-0">
+                                      <CheckCircle className="h-5 w-5 text-emerald-400" />
+                                    </div>
+                                    <span className="text-sm text-white font-medium">{doc}</span>
+                                  </div>
+                                  <Button size="sm" variant="ghost" className="text-emerald-400 hover:bg-emerald-400/10">
+                                    <Download className="h-3 w-3 mr-1" />
+                                    View
+                                  </Button>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-white/50 text-center py-8">No documents yet</p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* CTA */}
+                    {documents?.needed && documents.needed.length > 0 && (
+                      <Card className="bg-gradient-to-r from-yellow-400/20 via-yellow-400/10 to-emerald-400/20 border-yellow-400/50 backdrop-blur-xl overflow-hidden relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-transparent pointer-events-none"></div>
+                        <CardContent className="p-8 relative">
+                          <div className="flex items-start gap-6">
+                            <div className="flex-shrink-0">
+                              <div className="h-14 w-14 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg shadow-yellow-400/30">
+                                <AlertCircle className="h-7 w-7 text-black" />
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-xl font-bold text-white mb-2">
+                                Action Required
+                              </h3>
+                              <p className="text-white/70 mb-6 leading-relaxed">
+                                Upload remaining documents to move to the next stage. Our team will review within 24 hours.
+                              </p>
+                              <Button className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold h-11">
+                                Upload Documents
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
+                ) : (
+                  <Card className="bg-black/80 border-yellow-400/30 backdrop-blur-xl p-8 text-center max-w-2xl mx-auto">
+                    <CardTitle className="text-white mb-4 text-2xl">No Active Application</CardTitle>
+                    <p className="text-white/70 mb-8">Start your journey to funding by completing a pre-qualification form.</p>
+                    <Button className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold">
+                      <ArrowRight className="mr-2 h-4 w-4" />
+                      Start New Application
+                    </Button>
                   </Card>
+                )}
 
-                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
-                    <CardContent className="pt-6">
-                      <div className="text-sm text-yellow-400/70 mb-2">Investment Opportunities</div>
-                      <div className="text-3xl font-bold text-yellow-300">9-12%</div>
-                      <p className="text-xs text-white/50 mt-2">Fixed annual returns</p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-neutral-900/80 border border-yellow-400/20">
-                    <CardContent className="pt-6">
-                      <div className="text-sm text-yellow-400/70 mb-2">Fastest Funding</div>
-                      <div className="text-3xl font-bold text-yellow-300">24-48h</div>
-                      <p className="text-xs text-white/50 mt-2">Decision timeline</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Featured */}
-                <Card className="bg-gradient-to-r from-yellow-900/30 to-black/30 border border-yellow-400/30">
-                  <CardHeader>
-                    <CardTitle className="text-yellow-300">Featured: SaintVision Technologies™</CardTitle>
-                    <CardDescription className="text-yellow-400/70">AI-powered lending and investment solutions</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-white/70 mb-4">
-                      Experience next-generation financing with our patent-protected HACP™ technology. Faster decisions, better terms, technology-enabled excellence.
-                    </p>
-                    <a href="/apply" className="block">
-                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">
-                        Get Started Now
-                      </Button>
-                    </a>
-                  </CardContent>
-                </Card>
+                {/* Quick Links */}
+                {activeTab === 'dashboard' && !portalLoading && (
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+                    {quickActions.map((action, idx) => (
+                      <a
+                        key={idx}
+                        href={action.link}
+                        className="block"
+                      >
+                        <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full bg-neutral-900/80 border border-yellow-400/20">
+                          <CardContent className="pt-6">
+                            <div className={cn('w-12 h-12 rounded-lg flex items-center justify-center mb-4 bg-yellow-400/20', action.color)}>
+                              <action.icon className="w-6 h-6 text-yellow-300" />
+                            </div>
+                            <h3 className="font-semibold text-yellow-300 mb-1">{action.title}</h3>
+                            <p className="text-xs text-white/60">{action.description}</p>
+                            <Button
+                              variant="link"
+                              className="mt-4 p-0 text-yellow-400 hover:text-yellow-300"
+                            >
+                              Get Started <ExternalLink className="w-3 h-3 ml-1" />
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -456,7 +728,6 @@ export default function ClientHub() {
                   ))}
                 </div>
 
-                {/* CTA Section */}
                 <Card className="bg-gradient-to-r from-yellow-900/30 to-black/30 border border-yellow-400/30 text-white">
                   <CardContent className="pt-8">
                     <h3 className="text-2xl font-bold mb-2 text-yellow-300">Ready to Get Funded?</h3>
@@ -514,7 +785,6 @@ export default function ClientHub() {
                   ))}
                 </div>
 
-                {/* Why Invest */}
                 <Card className="bg-neutral-900/80 border border-yellow-400/20">
                   <CardHeader>
                     <CardTitle className="text-yellow-300">Why Invest with Saint Vision Group?</CardTitle>
@@ -682,7 +952,6 @@ export default function ClientHub() {
                   ))}
                 </div>
 
-                {/* Educational Resources */}
                 <Card className="bg-neutral-900/80 border border-yellow-400/20">
                   <CardHeader>
                     <CardTitle className="text-yellow-300">Educational Resources</CardTitle>
@@ -718,15 +987,15 @@ export default function ClientHub() {
                   <CardContent className="space-y-4">
                     <div>
                       <label className="text-sm font-medium text-yellow-400/70">Full Name</label>
-                      <p className="text-yellow-300 mt-1">Ryan Capatosto</p>
+                      <p className="text-yellow-300 mt-1">{client?.name || 'N/A'}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-yellow-400/70">Email</label>
-                      <p className="text-yellow-300 mt-1">ryan@example.com</p>
+                      <p className="text-yellow-300 mt-1">{client?.email || 'N/A'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-yellow-400/70">Pre-Approved Amount</label>
-                      <p className="text-yellow-300 mt-1">$5,000,000</p>
+                      <label className="text-sm font-medium text-yellow-400/70">Phone</label>
+                      <p className="text-yellow-300 mt-1">{client?.phone || 'N/A'}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -861,6 +1130,7 @@ export default function ClientHub() {
           </div>
         </div>
       </div>
+      <GlobalFooter />
     </div>
   );
 }
