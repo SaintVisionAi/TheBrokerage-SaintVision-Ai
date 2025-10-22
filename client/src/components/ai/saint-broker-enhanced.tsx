@@ -13,8 +13,15 @@ import {
   Clock,
   ArrowRight,
   Phone,
+  Zap,
+  CheckCircle,
+  AlertCircle,
+  Download,
+  Upload,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import PipelineProgress from '@/components/pipeline/pipeline-progress';
 
 interface MessageAction {
   type: 'button' | 'link';
