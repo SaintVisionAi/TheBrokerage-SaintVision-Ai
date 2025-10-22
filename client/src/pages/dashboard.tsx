@@ -92,7 +92,7 @@ export default function Dashboard() {
 
   if (appsLoading || statsLoading) {
     return (
-      <div className="h-screen flex flex-col bg-slate-900 overflow-hidden">
+      <div className="min-h-screen flex flex-col bg-slate-900">
         <GlobalHeader />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-white text-xl">Loading admin dashboard...</div>
@@ -103,10 +103,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900 overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-slate-900">
       <GlobalHeader />
-      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-        <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="flex-1 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-6">
+        <div className="max-w-7xl mx-auto px-6 space-y-6">
           {/* Header */}
           <header className="mb-8">
             <div className="flex items-center justify-between">
