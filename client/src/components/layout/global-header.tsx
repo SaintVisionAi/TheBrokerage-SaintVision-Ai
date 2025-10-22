@@ -274,24 +274,30 @@ export default function GlobalHeader() {
               
               {/* Services Section */}
               <div className="pb-2 mb-2 border-b border-gray-800">
-                <div className="text-xs text-gray-500 uppercase tracking-wider px-4 mb-2">Services</div>
-                {services.map((service) => (
-                  <Link key={service.href} href={service.href}>
-                    <div className="px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer flex items-center gap-3">
-                      <div className="p-2 bg-white/5 rounded-lg">
-                        {service.icon}
-                      </div>
-                      <div>
-                        <div className="font-medium text-white flex items-center gap-2">
-                          {service.name}
-                          {service.highlight && (
-                            <span className="text-[10px] px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full">HOT</span>
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-400">{service.description}</div>
-                      </div>
+                {services.map((category) => (
+                  <div key={category.category} className="mb-3">
+                    <div className="text-xs text-yellow-400/70 uppercase tracking-wider px-4 mb-2 font-bold">
+                      {category.category}
                     </div>
-                  </Link>
+                    {category.items.map((service) => (
+                      <Link key={service.href} href={service.href}>
+                        <div className="px-4 py-3 hover:bg-yellow-500/10 transition-colors cursor-pointer flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${service.highlight ? 'bg-yellow-500/20' : 'bg-white/5'}`}>
+                            {service.icon}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium text-white flex items-center gap-2">
+                              {service.name}
+                              {service.highlight && (
+                                <span className="text-[10px] px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full">HOT</span>
+                              )}
+                            </div>
+                            <div className="text-xs text-gray-400">{service.description}</div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 ))}
               </div>
 
