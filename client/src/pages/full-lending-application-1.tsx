@@ -60,6 +60,18 @@ export default function FullLendingApplicationPage() {
     type: 'drawn' | 'typed';
     consentChecks: Record<string, boolean>;
     signerName: string;
+    timestamp: string;
+    timestampMs: number;
+    ipAddress?: string;
+    userAgent?: string;
+    auditTrail: {
+      signedAt: string;
+      signedAtMs: number;
+      signatureMethod: 'drawn' | 'typed';
+      consentVerified: boolean;
+      allConsentsChecked: boolean;
+      signatureVerificationStatus: 'verified' | 'pending';
+    };
   } | null>(null);
 
   const form = useForm<ApplicationFormValues>({
@@ -89,10 +101,10 @@ export default function FullLendingApplicationPage() {
       confirmAccuracy: false,
       authorizeCredit: false,
       agreeToPrivacy: false,
-      signature: '',
-      signatureDate: new Date().toISOString().split('T')[0],
-      signatureData: '',
-      signatureType: undefined
+      signature: signatureData?.signerName || '',
+      signatureDate: signatureData?.timestamp?.split('T')[0] || new Date().toISOString().split('T')[0],
+      signatureData: signatureData?.data || '',
+      signatureType: signatureData?.type
     }
   });
 
