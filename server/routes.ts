@@ -989,7 +989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         source: leadData.source || 'website'
       });
       const contactId = (contactResponse as any).contact?.id || (contactResponse as any).data?.contact?.id || '';
-      console.log(`✅ Step 2: Contact created - ${contactId}`);
+      console.log(`�� Step 2: Contact created - ${contactId}`);
 
       // STEP 2.5: Save contact to PostgreSQL database
       try {
@@ -1836,7 +1836,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Helper function to map pipeline stage to application status
   function mapStageToStatus(stage: string): 'pending' | 'submitted' | 'incomplete' | 'completed' {
     const normalized = stage.toLowerCase().trim();
-    
+
     if (normalized.includes('new') || normalized.includes('contacted')) {
       return 'pending';
     }
@@ -1849,8 +1849,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (normalized.includes('funded') || normalized.includes('signature')) {
       return 'completed';
     }
-    
+
     return 'pending';
+  }
+
+  // Sync GHL data to database
+  app.post("/api/admin/sync-ghl", isAuthenticated, isAdmin, async (req, res) => {
+    try {
+      const { getAllContacts, getAllOpportunities } = await import('./services/ghl-client');
+      const { db } = await import('./db');
+      const { contacts: contactsTable, opportunities } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+
+      console.log('🔄 Starting GHL sync...');
+
+      // Fetch all contacts from GHL
+      const ghlContacts = await getAllContacts();
+      console.log(`📥 Fetched ${ghlContacts.length} contacts from GHL`);
+
+      const syncedContacts = [];
+      for (const ghlContact of ghlContacts) {
+        try {
+          const existing = await db
+            .select()
+            .from(contactsTable)
+            .where(eq(contactsTable.ghlContactId, ghlContact.id));
+
+          if (existing.length === 0) {
+            const [newContact] = await db.insert(contactsTable).values({
+              ghlContactId: ghlContact.id,
+              firstName: ghlContact.firstName || '',
+              lastName: ghlContact.lastName || '',
+              email: ghlContact.email || '',
+              phone: ghlContact.phone || '',
+              source: 'GHL Sync',
+              tags: ghlContact.tags || [],
+              customFields: ghlContact.customFields || {}
+            }).returning();
+
+            syncedContacts.push(newContact.id);
+            console.log(`✅ Synced contact: ${ghlContact.firstName} ${ghlContact.lastName}`);
+          }
+        } catch (error: any) {
+          console.warn(`⚠️  Failed to sync contact: ${ghlContact.email}`, error.message);
+        }
+      }
+
+      // Fetch all opportunities from GHL
+      const ghlOpportunities = await getAllOpportunities();
+      console.log(`📥 Fetched ${ghlOpportunities.length} opportunities from GHL`);
+
+      const syncedOpportunities = [];
+      for (const ghlOpp of ghlOpportunities) {
+        try {
+          const existing = await db
+            .select()
+            .from(opportunities)
+            .where(eq(opportunities.ghlOpportunityId, ghlOpp.id));
+
+          if (existing.length === 0) {
+            // Find the contact in our database
+            const relatedContact = await db
+              .select()
+              .from(contactsTable)
+              .where(eq(contactsTable.ghlContactId, ghlOpp.contactId));
+
+            const [newOpp] = await db.insert(opportunities).values({
+              ghlOpportunityId: ghlOpp.id,
+              contactId: relatedContact[0]?.id,
+              ghlContactId: ghlOpp.contactId,
+              pipelineId: ghlOpp.pipelineId || '',
+              stageId: ghlOpp.pipelineStageId || '',
+              stageName: ghlOpp.pipelineStageName || 'New Lead',
+              name: ghlOpp.name || 'Unnamed Opportunity',
+              monetaryValue: ghlOpp.monetaryValue || 0,
+              division: determineDivisionFromPipeline(ghlOpp.pipelineName),
+              priority: ghlOpp.priority || 'warm',
+              status: ghlOpp.status || 'open',
+              firstName: ghlOpp.firstName || '',
+              lastName: ghlOpp.lastName || '',
+              email: ghlOpp.email || ''
+            }).returning();
+
+            syncedOpportunities.push(newOpp.id);
+            console.log(`✅ Synced opportunity: ${ghlOpp.name}`);
+          }
+        } catch (error: any) {
+          console.warn(`⚠️  Failed to sync opportunity: ${ghlOpp.name}`, error.message);
+        }
+      }
+
+      res.json({
+        success: true,
+        message: 'GHL data synced successfully',
+        stats: {
+          ghlContactsFound: ghlContacts.length,
+          contactsSynced: syncedContacts.length,
+          ghlOpportunitiesFound: ghlOpportunities.length,
+          opportunitiesSynced: syncedOpportunities.length
+        }
+      });
+    } catch (error: any) {
+      console.error('GHL sync error:', error);
+      res.status(500).json({ error: 'Failed to sync GHL data', details: error.message });
+    }
+  });
+
+  function determineDivisionFromPipeline(pipelineName: string): string {
+    const name = (pipelineName || '').toLowerCase();
+    if (name.includes('lending')) return 'lending';
+    if (name.includes('investment')) return 'investment';
+    if (name.includes('real') || name.includes('estate')) return 'real_estate';
+    return 'lending';
   }
 
   // =====================================================
