@@ -8,10 +8,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
-import { Loader2, FileText, User, Building2, DollarSign, CheckCircle } from 'lucide-react';
+import { Loader2, FileText, User, Building2, DollarSign, CheckCircle, AlertCircle } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 const applicationSchema = z.object({
@@ -34,7 +35,13 @@ const applicationSchema = z.object({
   bankStatements: z.string().optional(),
   businessLicense: z.string().optional(),
   collateral: z.string().optional(),
-  additionalInfo: z.string().optional()
+  additionalInfo: z.string().optional(),
+  agreeToTerms: z.boolean().refine(val => val === true, 'You must agree to the loan terms and conditions'),
+  confirmAccuracy: z.boolean().refine(val => val === true, 'You must confirm the accuracy of your information'),
+  authorizeCredit: z.boolean().refine(val => val === true, 'You must authorize credit inquiry'),
+  agreeToPrivacy: z.boolean().refine(val => val === true, 'You must agree to the privacy policy'),
+  signature: z.string().min(2, 'Your full name (signature) is required'),
+  signatureDate: z.string().min(1, 'Date is required')
 });
 
 type ApplicationFormValues = z.infer<typeof applicationSchema>;
@@ -67,7 +74,13 @@ export default function FullLendingApplicationPage() {
       bankStatements: '',
       businessLicense: '',
       collateral: '',
-      additionalInfo: ''
+      additionalInfo: '',
+      agreeToTerms: false,
+      confirmAccuracy: false,
+      authorizeCredit: false,
+      agreeToPrivacy: false,
+      signature: '',
+      signatureDate: new Date().toISOString().split('T')[0]
     }
   });
 
