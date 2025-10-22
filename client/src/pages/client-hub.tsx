@@ -410,9 +410,11 @@ export default function ClientHub() {
                     <p className="text-sm text-white/70 mb-4">
                       Experience next-generation financing with our patent-protected HACP™ technology. Faster decisions, better terms, technology-enabled excellence.
                     </p>
-                    <Button className="bg-yellow-400 text-black hover:bg-yellow-300">
-                      Learn About Our Technology
-                    </Button>
+                    <a href="/apply" className="block">
+                      <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300">
+                        Get Started Now
+                      </Button>
+                    </a>
                   </CardContent>
                 </Card>
               </div>
@@ -460,7 +462,7 @@ export default function ClientHub() {
                     <h3 className="text-2xl font-bold mb-2 text-yellow-300">Ready to Get Funded?</h3>
                     <p className="mb-4 text-yellow-400/70">Complete application takes 15-20 minutes. Decision in 24-48 hours.</p>
                     <div className="flex gap-3">
-                      <a href="/full-lending-application-1" className="block">
+                      <a href="/apply" className="block">
                         <Button className="bg-yellow-400 text-black hover:bg-yellow-300">
                           Start Application
                         </Button>
