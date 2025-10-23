@@ -84,8 +84,8 @@ export default function GlobalHeader() {
           <div className="hidden lg:flex items-center gap-8">
 
             {/* Primary Navigation Links */}
-            <Link href="/apply" className={`px-3 py-2 font-semibold transition-colors ${isActive("/apply") || isActive("/full-lending-application-1") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
-              Business Loans
+            <Link href="/business-lending" className={`px-3 py-2 font-semibold transition-colors ${isActive("/business-lending") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
+              Business Lending
             </Link>
 
             <Link href="/real-estate" className={`px-3 py-2 font-semibold transition-colors ${isActive("/real-estate") ? "text-yellow-400" : "text-white hover:text-yellow-400"}`}>
@@ -96,14 +96,14 @@ export default function GlobalHeader() {
               Investments
             </Link>
 
-            {/* Services Dropdown - Simplified */}
+            {/* Services Dropdown */}
             <div className="relative">
               <button
                 className="flex items-center gap-2 px-3 py-2 text-white hover:text-yellow-400 transition-colors font-semibold"
                 onMouseEnter={() => setServicesOpen(true)}
                 onMouseLeave={() => setServicesOpen(false)}
               >
-                Services
+                More
                 <ChevronDown className="w-3 h-3" />
               </button>
 
@@ -115,37 +115,23 @@ export default function GlobalHeader() {
                 >
                   <div className="bg-slate-900 border border-yellow-500/30 rounded-lg shadow-2xl overflow-hidden min-w-max">
                     <div className="space-y-1 p-2">
-                      <Link href="/lending">
-                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer font-medium">
-                          💰 Business Lending
+                      {services.map((category) => (
+                        <div key={category.category}>
+                          <div className="text-xs text-yellow-400/60 uppercase tracking-wider px-4 py-2 font-bold">
+                            {category.category}
+                          </div>
+                          {category.items.map((item) => (
+                            <Link key={item.href} href={item.href}>
+                              <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer font-medium">
+                                {item.name}
+                              </div>
+                            </Link>
+                          ))}
+                          {category !== services[services.length - 1] && (
+                            <div className="border-t border-yellow-500/20 my-1"></div>
+                          )}
                         </div>
-                      </Link>
-                      <Link href="/real-estate">
-                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer font-medium">
-                          🏡 Real Estate Services
-                        </div>
-                      </Link>
-                      <Link href="/investments">
-                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer font-medium">
-                          📈 Investment Opportunities
-                        </div>
-                      </Link>
-                      <div className="border-t border-yellow-500/20 my-1"></div>
-                      <Link href="/about">
-                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer text-sm">
-                          About Us
-                        </div>
-                      </Link>
-                      <Link href="/contact">
-                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer text-sm">
-                          Contact
-                        </div>
-                      </Link>
-                      <Link href="/client-hub">
-                        <div className="px-4 py-2 hover:bg-yellow-500/20 rounded transition-colors text-white hover:text-yellow-400 cursor-pointer text-sm">
-                          Client Hub
-                        </div>
-                      </Link>
+                      ))}
                     </div>
                   </div>
                 </div>
