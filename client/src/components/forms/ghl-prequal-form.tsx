@@ -396,9 +396,10 @@ export default function GHLPreQualForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-black border-yellow-400/30 text-white">
-                        <SelectItem value="lending">Business Lending</SelectItem>
-                        <SelectItem value="real-estate">Real Estate</SelectItem>
-                        <SelectItem value="investments">Investments</SelectItem>
+                        <SelectItem value="business-lending">Business Lending</SelectItem>
+                        <SelectItem value="real-estate-finance">Real Estate Finance</SelectItem>
+                        <SelectItem value="real-estate-broker">Real Estate Broker Services</SelectItem>
+                        <SelectItem value="investment">Investment Opportunities</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
