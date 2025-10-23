@@ -62,6 +62,7 @@ export default function GHLPreQualForm({
   onError,
   initialData,
   embedded = false,
+  serviceType,
 }: GHLPreQualFormProps) {
   const { submit, isLoading, error } = useGHLSubmit();
   const [submitProgress, setSubmitProgress] = useState(0);
@@ -83,7 +84,7 @@ export default function GHLPreQualForm({
       loanPurpose: initialData?.loanPurpose || '',
       creditScore: initialData?.creditScore || '',
       hasCollateral: initialData?.hasCollateral || '',
-      serviceType: initialData?.serviceType || 'lending',
+      serviceType: (initialData?.serviceType || serviceType || 'business-lending') as 'business-lending' | 'real-estate-finance' | 'real-estate-broker' | 'investment',
       additionalNotes: initialData?.additionalNotes || '',
     },
   });
