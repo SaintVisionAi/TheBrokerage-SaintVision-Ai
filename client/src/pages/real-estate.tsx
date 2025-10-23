@@ -1,9 +1,10 @@
-import { useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Home, TrendingUp, ArrowRight } from 'lucide-react';
-import RealEstateForm from '@/components/forms/ghl-real-estate';
+import { Building2, Home, TrendingUp, ArrowRight, DollarSign, CheckCircle, Users, Briefcase } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
+import { useLocation } from 'wouter';
 
 export default function RealEstateLeadForm() {
   const formRef = useRef<HTMLDivElement>(null);
