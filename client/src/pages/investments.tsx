@@ -37,10 +37,8 @@ export default function Investments() {
     }
   ];
 
-  const handleGHLCapture = (formType: string) => {
-    // GHL integration placeholder - will be connected to actual webhook
-    console.log(`GHL Lead Capture: ${formType}`);
-    window.location.href = `/contact?service=investments&type=${formType}`;
+  const handleApply = () => {
+    window.location.href = '/apply?service=investment';
   };
 
   return (
