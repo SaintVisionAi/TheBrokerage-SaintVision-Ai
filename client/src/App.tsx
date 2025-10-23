@@ -101,11 +101,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
-      <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
+      <Route path="/auth" component={Auth} />
       <Route path="/verify-email/:token" component={VerifyEmail} />
-      <Route path="/forgot-password" component={ForgotPassword} />
-      <Route path="/reset-password/:token" component={ResetPassword} />
       <Route path="/dashboard" component={ProtectedDashboard} />
       <Route path="/admin" component={ProtectedDashboard} />
       <Route path="/client-hub" component={ProtectedClientHub} />
@@ -115,31 +112,15 @@ function Router() {
       <Route path="/admin/contacts">
         {() => <ProtectedAdminRoute component={QuickContactsPage} />}
       </Route>
-      <Route path="/about" component={About} />
       <Route path="/apply" component={Apply} />
-      <Route path="/application-complete" component={ApplicationCompletePage} />
       <Route path="/contact" component={Contact} />
+      <Route path="/support" component={Support} />
+      <Route path="/business-lending" component={Lending} />
       <Route path="/real-estate" component={RealEstate} />
-      <Route path="/real-estate/brokerage-intake" component={REBrokerageIntakePage} />
-      <Route path="/real-estate/finance-intake" component={REFinanceIntakePage} />
-      <Route path="/real-estate/agreement-preview" component={AgreementPreviewPage} />
-      <Route path="/lending" component={Lending} />
       <Route path="/investments" component={Investments} />
       <Route path="/upload/:token" component={UploadPortal} />
-      <Route path="/status" component={Status} />
-      <Route path="/privacy" component={Privacy} />
-      <Route path="/terms" component={Terms} />
-      <Route path="/cookies" component={Cookies} />
-      <Route path="/set-appointment" component={SetAppointmentPage} />
-      <Route path="/prequal-success" component={PrequalSuccessPage} />
-      <Route path="/loans-docs-4-funding" component={LoansDocs4FundingPage} />
-      <Route path="/real-estate-investing" component={RealEstateInvestingPage} />
-      <Route path="/investment-offering-1" component={InvestmentOffering1Page} />
-      <Route path="/comprehensive-solutions" component={ComprehensiveSolutionsPage} />
       <Route path="/file-hub" component={FileHubPage} />
-      <Route path="/upload-documents" component={UploadDocumentsPage} />
       <Route path="/full-lending-application-1" component={FullLendingApplicationPage} />
-      <Route path="/soft-credit-pull" component={SoftCreditPullPage} />
       <Route path="/m/account" component={ProtectedClientHub} />
       <Route component={NotFound} />
     </Switch>
