@@ -246,7 +246,7 @@ export default function GlobalHeader() {
 
               {/* Mobile Auth Buttons */}
               <div className="px-4 pt-2 space-y-2">
-                <Link href="/login">
+                <Link href="/auth">
                   <Button variant="outline" className="w-full border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10">
                     Sign In
                   </Button>
