@@ -107,6 +107,7 @@ export default function PreQualForm() {
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Pre-Qualification Form</h2>
+                {service && <p className="text-yellow-400 text-lg font-semibold">Application Type: {service.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</p>}
                 <p className="text-white/60 text-base md:text-lg">Complete in 5 minutes • No documents required</p>
               </div>
               <GHLPreQualForm />
