@@ -1,12 +1,21 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { FileText, Zap, Shield, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import GHLPreQualForm from '@/components/forms/ghl-prequal-form';
 import GlobalHeader from '@/components/layout/global-header';
 import GlobalFooter from '@/components/layout/global-footer';
+import { useLocation } from 'wouter';
 
 export default function PreQualForm() {
   const formRef = useRef<HTMLDivElement>(null);
+  const [location] = useLocation();
+
+  // Get service type from URL params
+  const service = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('service') || 'business-lending';
+  }, [location]);
 
   return (
     <>
