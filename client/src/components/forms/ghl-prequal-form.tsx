@@ -43,7 +43,7 @@ const preQualSchema = z.object({
   loanPurpose: z.string().optional(),
   creditScore: z.string().optional(),
   hasCollateral: z.string().optional(),
-  serviceType: z.enum(['lending', 'real-estate', 'investments']),
+  serviceType: z.enum(['business-lending', 'real-estate-finance', 'real-estate-broker', 'investment']),
   additionalNotes: z.string().optional(),
 });
 
@@ -54,6 +54,7 @@ interface GHLPreQualFormProps {
   onError?: (error: Error) => void;
   initialData?: Partial<PreQualFormData>;
   embedded?: boolean;
+  serviceType?: 'business-lending' | 'real-estate-finance' | 'real-estate-broker' | 'investment';
 }
 
 export default function GHLPreQualForm({
