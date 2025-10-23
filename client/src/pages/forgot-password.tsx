@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import GlobalHeader from '@/components/layout/global-header';
+import GlobalFooter from '@/components/layout/global-footer';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
