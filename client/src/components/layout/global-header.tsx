@@ -159,7 +159,7 @@ export default function GlobalHeader() {
 
             {/* Auth Buttons (Desktop) */}
             <div className="hidden lg:flex items-center gap-3">
-              <Link href="/login">
+              <Link href="/auth">
                 <Button variant="ghost" className="text-white hover:text-yellow-400 hover:bg-yellow-400/10">
                   Sign In
                 </Button>
