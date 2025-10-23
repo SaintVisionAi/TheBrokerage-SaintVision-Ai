@@ -110,7 +110,7 @@ export default function PreQualForm() {
                 {service && <p className="text-yellow-400 text-lg font-semibold">Application Type: {service.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</p>}
                 <p className="text-white/60 text-base md:text-lg">Complete in 5 minutes • No documents required</p>
               </div>
-              <GHLPreQualForm />
+              <GHLPreQualForm serviceType={service as 'business-lending' | 'real-estate-finance' | 'real-estate-broker' | 'investment'} />
             </div>
           </section>
         </div>
