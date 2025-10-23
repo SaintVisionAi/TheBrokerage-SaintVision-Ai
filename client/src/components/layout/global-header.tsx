@@ -182,9 +182,9 @@ export default function GlobalHeader() {
             <div className="flex flex-col space-y-1">
 
               {/* Primary Links */}
-              <Link href="/apply">
-                <div className={`px-4 py-3 font-semibold transition-colors cursor-pointer ${isActive("/apply") || isActive("/full-lending-application-1") ? "text-yellow-400 bg-yellow-500/5" : "text-white hover:bg-yellow-500/10"}`}>
-                  Business Loans
+              <Link href="/business-lending">
+                <div className={`px-4 py-3 font-semibold transition-colors cursor-pointer ${isActive("/business-lending") ? "text-yellow-400 bg-yellow-500/5" : "text-white hover:bg-yellow-500/10"}`}>
+                  Business Lending
                 </div>
               </Link>
 
@@ -202,49 +202,22 @@ export default function GlobalHeader() {
 
               <div className="border-t border-gray-800 my-3"></div>
 
-              {/* Services Section */}
-              <div className="text-xs text-yellow-400/70 uppercase tracking-wider px-4 mb-2 font-bold">Services & Tools</div>
-
-              {services.map((category) => (
-                <div key={category.category}>
-                  <div className="text-xs text-yellow-400/50 uppercase tracking-wider px-4 mt-3 mb-2 font-semibold">
-                    {category.category}
-                  </div>
-                  {category.items.map((service) => (
-                    <Link key={`${category.category}-${service.name}`} href={service.href}>
-                      <div className="px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer flex items-center gap-2">
-                        <div className={`text-lg ${service.highlight ? 'text-yellow-400' : 'text-white'}`}>
-                          {service.icon}
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium text-white flex items-center gap-2">
-                            {service.name}
-                            {service.highlight && (
-                              <span className="text-[10px] px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-full">HOT</span>
-                            )}
-                          </div>
-                          <div className="text-xs text-gray-500">{service.description}</div>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              ))}
-
-              <div className="border-t border-gray-800 my-3"></div>
-
-              {/* Company Section */}
-              <div className="text-xs text-yellow-400/50 uppercase tracking-wider px-4 mb-2 font-semibold">Company</div>
-
-              <Link href="/about">
-                <div className={`px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/about") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
-                  About Us
+              {/* More Links */}
+              <Link href="/apply">
+                <div className={`px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/apply") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
+                  Get Pre-Qualified
                 </div>
               </Link>
 
               <Link href="/contact">
                 <div className={`px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/contact") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
                   Contact
+                </div>
+              </Link>
+
+              <Link href="/support">
+                <div className={`px-4 py-2 hover:bg-yellow-500/10 transition-colors cursor-pointer ${isActive("/support") ? "text-yellow-400 bg-yellow-500/5" : "text-white"}`}>
+                  Support & Legal
                 </div>
               </Link>
 
