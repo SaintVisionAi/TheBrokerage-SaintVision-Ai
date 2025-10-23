@@ -63,21 +63,21 @@ export default function Investments() {
             Our HACP™-powered portfolio management delivers consistent returns while honoring Christian values.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              onClick={() => handleGHLCapture('invest-now')}
+            <Button
+              onClick={handleApply}
               className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-500 hover:to-yellow-600 font-semibold px-8 py-6 text-lg"
               data-testid="button-invest-now"
             >
-              Start Investing
+              Explore Opportunities
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button 
-              onClick={() => handleGHLCapture('schedule-review')}
-              variant="outline" 
+            <Button
+              onClick={handleApply}
+              variant="outline"
               className="border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/10 px-8 py-6 text-lg"
               data-testid="button-schedule-review"
             >
-              Schedule Portfolio Review
+              Get Started
             </Button>
           </div>
         </div>
