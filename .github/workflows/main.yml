@@ -1,0 +1,393 @@
+name: Automated Cleanup — add housekeeping + service stubs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-cleanup-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create branch
+        run: |
+          BRANCH="cleanup/full-cleanup-2025-10-23"
+          git config user.name "cleanup-action"
+          git config user.email "action@users.noreply.github.com"
+          if git show-ref --verify --quiet refs/heads/$BRANCH; then
+            echo "Branch $BRANCH exists locally"
+            git checkout $BRANCH
+          else
+            git checkout -b $BRANCH
+          fi
+
+      - name: Ensure directories
+        run: |
+          mkdir -p src/components src/pages scripts docs/images
+
+      - name: Create .gitignore
+        run: |
+          cat > .gitignore <<'EOF'
+          # Node & package manager
+          node_modules/
+          dist/
+          build/
+          .vscode/
+          .env
+          .env.local
+          .env.*.local
+
+          # Vite / Next / common
+          /.turbo
+          /.parcel-cache
+          /.next
+          /.vercel
+          /out
+          /.pnp.*
+          .yarn/*
+          !.yarn/releases
+          !.yarn/plugins
+          !.yarn/patches
+          !.yarn/sdks
+          !.yarn/versions
+
+          # Logs
+          npm-debug.log*
+          yarn-debug.log*
+          yarn-error.log*
+          pnpm-debug.log*
+
+          # OS
+          .DS_Store
+          Thumbs.db
+
+          # Generated files
+          coverage/
+          *.local
+          .idea/
+          EOF
+
+      - name: Create .prettierrc
+        run: |
+          cat > .prettierrc <<'EOF'
+          {
+            "printWidth": 100,
+            "tabWidth": 2,
+            "useTabs": false,
+            "semi": true,
+            "singleQuote": true,
+            "trailingComma": "es5",
+            "arrowParens": "always"
+          }
+          EOF
+
+      - name: Create .eslintrc.cjs
+        run: |
+          cat > .eslintrc.cjs <<'EOF'
+          module.exports = {
+            root: true,
+            env: { browser: true, es2021: true, node: true },
+            parser: '@typescript-eslint/parser',
+            parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+            extends: [
+              'eslint:recommended',
+              'plugin:@typescript-eslint/recommended',
+              'plugin:react/recommended',
+              'plugin:react-hooks/recommended',
+              'prettier'
+            ],
+            plugins: ['@typescript-eslint', 'react', 'react-hooks'],
+            rules: { 'react/react-in-jsx-scope': 'off' },
+            settings: { react: { version: 'detect' } }
+          };
+          EOF
+
+      - name: Create .editorconfig
+        run: |
+          cat > .editorconfig <<'EOF'
+          root = true
+
+          [*]
+          charset = utf-8
+          end_of_line = lf
+          insert_final_newline = true
+          indent_style = space
+          indent_size = 2
+          trim_trailing_whitespace = true
+          EOF
+
+      - name: Create README.md
+        run: |
+          cat > README.md <<'EOF'
+          # The Brokerage — SaintVision AI
+
+          Short overview:
+          This repository contains the frontend and server pieces for The Brokerage application (Vite + TypeScript + Tailwind + Drizzle).
+
+          Quick start:
+          # install dependencies
+          npm install
+
+          # dev
+          npm run dev
+
+          # build
+          npm run build
+
+          # lint
+          npm run lint
+
+          # typecheck
+          npm run typecheck
+
+          # tests (if present)
+          npm test
+          EOF
+
+      - name: Create CI workflow (ci.yml)
+        run: |
+          mkdir -p .github/workflows
+          cat > .github/workflows/ci.yml <<'EOF'
+          name: CI
+
+          on:
+            push:
+              branches:
+                - main
+                - 'cleanup/**'
+            pull_request:
+              branches:
+                - main
+
+          jobs:
+            build:
+              runs-on: ubuntu-latest
+              strategy:
+                matrix:
+                  node-version: [18.x]
+
+              steps:
+                - uses: actions/checkout@v4
+                - name: Use Node.js \${{ matrix.node-version }}
+                  uses: actions/setup-node@v4
+                  with:
+                    node-version: \${{ matrix.node-version }}
+                - run: npm ci
+                - run: npm run lint --if-present
+                - run: npm run typecheck --if-present
+                - run: npm run build --if-present
+                - run: npm test --if-present
+          EOF
+
+      - name: Add service layout component and page stubs
+        run: |
+          mkdir -p src/components src/pages
+          cat > src/components/ServicePageLayout.tsx <<'EOF'
+          import React from 'react';
+
+          type Props = {
+            title: string;
+            subtitle?: string;
+            children?: React.ReactNode;
+          };
+
+          export default function ServicePageLayout({ title, subtitle, children }: Props) {
+            return (
+              <div className="min-h-screen bg-gray-50 text-slate-800">
+                <header className="bg-white shadow">
+                  <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+                    <a href="/" className="text-2xl font-bold">SaintVision</a>
+                    <nav className="space-x-4">
+                      <a href="/business-lending" className="hover:underline">Business Lending</a>
+                      <a href="/real-estate" className="hover:underline">Real Estate</a>
+                      <a href="/investments" className="hover:underline">Investments</a>
+                      <a href="/apply" className="ml-4 inline-block px-3 py-2 bg-indigo-600 text-white rounded">Apply</a>
+                    </nav>
+                  </div>
+                </header>
+
+                <main className="max-w-6xl mx-auto px-4 py-12">
+                  <div className="mb-8">
+                    <h1 className="text-3xl font-extrabold">{title}</h1>
+                    {subtitle && <p className="mt-2 text-lg text-slate-600">{subtitle}</p>}
+                  </div>
+
+                  <section>{children}</section>
+                </main>
+
+                <footer className="bg-white border-t py-6 mt-12">
+                  <div className="max-w-6xl mx-auto px-4 text-sm text-slate-500">
+                    © {new Date().getFullYear()} SaintVision — <a href="/support">Support & Legal</a>
+                  </div>
+                </footer>
+              </div>
+            );
+          }
+          EOF
+
+          cat > src/pages/business-lending.tsx <<'EOF'
+          import React from 'react';
+          import ServicePageLayout from '../components/ServicePageLayout';
+
+          export default function BusinessLendingPage() {
+            return (
+              <ServicePageLayout title="Business Lending" subtitle="Flexible financing for businesses">
+                <div className="grid gap-8 md:grid-cols-2">
+                  <div>
+                    <h2 className="text-2xl font-semibold mb-4">Loan Types</h2>
+                    <ul className="list-disc ml-6 space-y-2 text-slate-700">
+                      <li>Working Capital</li>
+                      <li>Equipment Financing</li>
+                      <li>Commercial Real Estate</li>
+                    </ul>
+                    <div className="mt-6">
+                      <a href="/apply?service=business-lending" className="inline-block px-5 py-3 bg-slate-900 text-white rounded">
+                        Get Pre-Qualified
+                      </a>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-xl font-medium mb-2">Estimate Payments</h3>
+                    <p className="text-sm text-slate-600">Interactive calculator here (stub)</p>
+                    <div className="mt-4 p-4 bg-white rounded shadow">[Calculator component goes here]</div>
+                  </div>
+                </div>
+              </ServicePageLayout>
+            );
+          }
+          EOF
+
+          cat > src/pages/real-estate.tsx <<'EOF'
+          import React from 'react';
+          import ServicePageLayout from '../components/ServicePageLayout';
+
+          export default function RealEstatePage() {
+            return (
+              <ServicePageLayout title="Real Estate Services" subtitle="Finance or brokerage — choose your path">
+                <div className="grid gap-8 md:grid-cols-2">
+                  <div className="p-6 bg-white rounded shadow">
+                    <h3 className="text-xl font-semibold">Real Estate Finance</h3>
+                    <p className="text-slate-600 mt-2">Financing for purchases, refinances, and investment properties.</p>
+                    <a href="/apply?service=real-estate-finance" className="mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded">
+                      Apply for Financing
+                    </a>
+                  </div>
+
+                  <div className="p-6 bg-white rounded shadow">
+                    <h3 className="text-xl font-semibold">Brokerage Services</h3>
+                    <p className="text-slate-600 mt-2">Brokerage & advisory with JR Taber.</p>
+                    <a href="/apply?service=real-estate-broker" className="mt-4 inline-block px-4 py-2 bg-emerald-600 text-white rounded">
+                      Request Broker Services
+                    </a>
+                  </div>
+                </div>
+              </ServicePageLayout>
+            );
+          }
+          EOF
+
+          cat > src/pages/investments.tsx <<'EOF'
+          import React from 'react';
+          import ServicePageLayout from '../components/ServicePageLayout';
+
+          export default function InvestmentsPage() {
+            return (
+              <ServicePageLayout title="Investments" subtitle="Private offerings and syndications">
+                <div className="space-y-6">
+                  <p className="text-slate-700">Overview of investment opportunities, expected returns, and risk disclosures.</p>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="p-4 bg-white rounded shadow">[Opportunity card stub]</div>
+                    <div className="p-4 bg-white rounded shadow">[Opportunity card stub]</div>
+                  </div>
+
+                  <div>
+                    <a href="/apply?service=investment" className="inline-block px-5 py-3 bg-slate-900 text-white rounded">
+                      Get Started — Pre-Qual
+                    </a>
+                  </div>
+                </div>
+              </ServicePageLayout>
+            );
+          }
+          EOF
+
+      - name: Add inventory script
+        run: |
+          cat > scripts/generate-pages-inventory.js <<'EOF'
+          const fs = require('fs');
+          const {execSync} = require('child_process');
+
+          const files = execSync("git ls-files '*.tsx' '*.ts' '*.jsx' '*.js' || true", {encoding:'utf8'})
+            .split('\n')
+            .filter(Boolean);
+
+          function suggest(path) {
+            const name = path.toLowerCase();
+            const keepPatterns = [
+              'apply', 'client-hub', 'dashboard', '/auth', 'contact', 'support',
+              'file-hub', 'm/account', 'upload', 'verify-email', 'business-lending',
+              'real-estate', 'investments'
+            ];
+            for (const p of keepPatterns) if (name.includes(p)) return 'keep';
+            const deletePatterns = [
+              'prequal-success', 'application-complete', 'real-estate-investing',
+              'investment-offering', 'loans-docs', 'comprehensive-solutions', 'about',
+              'cookies', 'status', 'set-appointment', 'upload-documents', 'soft-credit-pull'
+            ];
+            for (const p of deletePatterns) if (name.includes(p)) return 'delete';
+            return 'review';
+          }
+
+          const rows = ['path,suggested_action'];
+          for (const f of files) rows.push(`${f},${suggest(f)}`);
+          fs.writeFileSync('inventory-pages.csv', rows.join('\n'));
+          console.log('Inventory written to inventory-pages.csv');
+          EOF
+
+      - name: Move large screenshots (non-destructive)
+        run: |
+          FILES="homepage_after_wait.png step2_homepage.png chat_input_failure.png chat_send_failed.png panel_dom_inspect.png panel_message_inspect.png panel_scrolled.png after_chat_send.png after_navigate_login.png"
+          for f in $FILES; do
+            if [ -f "$f" ]; then
+              mkdir -p docs/images
+              git mv "$f" "docs/images/$f" || true
+            fi
+          done || true
+
+      - name: Commit changes
+        run: |
+          git add -A
+          git commit -m "chore: add housekeeping files + service page stubs; move screenshots to docs/images" || echo "No changes to commit"
+
+      - name: Push branch using provided token
+        env:
+          TOKEN: ${{ secrets.CLEANUP_AND_EVERYTHING_NEEDED_PUSH_TOKEN }}
+        run: |
+          BRANCH="cleanup/full-cleanup-2025-10-23"
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+          git push -u origin $BRANCH
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.CLEANUP_AND_EVERYTHING_NEEDED_PUSH_TOKEN }}
+          commit-message: "chore: add housekeeping files + service page stubs; move screenshots to docs/images"
+          branch: cleanup/full-cleanup-2025-10-23
+          title: "chore: housekeeping + service page stubs"
+          body: |
+            This automated PR adds:
+            - .gitignore, .prettierrc, .eslintrc.cjs, .editorconfig, README
+            - CI workflow (ci.yml)
+            - Service page stubs: /business-lending, /real-estate, /investments
+            - ServicePageLayout component
+            - scripts/generate-pages-inventory.js
+            - Non-destructive move of large screenshots into docs/images/
