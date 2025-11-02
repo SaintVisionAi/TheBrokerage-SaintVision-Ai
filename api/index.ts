@@ -79,5 +79,5 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Export for Vercel serverless
-export default app;
+// Export handler for Vercel serverless (wraps Express app)
+export default (req: any, res: any) => app(req, res);
