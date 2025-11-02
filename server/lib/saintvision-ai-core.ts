@@ -77,7 +77,7 @@ IMPORTANT: This is a service business. Your job is to guide people to take actio
 
     this.azureOpenai = new OpenAI({
       apiKey: process.env.AZURE_AI_FOUNDRY_KEY,
-      baseURL: `${process.env.AZURE_AI_FOUNDRY_ENDPOINT}/deployments/${process.env.AZURE_DEPLOYMENT_GPT5_CORE}/chat/completions?api-version=2024-08-01-preview`,
+      baseURL: `${process.env.AZURE_AI_FOUNDRY_ENDPOINT}/deployments/${process.env.AZURE_DEPLOYMENT_GPT5_CORE}?api-version=2024-08-01-preview`,
       defaultHeaders: {
         'api-key': process.env.AZURE_AI_FOUNDRY_KEY
       }

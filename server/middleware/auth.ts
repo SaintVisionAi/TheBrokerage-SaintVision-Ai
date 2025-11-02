@@ -15,6 +15,11 @@ declare global {
  * Supports both session cookies and Bearer tokens
  */
 export function isAuthenticated(req: Request, res: Response, next: NextFunction) {
+  // Allow public access to Saint-Broker chat endpoint for guests
+  if (req.path === '/saint-broker/chat' || req.path.startsWith('/saint-broker/')) {
+    return next();
+  }
+
   let token: string | undefined;
 
   // Try to get token from Authorization header first (Bearer token)

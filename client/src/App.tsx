@@ -10,7 +10,6 @@ import { useSaintBroker } from "@/context/SaintBrokerContext";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import Auth from "@/pages/auth";
-import VerifyEmail from "@/pages/verify-email";
 import Apply from "@/pages/apply";
 import Contact from "@/pages/contact";
 import Support from "@/pages/support";
@@ -102,7 +101,6 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/auth" component={Auth} />
-      <Route path="/verify-email/:token" component={VerifyEmail} />
       <Route path="/dashboard" component={ProtectedDashboard} />
       <Route path="/admin" component={ProtectedDashboard} />
       <Route path="/client-hub" component={ProtectedClientHub} />
