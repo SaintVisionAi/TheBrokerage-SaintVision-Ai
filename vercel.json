@@ -32,6 +32,9 @@
     },
     "api/create-admin.ts": {
       "maxDuration": 10
+    },
+    "api/debug.ts": {
+      "maxDuration": 10
     }
   },
   "headers": [

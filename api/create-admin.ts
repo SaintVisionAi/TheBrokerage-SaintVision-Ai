@@ -60,7 +60,12 @@ export default async function handler(req: any, res: any) {
     return res.status(500).json({
       success: false,
       error: error.message,
-      details: error.stack
+      details: error.stack,
+      debug: {
+        databaseUrlExists: !!process.env.DATABASE_URL,
+        databaseUrl: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
+        help: 'Check Vercel environment variables are deployed. Visit /api/debug for more info.'
+      }
     });
   }
 }
