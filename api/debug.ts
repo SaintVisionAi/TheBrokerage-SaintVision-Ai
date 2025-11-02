@@ -1,6 +1,7 @@
 // Debug endpoint to check what's working
 import { db } from '../server/db';
 import { users } from '../shared/schema';
+import { eq } from 'drizzle-orm';
 
 export default async function handler(req: any, res: any) {
   const checks = {
@@ -38,7 +39,7 @@ export default async function handler(req: any, res: any) {
   try {
     // Try to find or create test user
     const testEmail = 'test@saintvision.com';
-    const [existingTest] = await db.select().from(users).where((users) => users.email === testEmail).limit(1);
+    const [existingTest] = await db.select().from(users).where(eq(users.email, testEmail)).limit(1);
 
     if (existingTest) {
       checks.checks.testUserExists = true;
