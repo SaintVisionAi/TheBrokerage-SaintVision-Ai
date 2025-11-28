@@ -15,6 +15,7 @@ const allowedOrigins = [
   'https://saintvisiongroup.com',
   'https://www.saintvisiongroup.com',
   'https://the-brokerage-by-saintsal-saintvisionai.vercel.app',
+  'https://chat-cookin-knowledge-saint-sal-two.vercel.app',
   process.env.VITE_API_URL
 ].filter(Boolean);
 
