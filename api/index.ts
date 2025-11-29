@@ -10,28 +10,20 @@ const app = express();
 // Trust proxy for Vercel
 app.set('trust proxy', true);
 
-// CORS configuration for production
-const allowedOrigins = [
-  'https://saintvisiongroup.com',
-  'https://www.saintvisiongroup.com',
-  'https://the-brokerage-by-saintsal-saintvisionai.vercel.app',
-  'https://chat-cookin-knowledge-saint-sal-two.vercel.app',
-  process.env.VITE_API_URL
-].filter(Boolean);
+// --- CORS: allow all origins (while supporting credentials) ---
+// Use origin: true to echo the requesting origin in Access-Control-Allow-Origin.
+// Note: this effectively allows any origin, and also allows cookies when credentials: true.
+const corsOptions = {
+  origin: true, // reflect the requesting origin
+  credentials: true, // allow cookies/auth to be sent
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+};
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or Postman)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Allow all origins in production for now
-    }
-  },
-  credentials: true
-}));
+app.use(cors(corsOptions));
+// Ensure preflight requests get a proper response
+app.options('*', cors(corsOptions));
+// -------------------------------------------------------------
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
